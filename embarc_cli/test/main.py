@@ -13,7 +13,7 @@ def get_allcase():
     return discover
 
 if __name__ == '__main__':
-    COV = coverage.coverage(branch=True, include='./embarc_tools/*')
+    COV = coverage.coverage(branch=True, include='../embarc_tools/*')
     COV.start()
     testfilepath = "test.html"
     ftp = open(testfilepath,'wb')
