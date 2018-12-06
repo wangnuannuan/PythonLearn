@@ -91,7 +91,10 @@ Version in 0.7.1
 # TODO: simplify javascript using ,ore than 1 class in the class attribute?
 
 import datetime
-import StringIO
+try:
+    import StringIO
+except:
+    from io import StringIO
 import sys
 import time
 import unittest
