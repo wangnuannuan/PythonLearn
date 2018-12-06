@@ -16,5 +16,5 @@ install:
   - "pip install coverage"
 
 script: 
-  - "cd embarc_cli/test"
-  - "python main.py" #"python -m unittest discover -p test_*.py"
+
+  - "python -m unittest discover -p test_*.py"
