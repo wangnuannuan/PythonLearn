@@ -11,5 +11,7 @@ sudo: false # Use container-based infrastructure
 
 install:
   - "pip install embarc_cli"
+  - "pip install html-testRunner"
+  - "pip install coverage"
 
 script: "python embarc_cli/test/main.py" #"python -m unittest discover -p test_*.py"
