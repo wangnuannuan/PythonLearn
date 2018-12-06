@@ -13,8 +13,6 @@ def get_allcase():
     return discover
 
 if __name__ == '__main__':
-    path_now = os.getcwd()
-    embarc_tools_path = 
     COV = coverage.coverage(branch=True, include='embarc_cli/embarc_tools/*')
     COV.start()
     testfilepath = "test.html"
