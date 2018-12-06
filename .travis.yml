@@ -1,0 +1,15 @@
+
+language: python
+cache: pip
+python:
+  - "2.7"
+  - "3.6"
+  - "3.5"
+  - "3.4"
+  - "pypy"
+sudo: false # Use container-based infrastructure
+
+install:
+  - "pip install embarc_cli"
+
+script: "python embarc_cli/test/main.py" #"python -m unittest discover -p test_*.py"
