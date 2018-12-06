@@ -13,7 +13,9 @@ def get_allcase():
     return discover
 
 if __name__ == '__main__':
-    COV = coverage.coverage(branch=True, include='embarc_cli/embarc_tools/*')
+    path_now = os.getcwd()
+    dir_path = os.path.dirname(path_now)
+    COV = coverage.coverage(branch=True, include=os.path.join(dir_path, "embarc_tools"))
     COV.start()
     testfilepath = "test.html"
     ftp = open(testfilepath,'wb')
