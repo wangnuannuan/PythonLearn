@@ -116,7 +116,7 @@ class Ide:
                     compile_opt_line = opt_line.split(":", 1)[1]
                     compile_opts = compile_opt_line.split()
         if update or self.buildopts:
-            osppath.update_makefile(build_template, os.getcwd())
+            osppath.update_makefile(dict(build_template), os.getcwd())
         print_string("Get inculdes and defines ")
         if compile_opts != "" and relative_root != "":
             for comp_opt in compile_opts:

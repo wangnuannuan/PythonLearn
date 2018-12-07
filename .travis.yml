@@ -17,4 +17,5 @@ install:
 
 script: 
   - "embarc osp --clone"
-  - "python -m unittest discover -p test_*.py"
+  - "cd embarc_cli"
+  - "python test/main.py"

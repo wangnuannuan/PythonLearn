@@ -3,7 +3,7 @@ from unittest import defaultTestLoader
 import HTMLTestRunner
 import coverage
 import os
-case_path = "."
+case_path = "./test"
 
 def get_allcase():
     discover = unittest.defaultTestLoader.discover(case_path, pattern="test*.py")
@@ -13,9 +13,7 @@ def get_allcase():
     return discover
 
 if __name__ == '__main__':
-    path_now = os.getcwd()
-    dir_path = os.path.dirname(path_now)
-    COV = coverage.coverage(branch=True, include=os.path.join(dir_path, "embarc_tools"))
+    COV = coverage.coverage(branch=True, include='./embarc_tools/*')
     COV.start()
     testfilepath = "test.html"
     ftp = open(testfilepath,'wb')
