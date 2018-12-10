@@ -3,7 +3,7 @@ from unittest import defaultTestLoader
 import HTMLTestRunner
 import coverage
 import os
-case_path = "./test"
+case_path = "."
 
 def get_allcase():
     discover = unittest.defaultTestLoader.discover(case_path, pattern="test*.py")
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     testfilepath = "test.html"
     ftp = open(testfilepath,'wb')
     # runner = unittest.TextTestRunner()
-    runner = HTMLTestRunner.HTMLTestRunner(stream=ftp, title="test result")
+    runner = HTMLTestRunner.HTMLTestRunner(stream=ftp, verbosity=2, title="test result")
     runner.run(get_allcase())
     ftp.close()
     COV.stop()

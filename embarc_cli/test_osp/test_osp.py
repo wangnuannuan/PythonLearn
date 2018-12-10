@@ -27,8 +27,13 @@ class TestRepo(unittest.TestCase):
 class TestOSP(unittest.TestCase):
 
     def setUp(self):
-
-        self.osp_root = "C:/Users/jingru/Documents/embarc_application/embarc_osp"
+    	url = "https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_osp"
+    	osprepo = repo.Repo.fromurl(url)
+    	path = getcwd()
+    	if not os.path.exists(osprepo.name):
+    		osprepo.clone(osprepo.url, path=os.path.join(path, osprepo.name), rev=None, depth=None, protocol=None, offline=False)
+    		osp_path.set_path(os.path.join(path, osprepo.name), osprepo.url)
+    		self.osp_root = os.path.join(path, osprepo.name)
         self.osppath = osp.OSP()
 
     def test_set_path(self):
