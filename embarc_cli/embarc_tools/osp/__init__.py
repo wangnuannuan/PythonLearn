@@ -1,7 +1,7 @@
 from __future__ import print_function, absolute_import, unicode_literals
 import re
 import os
-from .. download_manager import (show_progress, hide_progress)
+from .. download_manager import (show_progress, hide_progress, getcwd)
 from embarc_tools.utils import pquery, popen
 
 regex_repo_url = r'^(git\://|file\://|ssh\://|https?\://|)(([^/:@]+)(\:([^/:@]+))?@)?([^/:]{3,})(\:\d+)?[:/](.+?)(\.git|\.hg|\/?)$'
@@ -88,10 +88,10 @@ class Git(object):
         except ProcessException:
             pass
 
-    def commit(msg=None):
+    def commit(msg=None, very_verbose=False, verbose=False):
         popen([git_cmd, 'commit', '-a'] + (['-m', msg] if msg else []) + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
 
-    def publish(all_refs=None):
+    def publish(all_refs=None, very_verbose=False, verbose=False):
         if all_refs:
             popen([git_cmd, 'push', '--all'] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
         else:
@@ -106,7 +106,7 @@ class Git(object):
                 if not branch:
                     print(err+"Working set is not on a branch.", 1)
 
-    def fetch():
+    def fetch(very_verbose=False, verbose=False):
         print("Fetching revisions from remote repository to \"%s\"" % os.path.basename(getcwd()))
         popen([git_cmd, 'fetch', '--all', '--tags'] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
 
