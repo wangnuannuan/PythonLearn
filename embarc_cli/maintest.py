@@ -28,7 +28,11 @@ def deploy():
         delete_dir_files(file)
         git.add("--all")
         git.commit("deploy html")
-        git.publish()
+        try:
+            git.publish()
+        except:
+            popen(["git", "pull", url, "gh-pages"])
+            git.publish()
         # popen(["git", "push", url, "gh-pages:gh-pages"])
 
 
@@ -42,7 +46,7 @@ if __name__ == '__main__':
     testfilepath = pythonversion + "index.html"
     ftp = open(testfilepath,'wb')
     # runner = unittest.TextTestRunner()
-    runner = HTMLTestRunner.HTMLTestRunner(stream=ftp, verbosity=2, title="test result")
+    runner = HTMLTestRunner.HTMLTestRunner(stream=ftp, verbosity=2, title=pythonversion)
     runner.run(get_allcase("."))
     ftp.close()
     deploy()
