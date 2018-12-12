@@ -15,7 +15,7 @@ def deploy():
     tar.close()
     repo_slug = os.environ.get("TRAVIS_REPO_SLUG")
     gh_token = os.environ.get("GH_TOKEN")
-    url = "https://" + gh_token + "@github.com/" + repo_slug
+    url = "https://" + gh_token + "@github.com/" + repo_slug + ".git"
     mkdir("gh-pages")
     with cd("gh-pages"):
         git = Git()
