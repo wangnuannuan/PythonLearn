@@ -6,7 +6,6 @@ import os
 import tarfile
 from embarc_tools.osp import repo, Git
 from embarc_tools.download_manager import mkdir, cd, copy_file, untar, getcwd, delete_dir_files
-from git import Repo
 from embarc_tools.utils import popen
 
 def deploy():
