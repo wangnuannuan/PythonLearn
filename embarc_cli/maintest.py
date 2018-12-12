@@ -28,8 +28,8 @@ def deploy():
         delete_dir_files(file)
         git.add("--all")
         git.commit("deploy html")
-        # git.publish()
-        popen(["git", "push", url, "gh-pages:gh-pages"])
+        git.publish()
+        # popen(["git", "push", url, "gh-pages:gh-pages"])
 
 
 def get_allcase(case_path):
