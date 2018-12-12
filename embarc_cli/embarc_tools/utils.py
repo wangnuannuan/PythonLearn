@@ -89,6 +89,7 @@ def processcall(command,**kwargs):
     return returncode
 
 def pquery(command, output_callback=None, stdin=None, **kwargs):
+    proc = None
     try:
         proc = subprocess.Popen(command, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
     except OSError as e:

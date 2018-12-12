@@ -8,7 +8,7 @@ class TestToolchain(unittest.TestCase):
         super(TestToolchain, self).setUp()
         self.gnu = gnu.Gnu()
         self.mw = metaware.Mw()
-        self.pack = "arc_gnu_2018.03_prebuilt_elf32_le_linux_install.tar.gz"
+        self.pack = "arc_gnu_2018.09_prebuilt_elf32_le_linux_install.tar.gz"
 
     def test_is_support(self):
         result = arcToolchain.is_supported("gnu")
@@ -27,7 +27,7 @@ class TestToolchain(unittest.TestCase):
         print(mwversion)
 
     def test_download(self):
-        gnu_tgz_path = self.gnu.download(version="2018.03")
+        gnu_tgz_path = self.gnu.download(version="2018.09")
         print("download ",gnu_tgz_path)
 
         self.assertIsNotNone(gnu_tgz_path)
