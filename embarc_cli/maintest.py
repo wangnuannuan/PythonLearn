@@ -7,11 +7,11 @@ import tarfile
 from embarc_tools.osp import repo, Git
 from embarc_tools.download_manager import mkdir, cd, copy_file, untar, getcwd, delete_dir_files
 from embarc_tools.utils import popen
-
+pythonversion = os.environ.get("TRAVIS_PYTHON_VERSION") 
 def deploy():
     file = "index.tar.gz"
     tar = tarfile.open(file, "w:gz")
-    tar.add("index.html")
+    tar.add(pythonversion + "index.html")
     tar.close()
     repo_slug = os.environ.get("TRAVIS_REPO_SLUG")
     gh_token = os.environ.get("GH_TOKEN")
@@ -39,7 +39,7 @@ def get_allcase(case_path):
 if __name__ == '__main__':
     COV = coverage.coverage(branch=True, include='./embarc_tools/*')
     COV.start()
-    testfilepath = "index.html"
+    testfilepath = pythonversion + "index.html"
     ftp = open(testfilepath,'wb')
     # runner = unittest.TextTestRunner()
     runner = HTMLTestRunner.HTMLTestRunner(stream=ftp, verbosity=2, title="test result")
