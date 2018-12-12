@@ -16,4 +16,4 @@ install:
 script: 
   - "embarc osp --clone"
   - "cd embarc_cli"
-  - "python main.py"
+  - "python maintest.py"
