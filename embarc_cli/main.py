@@ -9,7 +9,7 @@ from embarc_tools.download_manager import mkdir, cd, copy_file, untar, getcwd, d
 from git import Repo
 from embarc_tools.utils import popen
 
-def deploy()
+def deploy():
     file = "index.tar.gz"
     tar = tarfile.open(file, "w:gz")
     tar.add("index.html")
@@ -54,5 +54,6 @@ if __name__ == '__main__':
     covdir = os.path.join(basedir, 'coverage')
     COV.html_report(directory=covdir)
     print('HTML version: file://%s/index.html' % covdir)
+    print("See test result from https://wangnuannuan.github.io/PythonLearn")
     COV.erase()
 
