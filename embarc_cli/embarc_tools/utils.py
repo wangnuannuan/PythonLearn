@@ -93,7 +93,7 @@ def pquery(command, output_callback=None, stdin=None, **kwargs):
         proc = subprocess.Popen(command, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
     except OSError as e:
         if e.args[0] == errno.ENOENT:
-            error(
+            print(
                 "Could not execute \"%s\" in \"%s\".\n"
                 "You can verify that it's installed and accessible from your current path by executing \"%s\".\n" % (' '.join(command), getcwd(), command[0]), e.args[0])
         else:

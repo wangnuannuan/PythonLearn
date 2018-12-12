@@ -3,7 +3,7 @@ from embarc_tools.builder import build
 from embarc_tools.osp import osp, repo
 import unittest
 import os, shutil
-from embarc_tools.toolchain import arcToolchain, gnu,
+from embarc_tools.toolchain import gnu
 
 class TestBuilder(unittest.TestCase):
     def setUp(self):
