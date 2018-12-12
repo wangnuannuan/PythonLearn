@@ -7,7 +7,10 @@ from embarc_tools.download_manager import cd
 
 class TestIde(unittest.TestCase):
     def setUp(self):
-        self.app_path = "C:\\Users\\jingru\\Documents\\embarc_tool\\embarc_tool\\test\\testapp"
+        ospclass = osp.OSP()
+        self.osp_root = ospclass.get_path()
+        self.app_path = os.path.join(self.osp_root, "example/baremetal/blinky")
+        
         self.ide = Ide(path=self.app_path)
 
 
@@ -23,7 +26,7 @@ class TestIde(unittest.TestCase):
             self.assertEqual(len(cproject_template["core"].keys()), 1)
             self.assertIsInstance(cproject_template["includes"], list)
             print(cproject_template["includes"]) 
-            self.assertIn("testapp", cproject_template["includes"])
+            self.assertIn("blinky", cproject_template["includes"])
 
     def test_set_link_folders(self):
         includes = []

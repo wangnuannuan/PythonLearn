@@ -1,5 +1,6 @@
 from __future__ import print_function, division
 from embarc_tools.utils import *
+from embarc_tools.osp import osp
 import unittest
 import os
 
@@ -19,8 +20,10 @@ class TestUtils(unittest.TestCase):
         l1 = ['a', 'b', 'b', 'c', 'b', 'd', 'c', 'e', 'f', 'a']
         assert uniqify(l1) == ['a', 'b', 'c', 'd', 'e', 'f']
 
+
     def test_load_yaml_records(self):
-        f = ["C:\\Users\\jingru\\.embarc_cli\\osp.yaml"]
+        ospclass = osp.OSP()
+        f = [os.path.join(ospclass.path, ospclass.file)]
         dictionaries = load_yaml_records(f)
         assert len(dictionaries) > 0
 

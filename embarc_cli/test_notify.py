@@ -6,23 +6,17 @@ import os
 class TestNotify(unittest.TestCase):
 
     def setUp(self):
-        self.notifier = TerminalNotifier()
+        pass
 
-    def test_collect_message(self):
-        self.notifier.collect_message("hello")
-        assert self.notifier.messages == ["[embARC] hello\n"]
+    def test_print_string(self):
+        print_string("hello")
+        print_string("hello", level="warning")
 
-    def test_notify(self):
-        event = {
-            "type": "info",
-            "format": "string",
-            "message": ""
-        }
-        result = self.notifier.notify(event)
-        self.assertTrue(result)
-        event["type"] = "None"
-        result = self.notifier.notify(event)
-        self.assertTrue(result)
+    def test_print_table(self):
+        msg_head = ["title", "config"]
+        msg_content = [["BOARD","emsk"],["BD_VER","11 22 23"]]
+        msg = [msg_head, msg_content]
+        print_table(msg, level=None)
 
     def tearDown(self):
-        print("test builder")
+        print("test notify")
