@@ -3,21 +3,13 @@ from embarc_tools.builder import build
 from embarc_tools.osp import osp, repo
 import unittest
 import os, shutil
-from embarc_tools.toolchain import gnu
 
 class TestBuilder(unittest.TestCase):
     def setUp(self):
         super(TestBuilder, self).setUp()
         ospclass = osp.OSP()
         self.osp_root = ospclass.get_path()
-        toolchain_class = gnu.Gnu()
-        try:
-            toolchain_class.check_version()
-        except:
-            tgz_path = toolchain_class.download(version="2018.09")
-            bin_path = toolchain_class.extract_file(tgz_path)
-            toolchain_class.set_env(path=bin_path)
-        if not self.osp_root:
+        if not self.osp_root
             url = "https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_osp"
             osprepo = repo.Repo.fromurl(url)
             path = os.getcwd()
