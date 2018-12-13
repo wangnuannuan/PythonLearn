@@ -33,7 +33,7 @@ class TestToolchain(unittest.TestCase):
         self.assertIsNotNone(gnu_tgz_path)
 
     def test_extract_file(self):
-        pack = "arc_gnu_2018.03_prebuilt_elf32_le_linux_install.tar.gz"
+        pack = "arc_gnu_2018.09_prebuilt_elf32_le_linux_install.tar.gz"
         path = self.gnu.extract_file(pack)
         print("gnu pack path: ",path)
 
@@ -45,7 +45,7 @@ class TestToolchain(unittest.TestCase):
         if os.path.exists(self.pack):
 
             os.remove(self.pack)
-        if os.path.exists("2018.03"):
-            shutil.rmtree("2018.03")
+        if os.path.exists("2018.09"):
+            shutil.rmtree("2018.09")
 
 

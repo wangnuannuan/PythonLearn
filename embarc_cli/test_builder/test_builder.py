@@ -11,9 +11,12 @@ class TestBuilder(unittest.TestCase):
         ospclass = osp.OSP()
         self.osp_root = ospclass.get_path()
         toolchain_class = gnu.Gnu()
-        tgz_path = toolchain_class.download(version="2018.03")
-        bin_path = toolchain_class.extract_file(tgz_path)
-        toolchain_class.set_env(path=bin_path)
+        try:
+            toolchain_class.check_version()
+        except:
+            tgz_path = toolchain_class.download(version="2018.09")
+            bin_path = toolchain_class.extract_file(tgz_path)
+            toolchain_class.set_env(path=bin_path)
         if not self.osp_root:
             url = "https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_osp"
             osprepo = repo.Repo.fromurl(url)

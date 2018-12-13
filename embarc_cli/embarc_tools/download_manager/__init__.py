@@ -119,8 +119,8 @@ def download_file(url, path):
     except AttributeError:
         from urllib import request
         request.urlretrieve(url, path)
-    else:
-        print("[embARC] This file from %s can't be download"%(url))
+    except Exception as e:
+        print("[embARC] This file from %s can't be download for %s"%(url, e))
         sys.stdout.flush()
         return False
     return True
