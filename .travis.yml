@@ -16,6 +16,8 @@ install:
   - "sudo apt-get install dos2unix"
   - "pip install embarc_cli"
   - "pip install coverage"
+  
+before_script:
   - "embarc toolchain --toolchain gnu --version 2018.09 --install"
 
 script: 
