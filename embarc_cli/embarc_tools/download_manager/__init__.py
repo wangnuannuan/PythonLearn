@@ -172,14 +172,14 @@ def extract_file(file, path):
 
 def show_progress(title, percent, max_width=80):
     '''show progress when download file'''
-    if sys.stdout.isatty():
-        percent = round(float(percent), 2)
-        show_percent = '%.2f' % percent
-        bwidth = max_width - len(str(title)) - len(show_percent) - 6 # 6 equals the spaces and paddings between title, progress bar and percentage
-        sys.stdout.write('%s |%s%s| %s%%\r' % (str(title), '#' * int(percent * bwidth // 100), '-' * (bwidth - int(percent * bwidth // 100)), show_percent))
-        sys.stdout.flush()
+    #if sys.stdout.isatty():
+    percent = round(float(percent), 2)
+    show_percent = '%.2f' % percent
+    bwidth = max_width - len(str(title)) - len(show_percent) - 6 # 6 equals the spaces and paddings between title, progress bar and percentage
+    sys.stdout.write('%s |%s%s| %s%%\r' % (str(title), '#' * int(percent * bwidth // 100), '-' * (bwidth - int(percent * bwidth // 100)), show_percent))
+    sys.stdout.flush()
 
 def hide_progress(max_width=80):
-    if sys.stdout.isatty():
-        sys.stdout.write("\r%s\r" % (' ' * max_width))
+    #if sys.stdout.isatty():
+    sys.stdout.write("\r%s\r" % (' ' * max_width))
 

@@ -7,7 +7,6 @@ import tarfile
 from embarc_tools.osp import repo, Git
 from embarc_tools.download_manager import mkdir, cd, copy_file, untar, getcwd, delete_dir_files
 from embarc_tools.utils import popen
-from embarc_tools.toolchain import gnu
 pythonversion = os.environ.get("TRAVIS_PYTHON_VERSION") 
 def deploy():
     file = "index.tar.gz"
@@ -41,16 +40,9 @@ def get_allcase(case_path):
     discover = unittest.defaultTestLoader.discover(case_path, pattern="test*.py")
     return discover
 
-def before_install():
-    gnutoolchain = gnu.Gnu()
-    gnu_tgz_path = gnutoolchain.download(version="2018.09")
-    pack = "arc_gnu_2018.09_prebuilt_elf32_le_linux_install.tar.gz"
-    path = gnutoolchain.extract_file(pack)
-
 if __name__ == '__main__':
     COV = coverage.coverage(branch=True, include='./embarc_tools/*')
     COV.start()
-    before_install()
     testfilepath = pythonversion + "index.html"
     ftp = open(testfilepath,'wb')
     # runner = unittest.TextTestRunner()
