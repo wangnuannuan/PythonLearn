@@ -19,6 +19,7 @@ install:
   
 before_script:
   - "embarc toolchain --toolchain gnu --version 2018.09 --install"
+  - "export PATH=$PATH:/home/travis/build/wangnuannuan/PythonLearn/embarc_cli/2018.09/bin"
 
 script: 
   - "embarc osp --clone"
