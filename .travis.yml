@@ -7,9 +7,13 @@ python:
   - "3.5"
   - "3.4"
   - "pypy"
-sudo: false # Use container-based infrastructure
-
+#sudo: false # Use container-based infrastructure
+sudo: required
+dist: trusty
 install:
+  - "sudo apt-get update"
+  - "sudo apt-get install lib32z1"
+  - "sudo apt-get install dos2unix"
   - "pip install embarc_cli"
   - "pip install coverage"
 
