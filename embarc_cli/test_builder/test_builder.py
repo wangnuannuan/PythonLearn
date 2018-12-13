@@ -9,7 +9,7 @@ class TestBuilder(unittest.TestCase):
         super(TestBuilder, self).setUp()
         ospclass = osp.OSP()
         self.osp_root = ospclass.get_path()
-        if not self.osp_root
+        if not self.osp_root:
             url = "https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_osp"
             osprepo = repo.Repo.fromurl(url)
             path = os.getcwd()
