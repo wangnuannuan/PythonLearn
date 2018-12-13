@@ -29,6 +29,7 @@ class TestToolchain(unittest.TestCase):
     def test_download(self):
         gnu_tgz_path = self.gnu.download(version="2018.09")
         print("download ",gnu_tgz_path)
+        print(os.listdir("."))
 
         self.assertIsNotNone(gnu_tgz_path)
 
