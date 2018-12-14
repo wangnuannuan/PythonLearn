@@ -68,6 +68,23 @@ def delete_dir_files(directory, dir=False):
         else:
             shutil.rmtree(directory)
 
+def generate_file(filename, data, path=None):
+    file = None
+    if path and os.path.exists(path) and os.path.isdir(path):
+        file = os.path.join(path, filename)
+    else:
+        file = os.path.join(os.getcwd(), filename)
+    if os.path.isfile(file):
+        os.remove(file)
+    try:
+        with open(file, 'w+') as f:
+            f.write(data)
+        f.close()
+    except:
+        print("[embARC] Unable to open %s for writing!" % file)
+        return -1
+    print("[embARC] Write to file %s" % file)
+    return 0  
 
 def generate_yaml(filename, data):
     file = os.path.join(os.getcwd(), filename)
@@ -84,7 +101,7 @@ def generate_yaml(filename, data):
     return 0
 
 
-def edit_yaml(filename,data):
+def edit_yaml(filename, data):
     file = os.path.join(os.getcwd(), filename)
     if not os.path.isfile(file):
         generate_yaml(filename,data)

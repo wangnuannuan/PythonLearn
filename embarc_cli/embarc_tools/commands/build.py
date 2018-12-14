@@ -1,24 +1,37 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
 from ..builder import build
-from ..download_manager import getcwd, cd, mkdir, getcwd
+from ..download_manager import getcwd, cd, mkdir, generate_file
 from embarc_tools.settings import *
 from embarc_tools.utils import pquery
 from embarc_tools.notify import print_string
-import sys
+import sys, os
 help = "Build application"
 
 def run(args):
-    root = getcwd()
     buildopts = dict()
     osproot = None
     curdir = args.outdir
     app_path = None
     build_status = None
-    parallel = args.parallel
-
-
+    recordBuildConfig = None
     if args.path:
         app_path = args.path
+        
+    if os.path.exists(app_path) and os.path.isdir(app_path):
+        with cd(app_path):
+            if os.path.exists(".build"):
+                with open(".build", "r") as f:
+                    content = f.read().splitlines()
+                    if len(content) > 0:
+                        recordBuildConfig = (content[0]).split()
+    if recordBuildConfig is not None:
+        for recoreOpt in recordBuildConfig:
+            if "=" in recoreOpt:
+                opt, value = recoreOpt.split("=")
+                if opt in build.BUILD_OPTION_NAMES:
+                    buildopts[opt] = recoreOpt.split("=")[1]
+
+    parallel = args.parallel
     if args.board:
         buildopts["BOARD"] = args.board
     if args.bd_ver:
@@ -68,6 +81,9 @@ def run(args):
             information = builder.build_target(app_path, target=args.target, parallel=False, coverity=False)
         else:
             print("[embARC] Please choose right target")
+        if information["result"]:
+            generate_file(".build", information["build_cmd"], path=app_path)
+
         # if not information["result"]:
             # print_string(information["reason"])
 

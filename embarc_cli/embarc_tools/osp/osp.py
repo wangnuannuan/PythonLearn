@@ -289,10 +289,10 @@ class OSP(object):
 
     def update_makefile(self, value, path): # update embarc_root in makefile
         with cd(path):
+            print_string("Update makefile {}".format(value))
             build_template = dict()
             makefile, build_template = self.get_makefile_config(build_template, verbose=True)
             build_template.update(value) #["EMBARC_OSP_ROOT"] = value
-            print_string("Update makefile {}".format(value))
             exporter = Exporter("application")
             exporter.gen_file_jinja("makefile.tmpl", build_template, makefile, os.getcwd())
 

@@ -123,29 +123,25 @@ def pquery(command, output_callback=None, stdin=None, **kwargs):
 
 def pqueryOutputinline(command, console=False, **kwargs):
     proc = None
-    preexec_fn = None
-    build_out = None
+    build_out = list()
     file_num = random.randint(100000, 200000)
     file_name = "message" + str(file_num) + ".log"
     try:
-        preexec_fn = os.setsid
-    except AttributeError:
-        pass
-    try:
         with io.open(file_name, "wb") as writer, io.open(file_name, "rb", 1) as reader:
-            proc = subprocess.Popen(command, stdout=writer, stderr=subprocess.PIPE, preexec_fn=preexec_fn, shell=True, bufsize=1, **kwargs)
+            proc = subprocess.Popen(command, stdout=writer, stderr=subprocess.PIPE, shell=True, bufsize=1, **kwargs)
             end = ""
             if python_version.startswith("3"):
                 end = "\n"
             try:
                 while True:
-                    line = reader.read()
-                    decodeline = line.decode()
+                    decodeline = reader.read().decode()
                     if decodeline == str() and proc.poll() != None:
                         break
-                    if console and decodeline != str():
-                        print(decodeline, end=end)
-                        time.sleep(0.1)
+                    if decodeline != str():
+                        build_out.append(decodeline)
+                        if console:
+                            print(decodeline, end=end)
+                            time.sleep(0.1)
             except (KeyboardInterrupt):
                 print("[embARC] Terminate batch job")
                 sys.exit(1)
@@ -161,11 +157,7 @@ def pqueryOutputinline(command, console=False, **kwargs):
         print(e)
     proc.wait()
     if os.path.exists(file_name):
-        with open(file_name) as f:
-            build_out = f.read().splitlines()
         os.remove(file_name)
-    if proc.returncode != 0:
-        raise ProcessException(proc.returncode, command[0], ' '.join(command), getcwd())
     if proc.stdout:
         proc.stdout.close()
     if proc.stderr:

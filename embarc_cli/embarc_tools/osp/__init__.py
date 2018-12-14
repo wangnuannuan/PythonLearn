@@ -50,10 +50,10 @@ class Git(object):
     default_branch = 'master'
     ignore_file = os.path.join('.git', 'info', 'exclude')
 
-    def init(path=None):
+    def init(path=None, very_verbose=False):
         popen([git_cmd, 'init'] + ([path] if path else []) + ([] if very_verbose else ['-q']))
 
-    def cleanup():
+    def cleanup(very_verbose=False):
         print("Cleaning up Git index")
         pquery([git_cmd, 'checkout', '--detach', 'HEAD'] + ([] if very_verbose else ['-q'])) # detach head so local branches are deletable
         branches = []
@@ -74,14 +74,14 @@ class Git(object):
             pquery([git_cmd, 'clone', '--progress', formaturl(url, protocol), name] + (['--depth', depth] if depth else []), output_callback=Git.action_progress)
             hide_progress()
 
-    def add(dest):
+    def add(dest, very_verbose=False):
         print("Adding reference "+dest)
         try:
             popen([git_cmd, 'add', dest] + (['-v'] if very_verbose else []))
         except ProcessException:
             pass
 
-    def remove(dest):
+    def remove(dest, very_verbose=False):
         print("Removing reference "+dest)
         try:
             pquery([git_cmd, 'rm', '-f', dest] + ([] if very_verbose else ['-q']))
@@ -116,11 +116,11 @@ class Git(object):
         pquery([git_cmd, 'checkout', '.'] + ([] if very_verbose else ['-q'])) # undo  modified files
         pquery([git_cmd, 'clean', '-fd'] + (['-x'] if clean_files else []) + (['-q'] if very_verbose else ['-q'])) # cleans up untracked files and folders
 
-    def merge(dest):
+    def merge(dest, very_verbose=False, verbose=False):
         print("Merging \"%s\" with \"%s\"" % (os.path.basename(getcwd()), dest))
         popen([git_cmd, 'merge', dest] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
 
-    def checkout(rev, clean=False):
+    def checkout(rev, clean=False, very_verbose=False):
         if not rev:
             return
         print("Checkout \"%s\" in %s" % (rev, os.path.basename(getcwd())))
@@ -164,7 +164,7 @@ class Git(object):
                 if not branch:
                     print(err+" Working set is not on a branch.")
 
-    def status():
+    def status(very_verbose=False):
         return pquery([git_cmd, 'status', '-s'] + (['-v'] if very_verbose else []))
 
     def dirty():

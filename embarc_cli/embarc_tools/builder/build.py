@@ -207,8 +207,9 @@ class embARC_Builder:
                     try:
                         return_code = os.system(build_cmd)
                         if return_code == 0:
-                            build_status["build_msg"] = "Build successfully"
+                            build_status["build_msg"] = ["Build successfully"]
                         else:
+                            build_status["build_msg"] = ["Build failed"]
                             build_status['result'] = False
                             build_status["reason"] = "ProcessError: Run command {} failed".format(build_cmd)
                     except (KeyboardInterrupt):
@@ -365,8 +366,9 @@ class embARC_Builder:
         build_size = dict()
         if build_status['result'] == True:
             app_size_lines = build_status['build_msg']
-            if len(app_size_lines) >= 3:
-                app_size_lines = app_size_lines[len(app_size_lines)-2:]
+            len_app_size_lines = len(app_size_lines)
+            if len_app_size_lines >= 3:
+                app_size_lines = app_size_lines[len_app_size_lines-2:]
                 section_names = app_size_lines[0].split()
                 section_values = app_size_lines[1].split()
                 for idx, section_name in enumerate(section_names):
@@ -374,7 +376,7 @@ class embARC_Builder:
                         build_size[section_name] = int(section_values[idx])
             else:
                 build_status['result'] = False
-        if len(build_size) < 1:
+        else:
             print_string("Build failed and there is no size information")
         build_status['build_size'] = build_size
         return build_status
