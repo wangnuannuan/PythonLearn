@@ -45,6 +45,8 @@ class Gnu(arcToolchain):
                 return version
         except ProcessException:
             return None
+        except:
+            return None
 
     def _set_version(self):
         '''get current gnu version and set the self.version'''

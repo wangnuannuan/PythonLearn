@@ -209,7 +209,11 @@ class embARC_Builder:
                         if return_code == 0:
                             build_status["build_msg"] = ["Build successfully"]
                         else:
+<<<<<<< HEAD
                             build_status["build_msg"] = ["Build failed"]
+=======
+                            build_status["build_msg"] = "Build failed"
+>>>>>>> f0595b552f2b935c60cd701fd08450eef31a3214
                             build_status['result'] = False
                             build_status["reason"] = "ProcessError: Run command {} failed".format(build_cmd)
                     except (KeyboardInterrupt):
@@ -221,7 +225,7 @@ class embARC_Builder:
                     build_status['build_msg'] = build_proc
                 except Exception as e:
                     print("Run command({}) failed!".format(build_cmd))
-                    build_status["build_msg"] = ["Build failed"]
+                    build_status["build_msg"] = "Build failed"
                     build_status["reason"] = "ProcessError: Run command {} failed".format(build_cmd)
                     build_status['result'] = False
         build_status['time_cost'] = (time.time() - time_pre)
