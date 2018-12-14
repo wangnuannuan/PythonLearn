@@ -17,8 +17,8 @@ class Gnu(arcToolchain):
     executable_name: a command will be used when check gnu
     '''
 
-    version = "2017.09"
-    root_url = "https://github.com/foss-for-synopsys-dwc-arc-processors/toolchain/releases/download/arc-"
+    
+    root_url = "https://github.com/foss-for-synopsys-dwc-arc-processors/toolchain/releases"
     pack = None
     path = None
     executable_name = "arc-elf32-gcc"
@@ -29,6 +29,7 @@ class Gnu(arcToolchain):
         if exe:
             self.path = os.path.split(exe)[0]
             self.version = self.check_version()
+
 
     @staticmethod
     def check_version():
@@ -58,13 +59,19 @@ class Gnu(arcToolchain):
         path - where the gnu package will be stored
         download gnu package and return the package path
         '''
-        if version is None:
-            version = self.version
-        url = self.root_url + version + "-release/arc_gnu_"  + version+ "_prebuilt_elf32_le_linux_install.tar.gz"
-        pack_tgz = "arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz"
+        url = None
+        pack_tgz = None
+        if version:
+            url = self.root_url + "/download/arc-"+ version + "-release/arc_gnu_"  + version+ "_prebuilt_elf32_le_linux_install.tar.gz"
+            pack_tgz = "arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz"    
+        else:
+            url = "https://github.com" + self._lastest_url()
+            version = re.search(r"[0-9]*\.[0-9]*", url).group(0)
+            pack_tgz = "arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz" 
+
         if path is None:
             path = getcwd()
-        gnu_tgz_path = os.path.join(path, "arc_gnu_" + version +"_prebuilt_elf32_le_linux_install.tar.gz")
+        gnu_tgz_path = os.path.join(path, pack_tgz)
         if not os.path.exists(path):
             mkdir(path)
         if pack_tgz in os.listdir(path):
@@ -109,6 +116,35 @@ class Gnu(arcToolchain):
     def set_env(self, path=None):
         '''set environment'''
         self.set_toolchain_env("gnu", path)
+
+    def _lastest_url(self):
+        pattern = re.compile('<ul.*?class="mt-1 mt-md-2">(.*?)</ul>', re.S|re.M)
+        pattern2 = re.compile('<a.*?href=(.*?)rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<strong.*?</a>', re.S|re.M)
+        try:
+            request = urllib2.Request(self.root_url)
+            response = urllib2.urlopen(request)
+            content = response.read().decode('utf-8')
+            
+            items = re.findall(pattern,content)
+            latesturl = None
+
+            for item in items:
+                itemsnow = re.findall(pattern2,item)
+                for i in itemsnow:
+                    if "_prebuilt_elf32_le_linux_install.tar.gz" in i:
+                        latesturl = i
+                    if latesturl:
+                        break
+                if latesturl:
+                    break
+            return latesturl
+        except urllib2.URLError as e:
+            if hasattr(e,"code"):
+                print_string(e.code, level="warning")
+            if hasattr(e,"reason"):
+                print_string(e.reason, level="warning")
+        except:
+            print_string("Can not get latest veriosn Gnu")
 
 
 

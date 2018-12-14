@@ -18,7 +18,7 @@ install:
   - "pip install coverage"
   
 before_script:
-  - "embarc toolchain --toolchain gnu --version 2018.09 --install"
+  - "embarc toolchain --toolchain gnu --install"
   - "export PATH=$PATH:/home/travis/build/wangnuannuan/PythonLearn/embarc_cli/2018.09/bin"
 
 script: 
