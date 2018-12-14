@@ -106,8 +106,10 @@ class embARC_Builder:
 
         print_string("BEGIN SECTION Build with Coverity {}".format(self.coverity_sa_version))
         coverity_build = "cov-build --config %s --dir %s %s"%(self.coverity_config, self.coverity_data_dir, make_cmd)
-        returncode = os.system(coverity_build)
-        if returncode != 0 :
+        try: 
+            build_proc = pqueryOutputinline(coverity_build, console=True)
+            build_status['build_msg'] = build_proc
+        except Exception as e:
             build_status["result"] = False
             build_status["reason"] = "Build with Coverity Failed!"
             return build_status
