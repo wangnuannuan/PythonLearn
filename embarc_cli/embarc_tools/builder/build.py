@@ -200,6 +200,7 @@ class embARC_Builder:
                 if not coverity_build_status["result"]:
                     build_status["result"] = False
                     build_status["reason"] = coverity_build_status["reason"]
+                    build_status["build_msg"] = coverity_build_status["build_msg"]
                 else:
                     build_status["build_msg"] = ["Build Coverity successfully"]
         else:
