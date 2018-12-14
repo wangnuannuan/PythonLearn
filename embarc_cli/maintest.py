@@ -42,6 +42,7 @@ def get_allcase(case_path):
     return discover
 
 def before_install():
+    popen["pycodestyle", " embarc_tools"]
     gnutoolchain = gnu.Gnu()
     gnu_tgz_path = gnutoolchain.download(version="2018.09")
     pack = "arc_gnu_2018.09_prebuilt_elf32_le_linux_install.tar.gz"

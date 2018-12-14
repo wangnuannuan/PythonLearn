@@ -4,8 +4,10 @@ from jinja2.environment import Environment
 import os
 from os.path import join, dirname, abspath, normpath, exists
 
+
 class Exporter(object):
-    TEMPLATE_DIR = abspath(join(dirname(__file__),'templates'))
+    TEMPLATE_DIR = abspath(join(dirname(__file__), 'templates'))
+
     def __init__(self, toolchain):
 
         self.toolchain = toolchain

@@ -25,5 +25,4 @@ before_script:
 script: 
   - "embarc osp --clone"
   - "cd embarc_cli"
-  - "pycodestyle embarc_tools"
   - "python maintest.py"

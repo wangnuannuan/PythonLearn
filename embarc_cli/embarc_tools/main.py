@@ -5,13 +5,14 @@ import pkg_resources
 from embarc_tools.commands import new, showconfig, build, show, toolchain, osp, ide
 subcommands = {
     "new": new,
-    "appconfig":showconfig,
+    "appconfig": showconfig,
     "build": build,
     "list": show,
     "toolchain": toolchain,
     "osp": osp,
     "ide": ide,
 }
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -20,7 +21,8 @@ def main():
     parser.add_argument('-q', dest='quietness', action='count', default=0,
         help='Decrease the verbosity of the output (repeat for more verbose output)')
     parser.add_argument("--version", action='version',
-        version=pkg_resources.require("embarc_cli")[0].version, help="Display version")
+        version=pkg_resources.require("embarc_cli")[0].version, 
+        help="Display version")
     subparsers = parser.add_subparsers(help='commands')
 
     for name, module in subcommands.items():
@@ -29,12 +31,11 @@ def main():
         module.setup(subparser)
         subparser.set_defaults(func=module.run)
     args = None
-
     argv_list = list()
     if len(sys.argv) == 1:
         return parser.print_help()
 
-    elif len(sys.argv)>1 and sys.argv[1] == "build":
+    elif len(sys.argv) > 1 and sys.argv[1] == "build":
         argv_list.append(sys.argv[1])
         make_list = list()
         end_index = 0
@@ -54,7 +55,7 @@ def main():
                     argv_list.append(argv)
             else:
                 argv_list.append(argv)
-        if len(make_list) > 0 :
+        if len(make_list) > 0:
             make_config = " ".join(make_list)
             argv_list.extend(["--make", make_config])
         if target:
@@ -64,8 +65,8 @@ def main():
         args = parser.parse_args()
 
     verbosity = args.verbosity - args.quietness
-
     return args.func(args)
+
 
 if __name__ == '__main__':
     try:
