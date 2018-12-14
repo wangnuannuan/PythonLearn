@@ -198,9 +198,8 @@ class embARC_Builder:
                 if not coverity_build_status["result"]:
                     build_status["result"] = False
                     build_status["reason"] = coverity_build_status["reason"]
-                    build_status["build_msg"] = ["Build Coverity failed"]
                 else:
-                    build_status["build_msg"] = "Build Coverity successfully"
+                    build_status["build_msg"] = ["Build Coverity successfully"]
         else:
             if target not in ["opt", "info", "size"]:
                 with cd(app_realpath):
@@ -209,11 +208,7 @@ class embARC_Builder:
                         if return_code == 0:
                             build_status["build_msg"] = ["Build successfully"]
                         else:
-<<<<<<< HEAD
                             build_status["build_msg"] = ["Build failed"]
-=======
-                            build_status["build_msg"] = "Build failed"
->>>>>>> f0595b552f2b935c60cd701fd08450eef31a3214
                             build_status['result'] = False
                             build_status["reason"] = "ProcessError: Run command {} failed".format(build_cmd)
                     except (KeyboardInterrupt):
@@ -225,7 +220,7 @@ class embARC_Builder:
                     build_status['build_msg'] = build_proc
                 except Exception as e:
                     print("Run command({}) failed!".format(build_cmd))
-                    build_status["build_msg"] = "Build failed"
+                    build_status["build_msg"] = ["Build failed"]
                     build_status["reason"] = "ProcessError: Run command {} failed".format(build_cmd)
                     build_status['result'] = False
         build_status['time_cost'] = (time.time() - time_pre)
