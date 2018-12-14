@@ -75,7 +75,7 @@ class arcToolchain:
                 content = list()
                 with open(bashrc) as f:
                     lines = f.read().splitlines()
-                    
+
                     toolchain_var_name = "ARC_%s_ROOT"%(tool_key.upper())
                     set_toolchain_var = False
                     set_toolchain_path = False

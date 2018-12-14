@@ -16,7 +16,7 @@ def run(args):
     recordBuildConfig = None
     if args.path:
         app_path = args.path
-        
+
     if os.path.exists(app_path) and os.path.isdir(app_path):
         with cd(app_path):
             if os.path.exists(".build"):

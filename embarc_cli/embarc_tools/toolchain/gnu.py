@@ -17,7 +17,7 @@ class Gnu(arcToolchain):
     executable_name: a command will be used when check gnu
     '''
 
-    
+
     root_url = "https://github.com/foss-for-synopsys-dwc-arc-processors/toolchain/releases"
     pack = None
     path = None
@@ -63,11 +63,11 @@ class Gnu(arcToolchain):
         pack_tgz = None
         if version:
             url = self.root_url + "/download/arc-"+ version + "-release/arc_gnu_"  + version+ "_prebuilt_elf32_le_linux_install.tar.gz"
-            pack_tgz = "arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz"    
+            pack_tgz = "arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz"
         else:
             url = "https://github.com" + self._lastest_url()
             version = re.search(r"[0-9]*\.[0-9]*", url).group(0)
-            pack_tgz = "arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz" 
+            pack_tgz = "arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz"
 
         if path is None:
             path = getcwd()
@@ -124,7 +124,7 @@ class Gnu(arcToolchain):
             request = urllib2.Request(self.root_url)
             response = urllib2.urlopen(request)
             content = response.read().decode('utf-8')
-            
+
             items = re.findall(pattern,content)
             latesturl = None
 

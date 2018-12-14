@@ -106,7 +106,7 @@ class embARC_Builder:
 
         print_string("BEGIN SECTION Build with Coverity {}".format(self.coverity_sa_version))
         coverity_build = "cov-build --config %s --dir %s %s"%(self.coverity_config, self.coverity_data_dir, make_cmd)
-        try: 
+        try:
             build_proc = pqueryOutputinline(coverity_build, console=True)
             build_status['build_msg'] = build_proc
         except Exception as e:
@@ -182,7 +182,7 @@ class embARC_Builder:
         if target != "info":
             build_config_template = self.get_build_template()
             with cd(app_realpath):
-                self.get_makefile_config(build_config_template) # self.buildopts = 
+                self.get_makefile_config(build_config_template) # self.buildopts =
             build_cmd_list = build_cmd.split()
             for i in range(len(build_cmd_list)):
                 if build_cmd_list[i].startswith("EMBARC_ROOT"):

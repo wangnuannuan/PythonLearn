@@ -8,7 +8,7 @@ from embarc_tools.osp import repo, Git
 from embarc_tools.download_manager import mkdir, cd, copy_file, untar, getcwd, delete_dir_files
 from embarc_tools.utils import popen
 from embarc_tools.toolchain import gnu
-pythonversion = os.environ.get("TRAVIS_PYTHON_VERSION") 
+pythonversion = os.environ.get("TRAVIS_PYTHON_VERSION")
 def deploy():
     file = "index.tar.gz"
     tar = tarfile.open(file, "w:gz")

@@ -16,6 +16,7 @@ install:
   - "sudo apt-get install dos2unix"
   - "pip install embarc_cli"
   - "pip install coverage"
+  - "pip install pycodestyle"
   
 before_script:
   - "embarc toolchain --toolchain gnu --install"
@@ -24,4 +25,5 @@ before_script:
 script: 
   - "embarc osp --clone"
   - "cd embarc_cli"
+  - "pycodestyle embarc_tools"
   - "python maintest.py"

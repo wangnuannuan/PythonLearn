@@ -26,7 +26,7 @@ def run(args):
             osp_path.set_path(os.path.join(path, osprepo.name), osprepo.url)
             print_string("Add (%s) to user profile osp.yaml" % os.path.join(path, osprepo.name))
         else:
-            print_string("There is already a folder or file named 'embarc_osp' under current path") 
+            print_string("There is already a folder or file named 'embarc_osp' under current path")
 
 def setup(subparser):
     subparser.add_argument(

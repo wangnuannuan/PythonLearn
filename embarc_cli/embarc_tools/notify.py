@@ -146,7 +146,7 @@ class TerminalNotifier():
             if len(event["message"]) > 1:
                 table_head = event["message"][0]
                 table_content = event["message"][1]
-                if event.get("type", None) in CLI_COLOR_MAP: #sys.stdout.isatty() and 
+                if event.get("type", None) in CLI_COLOR_MAP: #sys.stdout.isatty() and
                     sys.stdout.write(self.colorstring_to_escapecode(
                         CLI_COLOR_MAP[event["type"]]))
                     sys.stdout.flush()

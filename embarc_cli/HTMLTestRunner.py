@@ -315,8 +315,8 @@ pre         { }
 
 /* -- heading ---------------------------------------------------------------------- */
 h1 {
-	font-size: 16pt;
-	color: gray;
+    font-size: 16pt;
+    color: gray;
 }
 .heading {
     margin-top: 0ex;

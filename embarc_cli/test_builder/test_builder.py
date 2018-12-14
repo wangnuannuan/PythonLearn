@@ -29,7 +29,7 @@ class TestBuilder(unittest.TestCase):
     def test_build_target(self):
         app_path = self.app_path
         build_status = self.app_builder.build_target(app_path, target='size')
-       
+
 
     def test_get_build_info(self):
         app_path = self.app_path
@@ -41,7 +41,7 @@ class TestBuilder(unittest.TestCase):
         print(build_status['build_cmd'])
         print(build_status['time_cost'])
         print(build_status['build_msg'])
-        
+
         self.app_builder.distclean(self.app_path)
 
     def test_build_bin_hex(self):
@@ -50,12 +50,12 @@ class TestBuilder(unittest.TestCase):
         print(build_status['build_cmd'])
         print(build_status['time_cost'])
         print(build_status['build_msg'])
-        
+
         build_status = self.app_builder.build_hex(app_path, pre_clean=False, post_clean=False)
         print(build_status['build_cmd'])
         print(build_status['time_cost'])
         print(build_status['build_msg'])
-        
+
         self.app_builder.distclean(self.app_path)
 
     def test_get_build_size(self):
@@ -65,18 +65,18 @@ class TestBuilder(unittest.TestCase):
         print(build_status['time_cost'])
         print(build_status['build_msg'])
         print(build_status['build_size'])
-        
-        self.app_builder.distclean(self.app_path)
-        
 
-    
+        self.app_builder.distclean(self.app_path)
+
+
+
     '''def test_build_target_coverity(self):
         app_path = "C:\\Users\\jingru\\Documents\\embarc_tool\\embarc_tool\\test\\testapp"
         build_status = self.app_builder.build_target(app_path,target='all',coverity=True)
         self.app_builder.build_coverity_result()
         self.assertTrue(build_status["result"])
         app_builder.distclean(self.app_path)'''
-        
+
 
     def tearDown(self):
         print("test builder")

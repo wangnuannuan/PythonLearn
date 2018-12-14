@@ -185,7 +185,7 @@ class OSP(object):
                         continue
                     else:
                         result.append(filename)
-                        
+
         return result
 
     def get_makefile(self, app_path):

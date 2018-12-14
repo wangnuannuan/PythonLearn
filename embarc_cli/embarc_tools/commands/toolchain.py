@@ -28,7 +28,7 @@ def run(args):
         if args.install:
             print_string("Start to download ( %s with version %s)" % (args.toolchain, args.version))
             tgz_path = toolchain_class.download(version=args.version, path=args.download_path)
-            if tgz_path:          
+            if tgz_path:
                 print_string("Start extracting files and installing toolchain")
                 bin_path = toolchain_class.extract_file(tgz_path, path=args.extract_path)
                 print_string("Start setting environmental variable")

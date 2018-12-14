@@ -182,7 +182,7 @@ def pqueryTemporaryFile(command):
         proc = subprocess.Popen(current_command, stdout=log_file, stderr=None, shell=True)
         log_file.close()
         returncode = proc.wait()
-        
+
     except Exception as e:
         print("[embARC] Run command {} failed : {}".format(current_command, e))
     if os.path.exists(file_name):

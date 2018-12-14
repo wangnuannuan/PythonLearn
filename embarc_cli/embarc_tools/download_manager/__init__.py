@@ -84,7 +84,7 @@ def generate_file(filename, data, path=None):
         print("[embARC] Unable to open %s for writing!" % file)
         return -1
     print("[embARC] Write to file %s" % file)
-    return 0  
+    return 0
 
 def generate_yaml(filename, data):
     file = os.path.join(os.getcwd(), filename)

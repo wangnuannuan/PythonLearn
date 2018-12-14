@@ -79,7 +79,7 @@ class Ide:
         opt_command.append("opt")
         if update or self.buildopts:
             if update:
-                opt_command.append("EMBARC_ROOT={}".format(osp_root)) 
+                opt_command.append("EMBARC_ROOT={}".format(osp_root))
             if self.buildopts:
                 newBuildConfigString = ["%s=%s" % (key, value) for (key, value) in self.buildopts.items()]
                 opt_command.extend(newBuildConfigString)
