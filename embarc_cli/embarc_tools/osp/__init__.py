@@ -11,11 +11,12 @@ very_verbose = False
 git_cmd = 'git'
 scms = {}
 
+
 def formaturl(url, format="default"):
     url = "%s" % url
     m = re.match(regex_repo_url, url)
-    if m and m.group(1) == '': # no protocol specified, probably ssh string like "git@github.com:xxx/osp.git"
-        url = 'ssh://%s%s%s/%s' % (m.group(2) or 'git@', m.group(6), m.group(7) or '', m.group(8)) # convert to common ssh URL-like format
+    if m and m.group(1) == '':   # no protocol specified, probably ssh string like "git@github.com:xxx/osp.git"
+        url = 'ssh://%s%s%s/%s' % (m.group(2) or 'git@', m.group(6), m.group(7) or '', m.group(8))  # convert to common ssh URL-like format
         m = re.match(regex_repo_url, url)
 
     if m:
@@ -34,14 +35,17 @@ def scm(name):
         return cls
     return _scm
 
+
 def staticclass(cls):
     for k, v in cls.__dict__.items():
         if hasattr(v, '__call__') and not k.startswith('__'):
             setattr(cls, k, staticmethod(v))
     return cls
 
+
 class ProcessException(Exception):
     pass
+
 
 @scm('git')
 @staticclass
@@ -55,16 +59,16 @@ class Git(object):
 
     def cleanup(very_verbose=False):
         print("Cleaning up Git index")
-        pquery([git_cmd, 'checkout', '--detach', 'HEAD'] + ([] if very_verbose else ['-q'])) # detach head so local branches are deletable
+        pquery([git_cmd, 'checkout', '--detach', 'HEAD'] + ([] if very_verbose else ['-q']))  # detach head so local branches are deletable
         branches = []
-        lines = pquery([git_cmd, 'branch']).strip().splitlines() # fetch all local branches
+        lines = pquery([git_cmd, 'branch']).strip().splitlines()  # fetch all local branches
         for line in lines:
             if re.match(r'^\*?\s+\((.+)\)$', line):
                 continue
             line = re.sub(r'\s+', '', line)
             branches.append(line)
 
-        for branch in branches: # delete all local branches so the new repo clone is not poluted
+        for branch in branches:  # delete all local branches so the new repo clone is not poluted
             pquery([git_cmd, 'branch', '-D', branch])
 
     def clone(url, name=None, depth=None, protocol=None, very_verbose=False):
@@ -75,14 +79,14 @@ class Git(object):
             hide_progress()
 
     def add(dest, very_verbose=False):
-        print("Adding reference "+dest)
+        print("Adding reference " + dest)
         try:
             popen([git_cmd, 'add', dest] + (['-v'] if very_verbose else []))
         except ProcessException:
             pass
 
     def remove(dest, very_verbose=False):
-        print("Removing reference "+dest)
+        print("Removing reference " + dest)
         try:
             pquery([git_cmd, 'rm', '-f', dest] + ([] if very_verbose else ['-q']))
         except ProcessException:
@@ -102,9 +106,9 @@ class Git(object):
             else:
                 err = "Unable to publish outgoing changes for \"%s\" in \"%s\".\n" % (os.path.basename(getcwd()), getcwd())
                 if not remote:
-                    print(err+"The local repository is not associated with a remote one.", 1)
+                    print(err + "The local repository is not associated with a remote one.", 1)
                 if not branch:
-                    print(err+"Working set is not on a branch.", 1)
+                    print(err + "Working set is not on a branch.", 1)
 
     def fetch(very_verbose=False, verbose=False):
         print("Fetching revisions from remote repository to \"%s\"" % os.path.basename(getcwd()))
@@ -112,9 +116,9 @@ class Git(object):
 
     def discard(clean_files=False):
         print("Discarding local changes in \"%s\"" % os.path.basename(getcwd()))
-        pquery([git_cmd, 'reset', 'HEAD'] + ([] if very_verbose else ['-q'])) # unmarks files for commit
-        pquery([git_cmd, 'checkout', '.'] + ([] if very_verbose else ['-q'])) # undo  modified files
-        pquery([git_cmd, 'clean', '-fd'] + (['-x'] if clean_files else []) + (['-q'] if very_verbose else ['-q'])) # cleans up untracked files and folders
+        pquery([git_cmd, 'reset', 'HEAD'] + ([] if very_verbose else ['-q']))  # unmarks files for commit
+        pquery([git_cmd, 'checkout', '.'] + ([] if very_verbose else ['-q']))  # undo  modified files
+        pquery([git_cmd, 'clean', '-fd'] + (['-x'] if clean_files else []) + (['-q'] if very_verbose else ['-q']))  # cleans up untracked files and folders
 
     def merge(dest, very_verbose=False, verbose=False):
         print("Merging \"%s\" with \"%s\"" % (os.path.basename(getcwd()), dest))
@@ -126,13 +130,13 @@ class Git(object):
         print("Checkout \"%s\" in %s" % (rev, os.path.basename(getcwd())))
         branch = None
         refs = Git.getbranches(rev)
-        for ref in refs: # re-associate with a local or remote branch (rev is the same)
+        for ref in refs:  # re-associate with a local or remote branch (rev is the same)
             m = re.match(r'^(.*?)\/(.*?)$', ref)
-            if m and m.group(2) != "HEAD": # matches origin/<branch> and isn't HEAD ref
-                if not os.path.exists(os.path.join('.git', 'refs', 'heads', m.group(2))): # okay only if local branch with that name doesn't exist (git will checkout the origin/<branch> in that case)
+            if m and m.group(2) != "HEAD":  # matches origin/<branch> and isn't HEAD ref
+                if not os.path.exists(os.path.join('.git', 'refs', 'heads', m.group(2))):  # okay only if local branch with that name doesn't exist (git will checkout the origin/<branch> in that case)
                     branch = m.group(2)
             elif ref != "HEAD":
-                branch = ref # matches local branch and isn't HEAD ref
+                branch = ref  # matches local branch and isn't HEAD ref
 
             if branch:
                 print("Revision \"%s\" matches a branch \"%s\" reference. Re-associating with branch" % (rev, branch))
@@ -160,9 +164,9 @@ class Git(object):
             else:
                 err = "Unable to update \"%s\" in \"%s\"." % (os.path.basename(getcwd()), getcwd())
                 if not remote:
-                    print(err+" The local repository is not associated with a remote one.")
+                    print(err + " The local repository is not associated with a remote one.")
                 if not branch:
-                    print(err+" Working set is not on a branch.")
+                    print(err + " Working set is not on a branch.")
 
     def status(very_verbose=False):
         return pquery([git_cmd, 'status', '-s'] + (['-v'] if very_verbose else []))
@@ -232,7 +236,7 @@ class Git(object):
         remotes = Git.getremotes()
         for remote in remotes:
             url = remote[1]
-            if remote[0] == "origin": # Prefer origin URL
+            if remote[0] == "origin":  # Prefer origin URL
                 break
         return formaturl(url)
 
@@ -272,8 +276,8 @@ class Git(object):
             m = re.match(r'^(.+)\s+refs\/tags\/(.+)$', ref)
             if m:
                 t = m.group(2)
-                if re.match(r'^(.+)\^\{\}$', t): # detect tag "pointer"
-                    t = re.sub(r'\^\{\}$', '', t) # remove "pointer" chars, e.g. some-tag^{}
+                if re.match(r'^(.+)\^\{\}$', t):  # detect tag "pointer"
+                    t = re.sub(r'\^\{\}$', '', t)  # remove "pointer" chars, e.g. some-tag^{}
                     for tag in tags:
                         if tag[1] == t:
                             tags.remove(tag)
@@ -298,7 +302,7 @@ class Git(object):
                 os.mkdir(ignore_file_parent_directory)
 
             with open(Git.ignore_file, 'w') as f:
-                f.write('\n'.join(ignores)+'\n')
+                f.write('\n'.join(ignores) + '\n')
         except IOError:
             print("Unable to write ignore file in \"%s\"" % os.path.join(getcwd(), Git.ignore_file), 1)
 
@@ -319,6 +323,7 @@ class Git(object):
                     f.write(dest.replace("\\", "/") + '\n')
             except IOError:
                 print("Unable to write ignore file in \"%s\"" % os.path.join(getcwd(), Git.ignore_file), 1)
+
     def unignore(dest):
         try:
             with open(Git.ignore_file) as f:
@@ -349,6 +354,7 @@ class Git(object):
                 show_progress('Downloading', (float(m.group(3)) / float(m.group(4))) * 10 + 80)
             if m.group(1) == "Checking out files":
                 show_progress('Downloading', (float(m.group(3)) / float(m.group(4))) * 10 + 90)
+
 
 ignores = [
     # Version control folders
@@ -397,4 +403,4 @@ ignores = [
     # Python
     "*.py[cod]",
     "# subrepo ignores",
-    ]
+]

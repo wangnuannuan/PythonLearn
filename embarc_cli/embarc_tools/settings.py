@@ -10,8 +10,25 @@ OSP_PATH = ""
 CURRENT_PLATFORM = platform.system()
 python_version = platform.python_version()
 MakefileNames = ['Makefile', 'makefile', 'GNUMakefile']
-MIDDLEWARE = ["aws", "coap", "common", "fatfs", "http_parser", "ihex", "lwip-contrib", "Lwip", "mbedtls", "mqtt", "ntshell", "openthread", "parson", "u8glib", "wakaama"]
-LIBRARIES = ["clib","secureshield"]
+MIDDLEWARE = [
+    "aws",
+    "coap",
+    "common",
+    "fatfs",
+    "http_parser",
+    "ihex",
+    "lwip-contrib",
+    "Lwip",
+    "mbedtls",
+    "mqtt",
+    "ntshell",
+    "openthread",
+    "parson",
+    "u8glib",
+    "wakaama"
+]
+LIBRARIES = ["clib", "secureshield"]
+
 
 def get_input(input_str):
     if python_version.startswith("2"):

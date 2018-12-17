@@ -11,7 +11,8 @@ except NameError:
 import re
 import os
 from .. download_manager import (getcwd, cd, rmtree_readonly, cwd_root, relpath)
-from embarc_tools.osp import (formaturl,regex_local_ref,regex_url_ref, scms, ProcessException)
+from embarc_tools.osp import (formaturl, regex_local_ref, regex_url_ref, scms, ProcessException)
+
 
 class Repo(object):
     is_local = False
@@ -21,7 +22,6 @@ class Repo(object):
     rev = None
     cache = None
     scm = None
-
 
     @classmethod
     def fromurl(cls, url, path=None):
@@ -47,7 +47,7 @@ class Repo(object):
         return repo
 
     @classmethod
-    def fromlib(cls, lib=None):# get url from .lib
+    def fromlib(cls, lib=None):  # get url from .lib
         with open(lib) as f:
             ref = f.read(200)
 
@@ -61,9 +61,9 @@ class Repo(object):
             return cls.fromurl(ref, lib[:-4])
 
     @classmethod
-    def isrepo(cls, path=None):# a folder is a git repo
+    def isrepo(cls, path=None):  # a folder is a git repo
         name = ".git"
-        if os.path.isdir(os.path.join(path, '.'+name)):
+        if os.path.isdir(os.path.join(path, '.' + name)):
             return True
         return False
 
@@ -107,7 +107,7 @@ class Repo(object):
             revtags = self.gettags(rev) if rev else []
             output = ('rev ' if fmt & 1 else '') + (('#' + rev[:12] + ((' (tag' + ('s' if len(revtags) > 1 else '') + ': ' + ', '.join(revtags[0:2]) + ')') if len(revtags) else '')) if fmt & 2 and rev else '')
         else:
-            output = ('branch/tag' if fmt & 1 else '') + (' "'+rev+'"' if fmt & 2 else '')
+            output = ('branch/tag' if fmt & 1 else '') + (' "' + rev + '"' if fmt & 2 else '')
 
         return re.sub(r' \(', ', ', re.sub(r'\)', '', output)) if fmt & 4 else output
 
@@ -128,7 +128,7 @@ class Repo(object):
     def fullurl(self):
         if self.url:
             return (self.url.rstrip('/') + '/' +
-                    (('#') +self.rev if self.rev else ''))
+                    (('#') + self.rev if self.rev else ''))
 
     def sync(self):
         self.url = None
@@ -154,13 +154,13 @@ class Repo(object):
                 pass
 
             try:
-                self.libs = list(self.getlibs()) # .bld .lib repo
+                self.libs = list(self.getlibs())  # .bld .lib repo
             except ProcessException:
                 pass
 
     def getscm(self):
         for name, scm in scms.items():
-            if os.path.isdir(os.path.join(self.path, '.'+name)):
+            if os.path.isdir(os.path.join(self.path, '.' + name)):
                 return scm
 
     def gettags(self, rev=None):
@@ -252,7 +252,7 @@ class Repo(object):
 
     def getlibs(self):
         for root, dirs, files in os.walk(self.path):
-            dirs[:] = [d for d in dirs  if not d.startswith('.')]
+            dirs[:] = [d for d in dirs if not d.startswith('.')]
             files[:] = [f for f in files if not f.startswith('.')]
 
             for f in files:
@@ -263,24 +263,24 @@ class Repo(object):
                     if f[:-4] in dirs:
                         dirs.remove(f[:-4])
 
-    def write(self): #for lib
+    def write(self):
         up = urlparse(self.url)
         if up.hostname:
-            url = up._replace(netloc=up.hostname + (':'+str(up.port) if up.port else '')).geturl() # strip auth string
+            url = up._replace(netloc=up.hostname + (':' + str(up.port) if up.port else '')).geturl()  # strip auth string
         else:
-            url = self.url # use local repo "urls" as is
+            url = self.url  # use local repo "urls" as is
 
         if os.path.isfile(self.lib):
             with open(self.lib) as f:
                 lib_repo = Repo.fromurl(f.read().strip())
-                if (formaturl(lib_repo.url, 'https') == formaturl(url, 'https') # match URLs in common schema (https)
-                        and (lib_repo.rev == self.rev                           # match revs, even if rev is None (valid for repos with no revisions)
-                             or (lib_repo.rev and self.rev
-                                 and lib_repo.rev == self.rev[0:len(lib_repo.rev)]))):  # match long and short rev formats
-                    #print self.name, 'unmodified'
+                if (formaturl(lib_repo.url, 'https') == formaturl(url, 'https') and  # match URLs in common schema (https)
+                        (lib_repo.rev == self.rev or                         # match revs, even if rev is None (valid for repos with no revisions)
+                            (lib_repo.rev and self.rev and
+                                lib_repo.rev == self.rev[0:len(lib_repo.rev)]))):  # match long and short rev formats
                     return
 
-        if up.hostname == "github.com": # in public_scm_services:
+        if up.hostname == "github.com":
+            # in public_scm_services:
             # Safely convert repo URL to https schema if this is a public SCM service (github/butbucket), supporting all schemas.
             # This allows anonymous cloning of public repos without having to have ssh keys and associated accounts at github/bitbucket/etc.
             # Without this anonymous users will get clone errors with ssh repository links even if the repository is public.
@@ -290,14 +290,16 @@ class Repo(object):
         ref = url.rstrip('/') + '/' + ('#' + self.rev if self.rev else '')
         print("[embARC] Updating reference \"%s\" -> \"%s\"" % (relpath(cwd_root, self.path) if cwd_root != self.path else self.name, ref))
         with open(self.lib, 'w') as f:
-            f.write(ref+"\n")
+            f.write(ref + "\n")
 
-    def rm_untracked(self): # untracked some file
+    def rm_untracked(self):
+        # untracked some file
         untracked = self.scm.untracked()
         for f in untracked:
             if re.match(r'(.+)\.(lib)$', f) and os.path.isfile(f):
                 print("[embARC] Remove untracked library reference \"%s\"" % f)
                 os.remove(f)
+
     def url2cachedir(self, url):
         up = urlparse(formaturl(url, 'https'))
         if self.cache and up and up.netloc:
@@ -305,21 +307,23 @@ class Repo(object):
 
     def get_cache(self, url, scm):
         cpath = self.url2cachedir(url)
-        if cpath and os.path.isdir(os.path.join(cpath, '.'+scm)):
+        if cpath and os.path.isdir(os.path.join(cpath, '.' + scm)):
             return cpath
+
     def set_cache(self, url):
         cpath = self.url2cachedir(url)
         if cpath and os.path.isdir(self.path):
             try:
                 if not os.path.isdir(cpath):
                     os.makedirs(cpath)
-                scm_dir = '.'+self.scm.name
+                scm_dir = '.' + self.scm.name
                 if os.path.isdir(os.path.join(cpath, scm_dir)):
                     rmtree_readonly(os.path.join(cpath, scm_dir))
                 shutil.copytree(os.path.join(self.path, scm_dir), os.path.join(cpath, scm_dir))
             except Exception:
                 print("[embARC] Unable to cache \"%s\" to \"%s\"" % (self.path, cpath))
         return False
+
     def can_update(self, clean, clean_deps):
         err = None
         if (self.is_local or self.url is None) and not clean_deps:

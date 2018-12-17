@@ -8,6 +8,7 @@ from embarc_tools.notify import print_table
 from ..builder import build
 help = "Show application config"
 
+
 def run(args):
     root = getcwd()
     app_path = None
@@ -31,13 +32,12 @@ def run(args):
                     if exe:
 
                         opt_lines = exe.splitlines()
-
                         table_head = [" ", opt_lines[0].strip("=")]
                         table_content = list()
                         for opt_line in opt_lines:
                             table_line = opt_line.split(":", 1)
                             if len(table_line) > 1:
-                                if table_line[0].strip() in ["COMPILE_OPT","ASM_OPT","LINK_OPT", "DBG_HW_FLAGS", "CXX_COMPILE_OPT"]:
+                                if table_line[0].strip() in ["COMPILE_OPT", "ASM_OPT", "LINK_OPT", "DBG_HW_FLAGS", "CXX_COMPILE_OPT"]:
                                     table_line_list = table_line[1].split(" ")
                                     for i in range(len(table_line_list)):
                                         table_line_list[i] = table_line_list[i].replace("-I", "include: ")
@@ -57,4 +57,3 @@ def setup(subparser):
         "-a", "--application", help="Application path")
     subparser.add_argument(
         "--verbose", action="store_true", help="Show config in detail")
-

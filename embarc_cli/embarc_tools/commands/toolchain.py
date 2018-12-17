@@ -10,7 +10,7 @@ def run(args):
     if args.toolchain == "gnu":
         toolchain_class = gnu.Gnu()
     elif args.toolchain == "mw":
-        toolchain_class =  metaware.Mw()
+        toolchain_class = metaware.Mw()
     else:
         msg = "The toolchain (%s) you input is not supported" % args.toolchain
         print_string(msg, level="warning")

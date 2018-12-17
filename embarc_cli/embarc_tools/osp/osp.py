@@ -1,10 +1,11 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-from ..download_manager import generate_yaml, edit_yaml, getcwd ,cd
+from ..download_manager import generate_yaml, edit_yaml, getcwd, cd
 from embarc_tools.notify import (print_string, print_table, COLORS)
 from embarc_tools.settings import *
 import yaml
 import os
 from embarc_tools.exporter import Exporter
+
 
 class OSP(object):
     def __init__(self, file="osp.yaml"):
@@ -27,16 +28,16 @@ class OSP(object):
             self.cfg_dict = yaml.load(fl)
         self.current = self.get_path()
 
-    def set_path(self, path ,url=None):
+    def set_path(self, path, url=None):
         fl = os.path.join(self.path, self.file)
         path = path.replace("\\", "/")
         try:
             with open(fl) as f:
                 self.cfg_dict = yaml.load(f)
                 if self.cfg_dict:
-                    for key, path_dict  in self.cfg_dict.items():
+                    for key, path_dict in self.cfg_dict.items():
                         for url_, path_ in path_dict.items():
-                            if path==path_ :
+                            if path == path_:
                                 return
                 path_num = 0
                 if self.cfg_dict:
@@ -59,7 +60,7 @@ class OSP(object):
             with open(fl) as f:
                 self.cfg_dict = yaml.load(f)
                 if self.cfg_dict:
-                    for path, path_dict  in self.cfg_dict.items():
+                    for path, path_dict in self.cfg_dict.items():
                         if path_dict.get("local", None):
                             osp_root = path_dict["local"]
                             if self.is_osp(osp_root):
@@ -68,6 +69,7 @@ class OSP(object):
 
         except IOError:
             raise IOError("Can not open file %s ." % fl)
+
     def clear_path(self):
         fl = os.path.join(self.path, self.file)
         try:
@@ -121,7 +123,7 @@ class OSP(object):
                     pass
                 else:
                     return False
-            self.set_path(path=path,url=None)
+            self.set_path(path=path, url=None)
             return path
         else:
             return False
@@ -287,16 +289,12 @@ class OSP(object):
 
         return makefile, build_template
 
-    def update_makefile(self, value, path): # update embarc_root in makefile
+    def update_makefile(self, value, path):
+        """ update embarc_root in makefile"""
         with cd(path):
             print_string("Update makefile {}".format(value))
             build_template = dict()
             makefile, build_template = self.get_makefile_config(build_template, verbose=True)
-            build_template.update(value) #["EMBARC_OSP_ROOT"] = value
+            build_template.update(value)
             exporter = Exporter("application")
             exporter.gen_file_jinja("makefile.tmpl", build_template, makefile, os.getcwd())
-
-
-
-
-

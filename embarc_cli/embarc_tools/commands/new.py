@@ -8,6 +8,7 @@ from embarc_tools.exporter import Exporter
 import collections
 help = "Create a new application"
 
+
 def run(args):
 
     olevel = args.olevel
@@ -35,7 +36,7 @@ def run(args):
 
     config["olevel"] = olevel
     app_path = os.path.join(getcwd(), application)
-    config["EMBARC_OSP_ROOT"] = config["EMBARC_OSP_ROOT"].replace("\\" , "/")
+    config["EMBARC_OSP_ROOT"] = config["EMBARC_OSP_ROOT"].replace("\\", "/")
     config["middleware"] = args.middleware
     config["csrc"] = args.csrc
     config["asmsrc"] = args.asmsrc
@@ -48,6 +49,10 @@ def run(args):
     exporter.gen_file_jinja("makefile.tmpl", config, "makefile", application)
     exporter.gen_file_jinja("main.c.tmpl", config, "main.c", application)
     print_string("Finish generate makefile and main.c, and they are in " + app_path)
+    print(args.csrc)
+    if args.csrc != ".":
+        mkdir(os.path.join(getcwd(), application, args.csrc))
+
 
 def build_config(args):
     osppath = osp.OSP()
@@ -138,6 +143,7 @@ def build_config(args):
     config["EMBARC_OSP_ROOT"] = os.path.abspath(osp_root)
     return config
 
+
 def setup(subparser):
     subparser.add_argument(
         "-a", "--application", help="Application to be created")
@@ -154,15 +160,16 @@ def setup(subparser):
     subparser.add_argument(
         "-o", "--olevel", default="O3", help="Choose olevel")
     subparser.add_argument(
-        '-m', '--middleware', action='store', default= "common", help='Choose a middleware')
+        '-m', '--middleware', action='store', default="common", help='Choose a middleware')
     subparser.add_argument(
-        '--csrc', action='store', default= ".", help='Application source dirs')
+        '--csrc', action='store', default=".", help='Application source dirs')
     subparser.add_argument(
-        '--asmsrc', action='store', default= ".", help='Application source dirs')
+        '--asmsrc', action='store', default=".", help='Application source dirs')
     subparser.add_argument(
-        '--include', action='store', default= ".", help='Application include dirs')
+        '--include', action='store', default=".", help='Application include dirs')
     subparser.add_argument(
-        '--defines', action='store', default= ".", help='Application defines')
+        '--defines', action='store', default=".", help='Application defines')
     subparser.add_argument(
-        '--os', action='store', default= "", help='Choose os')
-    subparser.add_argument('--library', action='store', default= "", help='Choose library')
+        '--os', action='store', default="", help='Choose os')
+    subparser.add_argument(
+        '--library', action='store', default="", help='Choose library')

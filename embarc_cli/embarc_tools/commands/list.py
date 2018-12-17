@@ -5,10 +5,11 @@ from ..notify import (print_string, print_table)
 
 help = "Build configurations in embarc osp"
 
+
 def run(args):
     osp_root = args.osp
     osppath = osp.OSP()
-    if not any([args.board, args.bd_ver, args.core, args.toolchain, args.middleware,args.libraries]):
+    if not any([args.board, args.bd_ver, args.core, args.toolchain, args.middleware, args.libraries]):
         msg = "Please select a parameter [--board --bd_ver --core --toolchain --middleware --libraries]"
         print_string(msg, level="warning")
         return
@@ -55,6 +56,7 @@ def run(args):
     else:
         msg = "Please set a valid osp root [--osp]"
         print_string(msg, level="warning")
+
 
 def setup(subparser):
     subparser.add_argument(

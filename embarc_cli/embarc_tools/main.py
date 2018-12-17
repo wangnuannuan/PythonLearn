@@ -1,28 +1,47 @@
 from __future__ import print_function, absolute_import, unicode_literals
 import argparse
-import os, sys
+import os
+import sys
 import pkg_resources
-from embarc_tools.commands import new, showconfig, build, show, toolchain, osp, ide
-subcommands = {
-    "new": new,
-    "appconfig": showconfig,
-    "build": build,
-    "list": show,
-    "toolchain": toolchain,
-    "osp": osp,
-    "ide": ide,
-}
+from embarc_tools import commands
+import pkgutil
+import importlib
+
+
+def import_submodules(package, recursive=True):
+    """ Import all submodules of a module, recursively, including subpackages
+
+    :param package: package (name or actual module)
+    :type package: str | module
+    :rtype: dict[str, types.ModuleType]
+    """
+    results = {}
+    for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
+        full_name = package.__name__ + '.' + name
+        results[name] = importlib.import_module(full_name)
+        if recursive and is_pkg:
+            results.update(import_submodules(full_name))
+    return results
+
+
+subcommands = import_submodules(commands)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-v', dest='verbosity', action='count', default=0,
-        help='Increase the verbosity of the output (repeat for more verbose output)')
-    parser.add_argument('-q', dest='quietness', action='count', default=0,
-        help='Decrease the verbosity of the output (repeat for more verbose output)')
-    parser.add_argument("--version", action='version',
-        version=pkg_resources.require("embarc_cli")[0].version, 
-        help="Display version")
+    parser.add_argument(
+        '-v', dest='verbosity', action='count', default=0,
+        help='Increase the verbosity of the output'
+    )
+    parser.add_argument(
+        '-q', dest='quietness', action='count', default=0,
+        help='Decrease the verbosity of the output'
+    )
+    parser.add_argument(
+        "--version", action='version',
+        version=pkg_resources.require("embarc_cli")[0].version,
+        help="Display version"
+    )
     subparsers = parser.add_subparsers(help='commands')
 
     for name, module in subcommands.items():
@@ -50,7 +69,7 @@ def main():
                 make_list.append(argv)
             elif distance == 1:
                 if "-" not in argv:
-                   target = argv
+                    target = argv
                 else:
                     argv_list.append(argv)
             else:

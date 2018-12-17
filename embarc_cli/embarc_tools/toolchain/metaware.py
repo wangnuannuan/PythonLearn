@@ -4,7 +4,8 @@ from distutils.spawn import find_executable
 from embarc_tools.utils import pquery
 import re
 import os
-from .. download_manager import (download_file, extract_file, getcwd, mkdir,delete_dir_files)
+from .. download_manager import (download_file, extract_file, getcwd, mkdir, delete_dir_files)
+
 
 class Mw(arcToolchain):
     version = "2017.09"
@@ -22,7 +23,7 @@ class Mw(arcToolchain):
         cmd = ["ccac", "-v"]
         try:
             exe = pquery(cmd)
-            version = re.search(r"[0-9]*\.[0-9]*",exe).group(0)
+            version = re.search(r"[0-9]*\.[0-9]*", exe).group(0)
             if version:
                 return version
         except Exception as e:
@@ -44,7 +45,6 @@ class Mw(arcToolchain):
         path - the compressed package is extracted to this path
         return the root path of gnu and set self.path'''
         pass
-
 
     def set_env(self, path=None):
         self.set_toolchain_env("mw", path)

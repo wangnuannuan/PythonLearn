@@ -12,8 +12,10 @@ TOOLCHAIN_PATHS = {
     "mw": MW_PATH
 }
 
+
 class ProcessException(Exception):
     pass
+
 
 class arcToolchain:
 
@@ -59,12 +61,12 @@ class arcToolchain:
         return False if failed
         '''
         platform = self.get_platform()
-        if platform  == "Windows":
+        if platform == "Windows":
             from embarc_tools.toolchain import windows_env_set_arc
             env_obj = windows_env_set_arc.Win32Environment(scope="user")
-            windows_env_set_arc.set_env_path(env_obj,'Path', toolchain_root)
+            windows_env_set_arc.set_env_path(env_obj, 'Path', toolchain_root)
             return True
-        elif platform  == "Linux":
+        elif platform == "Linux":
             file_path = os.path.dirname(os.path.abspath(__file__))
             work_path = getcwd()
             toolchain_root = os.path.dirname(toolchain_root)
@@ -76,26 +78,26 @@ class arcToolchain:
                 with open(bashrc) as f:
                     lines = f.read().splitlines()
 
-                    toolchain_var_name = "ARC_%s_ROOT"%(tool_key.upper())
+                    toolchain_var_name = "ARC_%s_ROOT" % (tool_key.upper())
                     set_toolchain_var = False
                     set_toolchain_path = False
                     for line in lines:
                         if line.startswith(toolchain_var_name):
-                            line = "%s=%s"%(toolchain_var_name, toolchain_root)
+                            line = "%s=%s" % (toolchain_var_name, toolchain_root)
                             set_toolchain_var = True
                         if line.startswith("export PATH="):
                             if toolchain_root not in line:
-                                line = "%s:%s/bin"%(line, toolchain_root)
+                                line = "%s:%s/bin" % (line, toolchain_root)
                             set_toolchain_path = True
                         content.append(line)
                     if not set_toolchain_var:
-                        content.append("%s=%s"%(toolchain_var_name, toolchain_root))
+                        content.append("%s=%s" % (toolchain_var_name, toolchain_root))
                     if not set_toolchain_path:
-                        content.append("export PATH=$PATH:%s:%s/bin"%(line, toolchain_root))
+                        content.append("export PATH=$PATH:%s:%s/bin" % (line, toolchain_root))
                     f.close()
                 with open(bashrc, "w") as f:
                     for line in content:
-                        f.write("%s\n"%(line))
+                        f.write("%s\n" % (line))
                     f.close()
             except Exception as e:
                 print(e)
@@ -103,6 +105,3 @@ class arcToolchain:
         else:
             print("this platform {} is not supported".format(platform))
             return False
-
-
-

@@ -6,8 +6,9 @@ from embarc_tools.notify import (print_string, print_table)
 
 help = "Set embarc osp"
 
+
 def run(args):
-    if not any([args.list ,args.clone]):
+    if not any([args.list, args.clone]):
         msg = "Please select a parameter [--clone, --list]"
         print_string(msg, level="warning")
     osp_path = osp.OSP()
@@ -28,10 +29,9 @@ def run(args):
         else:
             print_string("There is already a folder or file named 'embarc_osp' under current path")
 
+
 def setup(subparser):
     subparser.add_argument(
         "--clone", action="store_true", help="clone embarc_osp")
     subparser.add_argument(
         "--list", action="store_true", help="List osp path")
-
-

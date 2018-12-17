@@ -10,10 +10,11 @@ from ..osp import osp
 import collections
 from embarc_tools.utils import pqueryOutputinline, pqueryTemporaryFile
 
-BUILD_OPTION_NAMES=['BOARD', 'BD_VER', 'CUR_CORE', 'TOOLCHAIN', 'OLEVEL', 'V', 'DEBUG', 'SILENT', 'JTAG']
-BUILD_INFO_NAMES=['EMBARC_ROOT', 'OUT_DIR_ROOT', 'BUILD_OPTION', 'APPLICATION_NAME', 'APPLICATION_LINKSCRIPT', 'APPLICATION_ELF', 'APPLICATION_BIN', 'APPLICATION_HEX', 'APPLICATION_MAP', 'APPLICATION_DUMP', 'APPLICATION_DASM', 'MIDDLEWARE', 'PERIPHERAL']
-BUILD_CFG_NAMES=['EMBARC_ROOT', 'OUT_DIR_ROOT', 'COMPILE_OPT', 'CXX_COMPILE_OPT', 'ASM_OPT', 'AR_OPT', 'LINK_OPT', 'DEBUGGER', 'DBG_HW_FLAGS', 'MDB_NSIM_OPT']
-BUILD_SIZE_SECTION_NAMES=['text', 'data', 'bss']
+BUILD_OPTION_NAMES = ['BOARD', 'BD_VER', 'CUR_CORE', 'TOOLCHAIN', 'OLEVEL', 'V', 'DEBUG', 'SILENT', 'JTAG']
+BUILD_INFO_NAMES = ['EMBARC_ROOT', 'OUT_DIR_ROOT', 'BUILD_OPTION', 'APPLICATION_NAME', 'APPLICATION_LINKSCRIPT', 'APPLICATION_ELF', 'APPLICATION_BIN', 'APPLICATION_HEX', 'APPLICATION_MAP', 'APPLICATION_DUMP', 'APPLICATION_DASM', 'MIDDLEWARE', 'PERIPHERAL']
+BUILD_CFG_NAMES = ['EMBARC_ROOT', 'OUT_DIR_ROOT', 'COMPILE_OPT', 'CXX_COMPILE_OPT', 'ASM_OPT', 'AR_OPT', 'LINK_OPT', 'DEBUGGER', 'DBG_HW_FLAGS', 'MDB_NSIM_OPT']
+BUILD_SIZE_SECTION_NAMES = ['text', 'data', 'bss']
+
 
 class embARC_Builder:
     def __init__(self, osproot=None, buildopts=None, outdir=None):
@@ -43,25 +44,25 @@ class embARC_Builder:
 
     @staticmethod
     def build_common_check(app):
-        build_status = {'result': True, 'reason':''}
+        build_status = {'result': True, 'reason': ''}
         app_normpath = os.path.normpath(app)
-        if os.path.isdir(app_normpath) == False:
+        if not os.path.isdir(app_normpath):
             build_status['reason'] = 'Application folder doesn\'t exist!'
             build_status['result'] = False
-        if not (os.path.exists(app_normpath+'/makefile') or \
-                os.path.exists(app_normpath+'/Makefile') or \
-                os.path.exists(app_normpath+'/GNUmakefile')):
+        if not (os.path.exists(app_normpath + '/makefile') or
+                os.path.exists(app_normpath + '/Makefile') or
+                os.path.exists(app_normpath + '/GNUmakefile')):
             build_status['reason'] = 'Application makefile donesn\'t exist!'
             build_status['result'] = False
 
-        app_realpath=os.path.realpath(app_normpath)
+        app_realpath = os.path.realpath(app_normpath)
         build_status['app_path'] = app_realpath
 
         return app_realpath, build_status
 
     def configCoverity(self, toolchain):
         print_string("Config coverity")
-        build_status = {'result': True, 'reason':''}
+        build_status = {'result': True, 'reason': ''}
         self.coverity_comptype = 'gcc'
         self.coverity_compiler = 'arc-elf32-gcc'
         if toolchain == "gnu":
@@ -94,18 +95,20 @@ class embARC_Builder:
             delete_dir_files(self.coverity_html, dir=True)
 
     def build_coverity(self, make_cmd):
-        build_status = {'result': True, 'reason':''}
+        build_status = {'result': True, 'reason': ''}
         print_string("BEGIN SECTION Configure Coverity to use the built-incompiler")
-        config_compilercmd = "cov-configure --config {} --template --comptype {} --compiler {}".format(self.coverity_config,
-            self.coverity_comptype, self.coverity_compiler)
+        config_compilercmd = "cov-configure --config {} --template --comptype {} --compiler {}".format(
+            self.coverity_config,
+            self.coverity_comptype, self.coverity_compiler
+        )
         returncode = os.system(config_compilercmd)
-        if returncode != 0 :
+        if returncode != 0:
             build_status["result"] = False
             build_status["reason"] = "Configure Coverity Failed!"
             return build_status
 
         print_string("BEGIN SECTION Build with Coverity {}".format(self.coverity_sa_version))
-        coverity_build = "cov-build --config %s --dir %s %s"%(self.coverity_config, self.coverity_data_dir, make_cmd)
+        coverity_build = "cov-build --config %s --dir %s %s" % (self.coverity_config, self.coverity_data_dir, make_cmd)
         try:
             build_proc = pqueryOutputinline(coverity_build, console=True)
             build_status['build_msg'] = build_proc
@@ -117,33 +120,37 @@ class embARC_Builder:
         print_string("BEGIN SECTION Coverity Analyze Defects")
         coverity_analyze = "cov-analyze --dir {}".format(self.coverity_data_dir)
         returncode = os.system(coverity_analyze)
-        if returncode != 0 :
+        if returncode != 0:
             build_status["result"] = False
             build_status["reason"] = "Coverity Analyze Defects Failed!"
             return build_status
 
         print_string("BEGIN SECTION Coverity Format Errors into HTML")
-        coverity_errors = "cov-format-errors --dir %s -x -X --html-output %s"%(self.coverity_data_dir, self.coverity_html)
+        coverity_errors = "cov-format-errors --dir %s -x -X --html-output %s" % (self.coverity_data_dir, self.coverity_html)
         returncode = os.system(coverity_errors)
-        if returncode != 0 :
+        if returncode != 0:
             build_status["result"] = False
             build_status["reason"] = "Coverity Format Errors into HTML Failed!"
             return build_status
 
         print_string("BEGIN SECTION Coverity Send E-mail Notifications")
-        coverity_manage = "cov-manage-im --mode notification --execute --view 'Default' --host %s --user %s --password %s" %(self.coverity_server,
-            self.user, self.password)
+        coverity_manage = "cov-manage-im --mode notification --execute --view 'Default' --host %s --user %s --password %s" % (
+            self.coverity_server,
+            self.user, self.password
+        )
         returncode = os.system(coverity_manage)
-        if returncode != 0 :
+        if returncode != 0:
             build_status["result"] = False
             build_status["reason"] = " Coverity Send E-mail Notifications Failed!"
             return build_status
 
         print_string("BEGIN SECTION Coverity Commit defects to {} steam {}".format(self.coverity_server, self.coverity_steam))
-        coverity_commit = "cov-commit-defects --dir %s --host %s --stream %s --user %s --password %s"%(self.coverity_data_dir,
-            self.coverity_server, self.coverity_steam, self.user, self.password)
+        coverity_commit = "cov-commit-defects --dir %s --host %s --stream %s --user %s --password %s" % (
+            self.coverity_data_dir,
+            self.coverity_server, self.coverity_steam, self.user, self.password
+        )
         returncode = os.system(coverity_commit)
-        if returncode != 0 :
+        if returncode != 0:
             build_status["result"] = False
             build_status["reason"] = "Coverity Commit defects Failed!"
             return build_status
@@ -156,20 +163,20 @@ class embARC_Builder:
         build_status['time_cost'] = 0
         print_string("Build target: {} " .format(target))
 
-        if build_status['result'] == False:
+        if not build_status['result']:
             return build_status
 
-        ### Check and create output directory
-        if self.outdir is not None and os.path.isdir(self.outdir) == False:
+        # Check and create output directory
+        if not os.path.isdir(self.outdir) and self.outdir is not None:
             print_string("Create application output directory: " + self.outdir)
             os.makedirs(self.outdir)
 
         build_precmd = "make "
         if parallel:
             build_precmd = "{} -j {}".format(build_precmd, str(parallel))
-        build_precmd = "{} {}".format(build_precmd, self.make_options) #+= self.make_options
+        build_precmd = "{} {}".format(build_precmd, self.make_options)
         if silent:
-            if not "SILENT=1" in build_precmd:
+            if "SILENT=1" not in build_precmd:
                 build_precmd = "{} SILENT=1 ".format(build_precmd)
 
         if type(target) is str or target is None:
@@ -182,7 +189,7 @@ class embARC_Builder:
         if target != "info":
             build_config_template = self.get_build_template()
             with cd(app_realpath):
-                self.get_makefile_config(build_config_template) # self.buildopts =
+                self.get_makefile_config(build_config_template)
             build_cmd_list = build_cmd.split()
             for i in range(len(build_cmd_list)):
                 if build_cmd_list[i].startswith("EMBARC_ROOT"):
@@ -232,7 +239,7 @@ class embARC_Builder:
 
     def get_build_info(self, app, parallel=False):
         build_status = self.build_target(app, target=str('opt'), parallel=parallel)
-        if build_status['result'] == False:
+        if not build_status['result']:
             return build_status
 
         build_cfg = dict()
@@ -248,13 +255,12 @@ class embARC_Builder:
 
         build_status['build_cfg'] = build_cfg
 
-        ### Get Build Info
+        # Get Build Info
         info_status = self.build_target(app, target=str('info'))
         build_out = info_status['build_msg']
         build_info = dict()
         if info_status['result']:
-            # info_lines = build_out.splitlines()
-            for info_line in build_out:#info_lines:
+            for info_line in build_out:
                 words = info_line.split(':')
                 if len(words) == 2:
                     key = words[0].strip()
@@ -262,13 +268,13 @@ class embARC_Builder:
                     if key in BUILD_INFO_NAMES:
                         build_info[key] = value
                     if key == 'BUILD_OPTION':
-                       build_cfgs_dict = value.split()
-                       for cfg_dict in build_cfgs_dict:
-                           cfg_pair = cfg_dict.split('=')
-                           if len(cfg_pair) == 2 and cfg_pair[0] in BUILD_OPTION_NAMES:
-                               build_status['build_cfg'][cfg_pair[0]] = cfg_pair[1]
+                        build_cfgs_dict = value.split()
+                        for cfg_dict in build_cfgs_dict:
+                            cfg_pair = cfg_dict.split('=')
+                            if len(cfg_pair) == 2 and cfg_pair[0] in BUILD_OPTION_NAMES:
+                                build_status['build_cfg'][cfg_pair[0]] = cfg_pair[1]
                     if key == 'MIDDLEWARE' or key == 'PERIPHERAL':
-                        build_info[key+'S'] = value.split()
+                        build_info[key + 'S'] = value.split()
                     if key == 'APPLICATION_ELF':
                         build_info['APPLICATION_OUTDIR'] = os.path.dirname(value)
         build_status['build_info'] = build_info
@@ -307,58 +313,58 @@ class embARC_Builder:
         return build_status
 
     def build_elf(self, app, parallel=False, pre_clean=False, post_clean=False, silent=False):
-        ### Clean Application before build if requested
+        # Clean Application before build if requested
         if pre_clean:
             build_status = self.build_target(app, parallel=parallel, target=str('clean'))
-            if build_status['result'] == False:
+            if not build_status['result']:
                 return build_status
 
-        ### Build Application
+        # Build Application
         build_status = self.build_target(app, parallel=parallel, target=str('all'), silent=silent)
-        if build_status['result'] == False:
+        if not build_status['result']:
             return build_status
-        ### Clean Application after build if requested
+        # Clean Application after build if requested
         if post_clean:
             clean_status = self.build_target(app, parallel=parallel, target=str('clean'))
-            if clean_status['result'] == False:
+            if not clean_status['result']:
                 return clean_status
 
         return build_status
 
     def build_bin(self, app, parallel=False, pre_clean=False, post_clean=False):
-        ### Clean Application before build if requested
+        # Clean Application before build if requested
         if pre_clean:
             build_status = self.build_target(app, parallel=parallel, target=str('clean'))
-            if build_status['result'] == False:
+            if not build_status['result']:
                 return build_status
 
-        ### Build Application
+        # Build Application
         build_status = self.build_target(app, parallel=parallel, target=str('bin'))
-        if build_status['result'] == False:
+        if not build_status['result']:
             return build_status
-        ### Clean Application after build if requested
+        # Clean Application after build if requested
         if post_clean:
             clean_status = self.build_target(app, parallel=parallel, target=str('clean'))
-            if clean_status['result'] == False:
+            if not clean_status['result']:
                 return clean_status
 
         return build_status
 
     def build_hex(self, app, parallel=False, pre_clean=False, post_clean=False):
-        ### Clean Application before build if requested
+        # Clean Application before build if requested
         if pre_clean:
             build_status = self.build_target(app, parallel=parallel, target=str('clean'))
-            if build_status['result'] == False:
+            if not build_status['result']:
                 return build_status
 
-        ### Build Application
+        # Build Application
         build_status = self.build_target(app, parallel=parallel, target=str('hex'))
-        if build_status['result'] == False:
+        if not build_status['result']:
             return build_status
-        ### Clean Application after build if requested
+        # Clean Application after build if requested
         if post_clean:
             clean_status = self.build_target(app, parallel=parallel, target=str('clean'))
-            if clean_status['result'] == False:
+            if not clean_status['result']:
                 return clean_status
 
         return build_status
@@ -366,11 +372,11 @@ class embARC_Builder:
     def get_build_size(self, app, parallel=False, silent=False):
         build_status = self.build_target(app, parallel=parallel, target=str('size'), silent=silent)
         build_size = dict()
-        if build_status['result'] == True:
+        if build_status['result']:
             app_size_lines = build_status['build_msg']
             len_app_size_lines = len(app_size_lines)
             if len_app_size_lines >= 3:
-                app_size_lines = app_size_lines[len_app_size_lines-2:]
+                app_size_lines = app_size_lines[len_app_size_lines - 2:]
                 section_names = app_size_lines[0].split()
                 section_values = app_size_lines[1].split()
                 for idx, section_name in enumerate(section_names):
@@ -409,7 +415,7 @@ class embARC_Builder:
             ospclass.update_makefile(new_osp_dict, os.getcwd())
 
         make_tool = "make"
-        if current_build_templates.get("TOOLCHAIN")== "mw":
+        if current_build_templates.get("TOOLCHAIN") == "mw":
             make_tool = "gmake"
         opt_command = [make_tool]
         opt_command.append(str("opt"))

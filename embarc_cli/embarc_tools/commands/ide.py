@@ -7,7 +7,7 @@ from ..osp import (osp)
 from embarc_tools.notify import print_string
 help = "Ide generator"
 
-#generator = Ide("baremetal_arc_feature_cache","projects.yaml")
+
 def run(args):
     buildopts = dict()
     osppath = osp.OSP()
@@ -28,7 +28,7 @@ def run(args):
 
     if os.path.exists(path):
         makefile = osppath.get_makefile(path)
-        if not makefile :
+        if not makefile:
             msg = "This is not a valid application path"
             print_string(msg, level="error")
             return
@@ -38,7 +38,7 @@ def run(args):
             if os.path.exists(".project") and os.path.exists(".cproject"):
                 while True:
                     yes = get_input("The IDE project already exists, recreate and overwrite the old files [Y/N]  ")
-                    if yes in ["yes", "Y",  "y"]:
+                    if yes in ["yes", "Y", "y"]:
                         break
                     elif yes in ["no", "n", "N"]:
                         return
@@ -47,9 +47,8 @@ def run(args):
 
             if args.generate:
                 generator = Generator()
-                for project in generator.generate(buildopts=buildopts):#"baremetal_arc_feature_cache"
+                for project in generator.generate(buildopts=buildopts):
                     project.generate()
-
 
 
 def setup(subparser):

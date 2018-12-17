@@ -7,15 +7,17 @@ import random
 from embarc_tools.settings import *
 from embarc_tools.notify import (print_string, print_table)
 import collections
-from embarc_tools.download_manager import cd
+from embarc_tools.download_manager import cd, getcwd
+
+
 class Generator:
 
     def generate(self, path=None, buildopts=None):
         yield Ide(buildopts=buildopts)
 
+
 class Ide:
     def __init__(self, path=None, buildopts=None):
-        #self.name = name
         self.ide = {}
         self.ide["common"] = {}
         self.ide["common"] = self._get_project_file_template()
@@ -23,12 +25,13 @@ class Ide:
         if path:
             self.ide["common"]["path"] = path
         else:
-            self.ide["common"]["path"] = os.getcwd().replace("\\", "/")
+            self.ide["common"]["path"] = getcwd().replace("\\", "/")
         print_string("Start to generate IDE project ")
+
     def _get_project_file_template(self, name="Default"):
         project_template = {
             "name": name,
-            "path":"",
+            "path": "",
             "folder": "",
             "root": "",
             "outdir": "${ProjDirPath}",
@@ -38,7 +41,7 @@ class Ide:
     def _get_cproject_template(self):
 
         cproject_template = {
-            "core": {}, #//duqu
+            "core": {},
             "includes": [],
             "defines": [],
             "build": "",
@@ -64,16 +67,20 @@ class Ide:
         build_template = self._get_build_template()
 
         osppath = osp.OSP()
-        makefile, current_build_template = osppath.get_makefile_config(build_template, verbose=True)
+        makefile, cur_build = osppath.get_makefile_config(
+            build_template, verbose=True
+        )
         build_template = collections.OrderedDict()
-        osp_root, update = osppath.check_osp(current_build_template["EMBARC_OSP_ROOT"])
+        osp_root, update = osppath.check_osp(cur_build["EMBARC_OSP_ROOT"])
 
-        current_build_template["EMBARC_OSP_ROOT"] = osp_root
+        cur_build["EMBARC_OSP_ROOT"] = osp_root
         self.ide["common"]["root"] = osp_root
-        self.ide["common"]["folder"] = os.path.relpath(os.getcwd(), osp_root).replace("\\", "/").strip("../")
+        self.ide["common"]["folder"] = os.path.relpath(
+            getcwd(), osp_root
+        ).replace("\\", "/").strip("../")
 
         make_tool = "make"
-        '''if current_build_template.get("TOOLCHAIN") == "mw":
+        '''if cur_build.get("TOOLCHAIN") == "mw":
             make_tool = "gmake" '''
         opt_command = [make_tool]
         opt_command.append("opt")
@@ -81,7 +88,9 @@ class Ide:
             if update:
                 opt_command.append("EMBARC_ROOT={}".format(osp_root))
             if self.buildopts:
-                newBuildConfigString = ["%s=%s" % (key, value) for (key, value) in self.buildopts.items()]
+                newBuildConfigString = [
+                    "%s=%s" % (key, value) for (key, value) in self.buildopts.items()
+                ]
                 opt_command.extend(newBuildConfigString)
         cmd_output = pquery(opt_command)
         includes = list()
@@ -89,45 +98,50 @@ class Ide:
         relative_root = ""
         if cmd_output:
             opt_lines = cmd_output.splitlines()
+            opt_value = opt_line.split(":", 1)[1]
             for opt_line in opt_lines:
                 if opt_line.startswith("APPL"):
-                    current_build_template["APPL"] = (opt_line.split(":", 1)[1]).strip()
-                build_template["APPL"] = current_build_template.get("APPL")
+                    cur_build["APPL"] = opt_value.strip()
+                build_template["APPL"] = cur_build.get("APPL")
                 if opt_line.startswith("BOARD"):
-                    current_build_template["BOARD"] = (opt_line.split(":", 1)[1]).strip()
-                build_template["BOARD"] = current_build_template.get("BOARD")
+                    cur_build["BOARD"] = opt_value.strip()
+                build_template["BOARD"] = cur_build.get("BOARD")
                 if opt_line.startswith("BD_VER"):
-                    current_build_template["BD_VER"] = (opt_line.split(":", 1)[1]).strip()
-                build_template["BD_VER"] = current_build_template.get("BD_VER")
+                    cur_build["BD_VER"] = opt_value.strip()
+                build_template["BD_VER"] = cur_build.get("BD_VER")
                 if opt_line.startswith("CUR_CORE"):
-                    current_build_template["CUR_CORE"] = (opt_line.split(":", 1)[1]).strip()
-                build_template["CUR_CORE"] = current_build_template.get("CUR_CORE")
+                    cur_build["CUR_CORE"] = opt_value.strip()
+                build_template["CUR_CORE"] = cur_build.get("CUR_CORE")
                 if opt_line.startswith("TOOLCHAIN"):
-                    current_build_template["TOOLCHAIN"] = (opt_line.split(":", 1)[1]).strip()
-                build_template["TOOLCHAIN"] = current_build_template.get("TOOLCHAIN")
+                    cur_build["TOOLCHAIN"] = opt_value.strip()
+                build_template["TOOLCHAIN"] = cur_build.get("TOOLCHAIN")
                 if opt_line.startswith("EMBARC_ROOT"):
-                    relative_root = (opt_line.split(":", 1)[1]).strip()
-                    osp_root = os.path.normpath(os.path.join(os.getcwd(), relative_root))
+                    relative_root = opt_value.strip()
+                    osp_root = os.path.normpath(
+                        os.path.join(getcwd(), relative_root)
+                    )
                     self.ide["common"]["root"] = osp_root.replace("\\", "/")
                     self.ide['common']['osp_root'] = os.path.basename(osp_root)
-                    current_build_template["EMBARC_OSP_ROOT"] = osp_root
-                build_template["EMBARC_OSP_ROOT"] = current_build_template.get("EMBARC_OSP_ROOT")
-                if  opt_line.startswith("COMPILE_OPT") == True:
-                    compile_opt_line = opt_line.split(":", 1)[1]
+                    cur_build["EMBARC_OSP_ROOT"] = osp_root
+                build_template["EMBARC_OSP_ROOT"] = cur_build.get(
+                    "EMBARC_OSP_ROOT"
+                )
+                if opt_line.startswith("COMPILE_OPT"):
+                    compile_opt_line = opt_value
                     compile_opts = compile_opt_line.split()
         if update or self.buildopts:
-            osppath.update_makefile(dict(build_template), os.getcwd())
+            osppath.update_makefile(dict(build_template), getcwd())
         print_string("Get inculdes and defines ")
         if compile_opts != "" and relative_root != "":
             for comp_opt in compile_opts:
-                if comp_opt.startswith("-I") == True:
+                if comp_opt.startswith("-I"):
                     inc_path = comp_opt.replace("-I", "", 1)
                     if inc_path.startswith(relative_root):
                         inc_path = os.path.relpath(inc_path, relative_root)
-                    inc_path = inc_path.replace("\\","/")
+                    inc_path = inc_path.replace("\\", "/")
 
                     includes.append(inc_path)
-                if comp_opt.startswith("-D") == True:
+                if comp_opt.startswith("-D"):
                     define = comp_opt.replace("-D", "", 1)
 
                     define = define.replace('\\"', '&quot;')
@@ -148,8 +162,11 @@ class Ide:
         cur_core = build_template["CUR_CORE"]
         self.ide["common"]["name"] = build_template["APPL"]
         core_description = "ARC {}".format(cur_core.upper())
-        cproject_template["core"] = {cur_core: {"description": core_description}}
-
+        cproject_template["core"] = {
+            cur_core: {
+                "description": core_description
+            }
+        }
         for core, settings in cproject_template["core"].items():
             core_id = random.randint(1000000000, 2000000000)
             cproject_template["core"][core]["id"] = core_id
@@ -163,12 +180,14 @@ class Ide:
             include = include.replace("\\", "/")
             cproject_template["includes"].append(include)
 
-
         self.ide["toolchain"] = build_template["TOOLCHAIN"]
         self.ide["common"]["links_folder"] = list()
         self.ide["common"]["links_file"] = list()
 
-        link_folders, link_files, virtual_folders = self.set_link_folders(includes, current_build_template)
+        link_folders, link_files, virtual_folders = self.set_link_folders(
+            includes,
+            cur_build
+        )
 
         self.ide["common"]["links_folder"].extend(link_folders)
         self.ide["common"]["links_file"].extend(link_files)
@@ -223,7 +242,9 @@ class Ide:
         for link in link_folders:
             if "/" in link:
                 link_depth = len(link.split("/"))
-                link_list = [link.rsplit("/", i)[0] for i in range(link_depth, 0, -1)]
+                link_list = [
+                    link.rsplit("/", i)[0] for i in range(link_depth, 0, -1)
+                ]
                 virtual_folders.extend(link_list)
         link_files = list()
         osp_root = self.ide["common"]["root"]
@@ -232,17 +253,21 @@ class Ide:
             for file in os.listdir(folder_path):
                 file_path = os.path.join(folder_path, file)
                 if os.path.isfile(file_path):
-                    relative_path = os.path.join(folder, file).replace("\\", "/")
+                    relative_path = os.path.join(
+                        folder,
+                        file
+                    ).replace("\\", "/")
                     link_files.append(relative_path)
         current_virtual_folders = list()
         for link in link_folders:
             link = "embARC/" + link
             if "/" in link:
                 link_depth = len(link.split("/"))
-                link_list = [link.rsplit("/", i)[0] for i in range(link_depth, 0, -1)]
+                link_list = [
+                    link.rsplit("/", i)[0] for i in range(link_depth, 0, -1)
+                ]
                 current_virtual_folders.extend(link_list)
         return link_folders, link_files, current_virtual_folders
-
 
     @staticmethod
     def _list_elim_none(list_to_clean):
@@ -261,7 +286,7 @@ class Ide:
             pass
         return dic
 
-    def _set_project_attributes(self, key_values, destination, source): # source --> destination
+    def _set_project_attributes(self, key_values, destination, source):
         if key_values in source:
             for attribute, data in source[key_values].items():
                 if attribute in destination:
@@ -272,7 +297,9 @@ class Ide:
                         else:
                             destination[attribute].append(data)
                     elif type(destination[attribute]) is dict:
-                        destination[attribute] = Ide._dict_elim_none(merge_recursive(destination[attribute], data))
+                        destination[attribute] = Ide._dict_elim_none(
+                            merge_recursive(destination[attribute], data)
+                        )
                     else:
                         if type(data) is list:
                             if data[0]:
@@ -280,6 +307,7 @@ class Ide:
                         else:
                             if data:
                                 destination[attribute] = data[0]
+
     def get_asm_c_include(self):
         self.ide["exporter"] = self._get_project_conf_template()
         self.ide["exporter"].update(self.ide["common"])
@@ -294,8 +322,22 @@ class Ide:
                 path_depth = len(app_path.split("/"))
 
             exporter = Exporter(self.ide["toolchain"])
-            print_string("Start to generate IDE project accroding to templates (.project.tmpl and .cproject.tmpl)")
-            exporter.gen_file_jinja("project.tmpl", self.ide["common"], ".project", outdir)
-            exporter.gen_file_jinja(".cproject.tmpl", self.ide["exporter"], ".cproject", outdir)
-            print_string("Finish generate IDE project and the files are in " + os.path.abspath(outdir))
-            print_string("Open ARC GNU IDE (version) Eclipse - >File >Open Projects from File System >Paste " + os.path.abspath(outdir))
+            print_string(
+                "Start to generate IDE project accroding to templates \
+                (.project.tmpl and .cproject.tmpl)"
+            )
+            exporter.gen_file_jinja(
+                "project.tmpl", self.ide["common"], ".project", outdir
+            )
+            exporter.gen_file_jinja(
+                ".cproject.tmpl", self.ide["exporter"], ".cproject", outdir
+            )
+            print_string(
+                "Finish generate IDE project and the files are in " +
+                os.path.abspath(outdir)
+            )
+            print_string(
+                "Open ARC GNU IDE (version) Eclipse \
+                - >File >Open Projects from File System >Paste " +
+                os.path.abspath(outdir)
+            )

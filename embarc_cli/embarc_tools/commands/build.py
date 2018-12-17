@@ -4,8 +4,10 @@ from ..download_manager import getcwd, cd, mkdir, generate_file
 from embarc_tools.settings import *
 from embarc_tools.utils import pquery
 from embarc_tools.notify import print_string
-import sys, os
+import sys
+import os
 help = "Build application"
+
 
 def run(args):
     buildopts = dict()
@@ -97,6 +99,7 @@ def get_config(config):
         config = config.split(" ")
     return config
 
+
 def setup(subparser):
     subparser.add_argument(
         "-d", "--path", default=".", help="Application path")
@@ -111,8 +114,8 @@ def setup(subparser):
     subparser.add_argument(
         "--toolchain", help="Build using the given TOOLCHAIN")
     subparser.add_argument(
-        "-j","--parallel", default=False, help="Build application with -j")
+        "-j", "--parallel", default=False, help="Build application with -j")
     subparser.add_argument(
         "--target", default="elf", help="Choose build target, default target is elf and options are [elf, bin, hex, size] ")
     subparser.add_argument(
-    "--make", nargs='*', help="Build application with config like 'BOARD=emsk BD_VER=11 CORE=arcem4 TOOLCHAIN=gnu")
+        "--make", nargs='*', help="Build application with config like 'BOARD=emsk BD_VER=11 CORE=arcem4 TOOLCHAIN=gnu")

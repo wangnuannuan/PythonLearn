@@ -8,32 +8,34 @@ COLOR = False
 CLI_COLOR_MAP = {
     "info": "white",
     "warning": "yellow",
-    "error"  : "red"
+    "error": "red"
 }
 
 COLOR_MATCHER = re.compile(r"(\w+)(\W+on\W+\w+)?")
 init()
 COLORS = {
-    'none' : "",
-    'default' : Style.RESET_ALL,
-    'black'   : Fore.BLACK,
-    'red'     : Fore.RED,
-    'green'   : Fore.GREEN,
-    'yellow'  : Fore.YELLOW,
-    'blue'    : Fore.BLUE,
-    'magenta' : Fore.MAGENTA,
-    'cyan'    : Fore.CYAN,
-    'white'   : Fore.WHITE,
+    'none': "",
+    'default': Style.RESET_ALL,
+    'black': Fore.BLACK,
+    'red': Fore.RED,
+    'green': Fore.GREEN,
+    'yellow': Fore.YELLOW,
+    'blue': Fore.BLUE,
+    'magenta': Fore.MAGENTA,
+    'cyan': Fore.CYAN,
+    'white': Fore.WHITE,
 
-    'on_black'   : Back.BLACK,
-    'on_red'     : Back.RED,
-    'on_green'   : Back.GREEN,
-    'on_yellow'  : Back.YELLOW,
-    'on_blue'    : Back.BLUE,
-    'on_magenta' : Back.MAGENTA,
-    'on_cyan'    : Back.CYAN,
-    'on_white'   : Back.WHITE,
+    'on_black': Back.BLACK,
+    'on_red': Back.RED,
+    'on_green': Back.GREEN,
+    'on_yellow': Back.YELLOW,
+    'on_blue': Back.BLUE,
+    'on_magenta': Back.MAGENTA,
+    'on_cyan': Back.CYAN,
+    'on_white': Back.WHITE,
 }
+
+
 def colorstring_to_escapecode(color_string):
     match = re.match(COLOR_MATCHER, color_string)
     if match:
@@ -42,6 +44,7 @@ def colorstring_to_escapecode(color_string):
              if match.group(2) else "")
     else:
         return COLORS['default']
+
 
 def print_string(msg, level=None):
     if not level:
@@ -54,6 +57,7 @@ def print_string(msg, level=None):
     if string_color != "white":
         sys.stdout.write(colorstring_to_escapecode('default'))
     sys.stdout.flush()
+
 
 def print_table(msg, level=None):
     if not level:
@@ -84,25 +88,25 @@ class TerminalNotifier():
         if self.color:
             init()
             self.COLORS = {
-                'none' : "",
-                'default' : Style.RESET_ALL,
-                'black'   : Fore.BLACK,
-                'red'     : Fore.RED,
-                'green'   : Fore.GREEN,
-                'yellow'  : Fore.YELLOW,
-                'blue'    : Fore.BLUE,
-                'magenta' : Fore.MAGENTA,
-                'cyan'    : Fore.CYAN,
-                'white'   : Fore.WHITE,
+                'none': "",
+                'default': Style.RESET_ALL,
+                'black': Fore.BLACK,
+                'red': Fore.RED,
+                'green': Fore.GREEN,
+                'yellow': Fore.YELLOW,
+                'blue': Fore.BLUE,
+                'magenta': Fore.MAGENTA,
+                'cyan': Fore.CYAN,
+                'white': Fore.WHITE,
 
-                'on_black'   : Back.BLACK,
-                'on_red'     : Back.RED,
-                'on_green'   : Back.GREEN,
-                'on_yellow'  : Back.YELLOW,
-                'on_blue'    : Back.BLUE,
-                'on_magenta' : Back.MAGENTA,
-                'on_cyan'    : Back.CYAN,
-                'on_white'   : Back.WHITE,
+                'on_black': Back.BLACK,
+                'on_red': Back.RED,
+                'on_green': Back.GREEN,
+                'on_yellow': Back.YELLOW,
+                'on_blue': Back.BLUE,
+                'on_magenta': Back.MAGENTA,
+                'on_cyan': Back.CYAN,
+                'on_white': Back.WHITE,
             }
 
     def _get_event_template(self):
@@ -118,10 +122,10 @@ class TerminalNotifier():
         self.messages.append(msg)
 
     def notify(self, event):
-        if event["format"] =="string":
+        if event["format"] == "string":
             self.print_string(event)
             return True
-        elif event["format"] =="table":
+        elif event["format"] == "table":
             self.print_table(event)
             return True
         else:
@@ -146,7 +150,7 @@ class TerminalNotifier():
             if len(event["message"]) > 1:
                 table_head = event["message"][0]
                 table_content = event["message"][1]
-                if event.get("type", None) in CLI_COLOR_MAP: #sys.stdout.isatty() and
+                if event.get("type", None) in CLI_COLOR_MAP:
                     sys.stdout.write(self.colorstring_to_escapecode(
                         CLI_COLOR_MAP[event["type"]]))
                     sys.stdout.flush()
@@ -171,7 +175,6 @@ class TerminalNotifier():
 
     COLOR_MATCHER = re.compile(r"(\w+)(\W+on\W+\w+)?")
 
-
     def colorstring_to_escapecode(self, color_string):
         match = re.match(self.COLOR_MATCHER, color_string)
         if match:
@@ -180,7 +183,3 @@ class TerminalNotifier():
                  if match.group(2) else "")
         else:
             return self.COLORS['default']
-
-
-
-

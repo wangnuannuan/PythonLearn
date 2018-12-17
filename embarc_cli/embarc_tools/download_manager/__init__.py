@@ -1,21 +1,25 @@
 from __future__ import print_function, absolute_import, unicode_literals
 
-import os, stat
+import os
+import stat
 import urllib
 import contextlib
 from os import listdir, remove, makedirs
 import sys
 from shutil import copyfile
 import shutil
-import zipfile, tarfile
+import zipfile
+import tarfile
 import yaml
 cwd_root = ""
 _cwd = os.getcwd()
+
 
 def getcwd():
     '''return current working path '''
     global _cwd
     return _cwd
+
 
 @contextlib.contextmanager
 def cd(newdir):
@@ -30,14 +34,17 @@ def cd(newdir):
         os.chdir(prevdir)
         _cwd = prevdir
 
+
 def relpath(root, path):
     '''return the relative path of root and path'''
-    return path[len(root)+1:]
+    return path[len(root) + 1:]
+
 
 def mkdir(path):
     '''A function that does mkdir'''
     if not os.path.exists(path):
         makedirs(path)
+
 
 def rmtree_readonly(directory):
     '''change permission and delete directory'''
@@ -48,6 +55,7 @@ def rmtree_readonly(directory):
             os.chmod(path, stat.S_IWRITE)
             func(path)
         shutil.rmtree(directory, onerror=remove_readonly)
+
 
 def delete_dir_files(directory, dir=False):
     """ A function that does rm -rf
@@ -68,6 +76,7 @@ def delete_dir_files(directory, dir=False):
         else:
             shutil.rmtree(directory)
 
+
 def generate_file(filename, data, path=None):
     file = None
     if path and os.path.exists(path) and os.path.isdir(path):
@@ -80,11 +89,12 @@ def generate_file(filename, data, path=None):
         with open(file, 'w+') as f:
             f.write(data)
         f.close()
-    except:
+    except EnvironmentError:
         print("[embARC] Unable to open %s for writing!" % file)
         return -1
     print("[embARC] Write to file %s" % file)
     return 0
+
 
 def generate_yaml(filename, data):
     file = os.path.join(os.getcwd(), filename)
@@ -94,7 +104,7 @@ def generate_yaml(filename, data):
         with open(file, 'w+') as f:
             f.write(yaml.dump(data, default_flow_style=False))
         f.close()
-    except:
+    except EnvironmentError:
         print("[embARC] Unable to open %s for writing!" % file)
         return -1
     print("[embARC] Write to file %s" % file)
@@ -104,17 +114,18 @@ def generate_yaml(filename, data):
 def edit_yaml(filename, data):
     file = os.path.join(os.getcwd(), filename)
     if not os.path.isfile(file):
-        generate_yaml(filename,data)
+        generate_yaml(filename, data)
         return
     else:
         try:
             with open(file, 'w+') as f:
                 f.write(yaml.dump(data, default_flow_style=False))
-        except:
+        except EnvironmentError:
             print("[embARC] Unable to open %s for writing!" % file)
             return -1
         print("[embARC] Write to file %s" % file)
         return 0
+
 
 def copy_file(src, dst):
     """ Implement the behaviour of "shutil.copy(src, dst)" without copying the
@@ -129,6 +140,7 @@ def copy_file(src, dst):
         dst = os.path.join(dst, base)
     copyfile(src, dst)
 
+
 def download_file(url, path):
     '''from url download file to path. if failed ,return False. else return True'''
     try:
@@ -137,10 +149,11 @@ def download_file(url, path):
         from urllib import request
         request.urlretrieve(url, path)
     except Exception as e:
-        print("[embARC] This file from %s can't be download for %s"%(url, e))
+        print("[embARC] This file from %s can't be download for %s" % (url, e))
         sys.stdout.flush()
         return False
     return True
+
 
 def unzip(file, path):
     '''extract file from .zip to path
@@ -158,6 +171,7 @@ def unzip(file, path):
     except Exception as e:
         print(e)
     return file_name
+
 
 def untar(file, path):
     file_name = None
@@ -187,16 +201,17 @@ def extract_file(file, path):
         extract_file_path = os.path.join(path, extract_file_name)
     return extract_file_path
 
+
 def show_progress(title, percent, max_width=80):
     '''show progress when download file'''
     if sys.stdout.isatty():
         percent = round(float(percent), 2)
         show_percent = '%.2f' % percent
-        bwidth = max_width - len(str(title)) - len(show_percent) - 6 # 6 equals the spaces and paddings between title, progress bar and percentage
+        bwidth = max_width - len(str(title)) - len(show_percent) - 6  # 6 equals the spaces and paddings between title, progress bar and percentage
         sys.stdout.write('%s |%s%s| %s%%\r' % (str(title), '#' * int(percent * bwidth // 100), '-' * (bwidth - int(percent * bwidth // 100)), show_percent))
         sys.stdout.flush()
+
 
 def hide_progress(max_width=80):
     if sys.stdout.isatty():
         sys.stdout.write("\r%s\r" % (' ' * max_width))
-

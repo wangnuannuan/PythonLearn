@@ -4,7 +4,7 @@ from distutils.spawn import find_executable
 from embarc_tools.utils import pquery
 import re
 import os
-from .. download_manager import (download_file, extract_file, getcwd, mkdir,delete_dir_files)
+from .. download_manager import (download_file, extract_file, getcwd, mkdir, delete_dir_files)
 import shutil
 from embarc_tools.notify import print_string
 
@@ -16,8 +16,6 @@ class Gnu(arcToolchain):
     pack: where the gnu archive is
     executable_name: a command will be used when check gnu
     '''
-
-
     root_url = "https://github.com/foss-for-synopsys-dwc-arc-processors/toolchain/releases"
     pack = None
     path = None
@@ -30,7 +28,6 @@ class Gnu(arcToolchain):
             self.path = os.path.split(exe)[0]
             self.version = self.check_version()
 
-
     @staticmethod
     def check_version():
         '''run command "arc-elf32-gcc--version" and return current gnu version'''
@@ -41,7 +38,7 @@ class Gnu(arcToolchain):
                 msg = "can not execuate {}".format(cmd[0])
                 print_string(msg, level="warning")
                 return None
-            version = re.search(r"[0-9]*\.[0-9]*",exe).group(0)
+            version = re.search(r"[0-9]*\.[0-9]*", exe).group(0)
             if version:
                 return version
         except ProcessException:
@@ -62,7 +59,7 @@ class Gnu(arcToolchain):
         url = None
         pack_tgz = None
         if version:
-            url = self.root_url + "/download/arc-"+ version + "-release/arc_gnu_"  + version+ "_prebuilt_elf32_le_linux_install.tar.gz"
+            url = self.root_url + "/download/arc-" + version + "-release/arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz"
             pack_tgz = "arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz"
         else:
             url = "https://github.com" + self._lastest_url()
@@ -118,18 +115,18 @@ class Gnu(arcToolchain):
         self.set_toolchain_env("gnu", path)
 
     def _lastest_url(self):
-        pattern = re.compile('<ul.*?class="mt-1 mt-md-2">(.*?)</ul>', re.S|re.M)
-        pattern2 = re.compile('<a.*?href=(.*?)rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<strong.*?</a>', re.S|re.M)
+        pattern = re.compile('<ul.*?class="mt-1 mt-md-2">(.*?)</ul>', re.S | re.M)
+        pattern2 = re.compile('<a.*?href=(.*?)rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<strong.*?</a>', re.S | re.M)
         try:
             request = urllib2.Request(self.root_url)
             response = urllib2.urlopen(request)
             content = response.read().decode('utf-8')
 
-            items = re.findall(pattern,content)
+            items = re.findall(pattern, content)
             latesturl = None
 
             for item in items:
-                itemsnow = re.findall(pattern2,item)
+                itemsnow = re.findall(pattern2, item)
                 for i in itemsnow:
                     if "_prebuilt_elf32_le_linux_install.tar.gz" in i:
                         latesturl = i
@@ -139,21 +136,9 @@ class Gnu(arcToolchain):
                     break
             return latesturl
         except urllib2.URLError as e:
-            if hasattr(e,"code"):
+            if hasattr(e, "code"):
                 print_string(e.code, level="warning")
-            if hasattr(e,"reason"):
+            if hasattr(e, "reason"):
                 print_string(e.reason, level="warning")
-        except:
+        else:
             print_string("Can not get latest veriosn Gnu")
-
-
-
-
-
-
-
-
-
-
-
-

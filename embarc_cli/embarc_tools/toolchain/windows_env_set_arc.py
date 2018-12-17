@@ -31,7 +31,7 @@ class Win32Environment:
                 i += 1
                 if key_value == name:
                     break
-        except:
+        except Exception as e:
             key_value = ''
         return key_value
 
@@ -39,14 +39,14 @@ class Win32Environment:
         key = winreg.OpenKey(self.root, self.subkey, 0, winreg.KEY_READ)
         try:
             value, _ = winreg.QueryValueEx(key, name)
-        except:
+        except Exception as e:
             value = ''
         return value
 
     def setenv(self, name, value):
         # Note: for 'system' scope, you must run this as Administrator
         key = winreg.OpenKey(self.root, self.subkey, 0, winreg.KEY_ALL_ACCESS)
-        winreg.SetValueEx(key, name, 0, winreg.REG_EXPAND_SZ, value)# store value in the name field of an open registry key
+        winreg.SetValueEx(key, name, 0, winreg.REG_EXPAND_SZ, value)  # store value in the name field of an open registry key
         winreg.CloseKey(key)
         # For some strange reason, calling SendMessage from the current process
         # doesn't propagate environment changes at all.
@@ -61,7 +61,7 @@ class Win32Environment:
         return value
 
 
-def set_env_path(env_obj, env_name, env_path,refresh=False):
+def set_env_path(env_obj, env_name, env_path, refresh=False):
     need_add = False
     path_values = None
     exist_path = None
@@ -71,9 +71,9 @@ def set_env_path(env_obj, env_name, env_path,refresh=False):
         exist_path = env_obj.get_userenv(env_name.upper())
 
     if refresh:
-        exist_path=None
+        exist_path = None
     if exist_path:
-        path_values = [i for i in exist_path.split(';')]# path in registry
+        path_values = [i for i in exist_path.split(';')]
         for i in env_path.split(';'):
             if i not in path_values:
                 path_values.append(i)
@@ -84,6 +84,6 @@ def set_env_path(env_obj, env_name, env_path,refresh=False):
     if path_values:
         env_path = ';'.join(path_values)
 
-    env_obj.setenv(env_name, os.path.expanduser(env_path))# add paths in registry to environment
+    env_obj.setenv(env_name, os.path.expanduser(env_path))
     path_value = env_obj.get_userenv(env_name)
     return 'set environment variable {}:{}'.format(env_name, path_value)
