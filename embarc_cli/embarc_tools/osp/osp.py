@@ -1,7 +1,7 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-from ..download_manager import generate_yaml, edit_yaml, getcwd, cd
+from ..download_manager import generate_yaml, edit_yaml, cd
 from embarc_tools.notify import (print_string, print_table, COLORS)
-from embarc_tools.settings import *
+from embarc_tools.settings import MakefileNames, get_input, OSP_DIRS
 import yaml
 import os
 from embarc_tools.exporter import Exporter
@@ -73,10 +73,8 @@ class OSP(object):
     def clear_path(self):
         fl = os.path.join(self.path, self.file)
         try:
-            with open(fl) as f:
-                self.cfg_dict = dict()
-                print("here")
-                edit_yaml(fl, self.cfg_dict)
+            self.cfg_dict = dict()
+            edit_yaml(fl, self.cfg_dict)
 
         except IOError:
             raise IOError("Can not open file %s ." % fl)
@@ -174,7 +172,6 @@ class OSP(object):
         result = []
         board_version_path_dict = self._board_version_config(root, board, bd_version)
         board_path = board_version_path_dict[bd_version]
-        break_flag = False
         cur_core_file = cur_core + ".tcf" if cur_core else cur_core
         if os.path.exists(board_path):
             for root, dirs, files in os.walk(board_path, topdown=True):

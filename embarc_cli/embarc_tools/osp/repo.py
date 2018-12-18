@@ -8,10 +8,12 @@ except NameError:
     # Python 3
     basestring = str
     from urllib.parse import urlparse, quote
-import re
-import os
 from .. download_manager import (getcwd, cd, rmtree_readonly, cwd_root, relpath)
 from embarc_tools.osp import (formaturl, regex_local_ref, regex_url_ref, scms, ProcessException)
+from embarc_tools.notify import print_string
+import shutil
+import re
+import os
 
 
 class Repo(object):
@@ -357,8 +359,8 @@ class Repo(object):
 
         if err:
             if show_warning:
-                warning(err)
+                print_string(err, level="warning")
             else:
-                error(err, 1)
+                print_string(err, level="error")
             return False
         return True

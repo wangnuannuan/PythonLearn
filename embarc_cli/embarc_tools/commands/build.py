@@ -1,10 +1,6 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
 from ..builder import build
-from ..download_manager import getcwd, cd, mkdir, generate_file
-from embarc_tools.settings import *
-from embarc_tools.utils import pquery
-from embarc_tools.notify import print_string
-import sys
+from ..download_manager import cd, generate_file
 import os
 help = "Build application"
 
@@ -14,7 +10,6 @@ def run(args):
     osproot = None
     curdir = args.outdir
     app_path = None
-    build_status = None
     recordBuildConfig = None
     if args.path:
         app_path = args.path
@@ -91,7 +86,6 @@ def run(args):
 
 
 def get_config(config):
-    make_configs = dict()
     if type(config) == list:
         if len(config) == 1 and " " in config[0]:
             config = config[0].split(" ")

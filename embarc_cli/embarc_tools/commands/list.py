@@ -1,5 +1,5 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-from embarc_tools.settings import *
+from embarc_tools.settings import SUPPORT_TOOLCHAIN, MIDDLEWARE, LIBRARIES
 from ..osp import (osp)
 from ..notify import (print_string, print_table)
 
@@ -17,7 +17,6 @@ def run(args):
         if not osppath.is_osp(osp_root):
             osp_root = osppath.get_path()
     if osp_root:
-        show = False
         print_string("Here choose " + osp_root + "as osp root")
         if args.board:
 

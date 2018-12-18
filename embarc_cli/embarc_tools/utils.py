@@ -1,12 +1,11 @@
 from __future__ import print_function, absolute_import, unicode_literals
 from embarc_tools.download_manager import getcwd
-from embarc_tools.settings import *
+from embarc_tools.settings import python_version
 from functools import reduce
 import yaml
 import operator
 import subprocess
 import errno
-import tempfile
 import os
 import signal
 import sys

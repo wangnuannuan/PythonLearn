@@ -7,6 +7,7 @@ import os
 from .. download_manager import (download_file, extract_file, getcwd, mkdir, delete_dir_files)
 import shutil
 from embarc_tools.notify import print_string
+import urllib2
 
 
 class Gnu(arcToolchain):

@@ -1,6 +1,5 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-from ..toolchain import arcToolchain, gnu, metaware
-import os
+from ..toolchain import gnu, metaware
 from embarc_tools.notify import print_string
 help = "Download and install toolchain(gnu)"
 

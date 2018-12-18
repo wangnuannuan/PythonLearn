@@ -2,7 +2,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from ..osp import repo, osp
 import os
 from ..download_manager import getcwd
-from embarc_tools.notify import (print_string, print_table)
+from embarc_tools.notify import print_string
 
 help = "Set embarc osp"
 

@@ -1,14 +1,13 @@
 from __future__ import print_function, absolute_import, unicode_literals
-import sys
-import os
-import subprocess
-import time
-from embarc_tools.settings import *
 from .. download_manager import mkdir, delete_dir_files, cd
 from embarc_tools.notify import (print_string, print_table)
 from ..osp import osp
 import collections
 from embarc_tools.utils import pqueryOutputinline, pqueryTemporaryFile
+import sys
+import os
+import time
+# from embarc_tools.settings import *
 
 BUILD_OPTION_NAMES = ['BOARD', 'BD_VER', 'CUR_CORE', 'TOOLCHAIN', 'OLEVEL', 'V', 'DEBUG', 'SILENT', 'JTAG']
 BUILD_INFO_NAMES = ['EMBARC_ROOT', 'OUT_DIR_ROOT', 'BUILD_OPTION', 'APPLICATION_NAME', 'APPLICATION_LINKSCRIPT', 'APPLICATION_ELF', 'APPLICATION_BIN', 'APPLICATION_HEX', 'APPLICATION_MAP', 'APPLICATION_DUMP', 'APPLICATION_DASM', 'MIDDLEWARE', 'PERIPHERAL']
@@ -114,7 +113,7 @@ class embARC_Builder:
             build_status['build_msg'] = build_proc
         except Exception as e:
             build_status["result"] = False
-            build_status["reason"] = "Build with Coverity Failed!"
+            build_status["reason"] = "Build with Coverity Failed! {}".format(e)
             return build_status
 
         print_string("BEGIN SECTION Coverity Analyze Defects")
@@ -229,7 +228,7 @@ class embARC_Builder:
                     build_proc = pqueryOutputinline(build_cmd, cwd=app, console=True)
                     build_status['build_msg'] = build_proc
                 except Exception as e:
-                    print("Run command({}) failed!".format(build_cmd))
+                    print("Run command({}) failed! {} ".format(build_cmd, e))
                     build_status["build_msg"] = ["Build failed"]
                     build_status["reason"] = "ProcessError: Run command {} failed".format(build_cmd)
                     build_status['result'] = False

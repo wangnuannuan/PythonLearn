@@ -2,9 +2,6 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from embarc_tools.settings import GNU_PATH, MW_PATH, SUPPORT_TOOLCHAIN, CURRENT_PLATFORM
 from distutils.spawn import find_executable
 import os
-from embarc_tools.notify import TerminalNotifier
-from embarc_tools.utils import popen
-from .. download_manager import getcwd, delete_dir_files
 
 
 TOOLCHAIN_PATHS = {
@@ -67,11 +64,7 @@ class arcToolchain:
             windows_env_set_arc.set_env_path(env_obj, 'Path', toolchain_root)
             return True
         elif platform == "Linux":
-            file_path = os.path.dirname(os.path.abspath(__file__))
-            work_path = getcwd()
             toolchain_root = os.path.dirname(toolchain_root)
-            sh_script = os.path.join(file_path, "linux_env_set_arc.sh")
-            command = ["bash", sh_script, "-t", tool_key, "-r", toolchain_root]
             try:
                 bashrc = os.path.join(os.path.expanduser("~"), '.bashrc')
                 content = list()

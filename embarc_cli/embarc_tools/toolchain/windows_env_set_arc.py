@@ -31,7 +31,7 @@ class Win32Environment:
                 i += 1
                 if key_value == name:
                     break
-        except Exception as e:
+        except Exception:
             key_value = ''
         return key_value
 
@@ -39,7 +39,7 @@ class Win32Environment:
         key = winreg.OpenKey(self.root, self.subkey, 0, winreg.KEY_READ)
         try:
             value, _ = winreg.QueryValueEx(key, name)
-        except Exception as e:
+        except Exception:
             value = ''
         return value
 

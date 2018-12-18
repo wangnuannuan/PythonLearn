@@ -1,7 +1,7 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-from embarc_tools.project import Ide, Generator
+from embarc_tools.project import Generator
 import os
-from embarc_tools.settings import *
+from embarc_tools.settings import get_input
 from ..download_manager import cd
 from ..osp import (osp)
 from embarc_tools.notify import print_string
@@ -11,7 +11,6 @@ help = "Ide generator"
 def run(args):
     buildopts = dict()
     osppath = osp.OSP()
-    message = None
     path = None
     if args.board:
         buildopts["BOARD"] = args.board
@@ -33,8 +32,6 @@ def run(args):
             print_string(msg, level="error")
             return
         with cd(path):
-            project_file = ".project"
-            cproject_file = ".cproject"
             if os.path.exists(".project") and os.path.exists(".cproject"):
                 while True:
                     yes = get_input("The IDE project already exists, recreate and overwrite the old files [Y/N]  ")

@@ -4,7 +4,6 @@ from distutils.spawn import find_executable
 from embarc_tools.utils import pquery
 import re
 import os
-from .. download_manager import (download_file, extract_file, getcwd, mkdir, delete_dir_files)
 
 
 class Mw(arcToolchain):
@@ -44,7 +43,7 @@ class Mw(arcToolchain):
         pack - the path of the compressed package
         path - the compressed package is extracted to this path
         return the root path of gnu and set self.path'''
-        pass
+        print("Extract gnu file from pack to path")
 
     def set_env(self, path=None):
         self.set_toolchain_env("mw", path)

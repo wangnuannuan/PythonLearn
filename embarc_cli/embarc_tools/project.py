@@ -4,7 +4,6 @@ from embarc_tools.exporter import Exporter
 from embarc_tools.osp import osp
 import os
 import random
-from embarc_tools.settings import *
 from embarc_tools.notify import (print_string, print_table)
 import collections
 from embarc_tools.download_manager import cd, getcwd
@@ -316,9 +315,6 @@ class Ide:
 
             self.get_asm_c_include()
             outdir = "."
-            if "path" in self.ide["common"]:
-                app_path = self.ide["common"]["folder"]
-                path_depth = len(app_path.split("/"))
 
             exporter = Exporter(self.ide["toolchain"])
             print_string(

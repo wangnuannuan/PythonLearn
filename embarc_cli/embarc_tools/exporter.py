@@ -1,8 +1,8 @@
 from __future__ import print_function, absolute_import, unicode_literals
-from jinja2 import Template, FileSystemLoader
+from jinja2 import FileSystemLoader
 from jinja2.environment import Environment
 import os
-from os.path import join, dirname, abspath, normpath, exists
+from os.path import join, dirname, abspath, exists
 
 
 class Exporter(object):
@@ -16,7 +16,6 @@ class Exporter(object):
         if not exists(dest_path):
             os.makedirs(dest_path)
         output = join(dest_path, output)
-        logger.debug("Generating: %s" % output)
 
         open(output, "w").write(target_text)
         return dirname(output), output

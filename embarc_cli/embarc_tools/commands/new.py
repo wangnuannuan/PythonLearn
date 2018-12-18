@@ -1,8 +1,8 @@
 from __future__ import print_function, absolute_import, unicode_literals, unicode_literals
 import os
-from ..osp import (formaturl, repo, osp)
+from ..osp import osp
 from ..download_manager import mkdir, getcwd
-from embarc_tools.settings import *
+from embarc_tools.settings import get_input, SUPPORT_TOOLCHAIN
 from embarc_tools.notify import (print_string, print_table)
 from embarc_tools.exporter import Exporter
 import collections

@@ -71,7 +71,7 @@ class Git(object):
         for branch in branches:  # delete all local branches so the new repo clone is not poluted
             pquery([git_cmd, 'branch', '-D', branch])
 
-    def clone(url, name=None, depth=None, protocol=None, very_verbose=False):
+    def clone(url, name=None, depth=None, protocol=None, very_verbose=False, verbose=False):
         if very_verbose:
             popen([git_cmd, 'clone', formaturl(url, protocol), name] + (['--depth', depth] if depth else []) + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
         else:

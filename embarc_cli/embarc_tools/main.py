@@ -1,6 +1,5 @@
 from __future__ import print_function, absolute_import, unicode_literals
 import argparse
-import os
 import sys
 import pkg_resources
 from embarc_tools import commands
