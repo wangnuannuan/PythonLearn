@@ -1,5 +1,11 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-import urllib2
+try:
+    # For Python 3.0 and later
+    from urllib.request import urlopen, Request
+except ImportError:
+    # Fall back to Python 2's urllib2
+    from urllib2 import Request
+    from urllib2 import urlopen
 import shutil
 import re
 import os
@@ -122,8 +128,8 @@ class Gnu(ARCtoolchain):
         pattern = re.compile('<ul.*?class="mt-1 mt-md-2">(.*?)</ul>', re.S | re.M)
         pattern2 = re.compile('<a.*?href=(.*?)rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<strong.*?</a>', re.S | re.M)
         try:
-            request = urllib2.Request(self.root_url)
-            response = urllib2.urlopen(request)
+            request = Request(self.root_url)
+            response = urlopen(request)
             content = response.read().decode('utf-8')
 
             items = re.findall(pattern, content)
