@@ -99,24 +99,23 @@ class Ide:
         if cmd_output:
             opt_lines = cmd_output.splitlines()
             for opt_line in opt_lines:
-                opt_value = opt_line.split(":", 1)[1]
                 if opt_line.startswith("APPL"):
-                    cur_build["APPL"] = opt_value.strip()
+                    cur_build["APPL"] = opt_line.split(":", 1)[1].strip()
                 build_template["APPL"] = cur_build.get("APPL")
                 if opt_line.startswith("BOARD"):
-                    cur_build["BOARD"] = opt_value.strip()
+                    cur_build["BOARD"] = opt_line.split(":", 1)[1].strip()
                 build_template["BOARD"] = cur_build.get("BOARD")
                 if opt_line.startswith("BD_VER"):
-                    cur_build["BD_VER"] = opt_value.strip()
+                    cur_build["BD_VER"] = opt_line.split(":", 1)[1].strip()
                 build_template["BD_VER"] = cur_build.get("BD_VER")
                 if opt_line.startswith("CUR_CORE"):
-                    cur_build["CUR_CORE"] = opt_value.strip()
+                    cur_build["CUR_CORE"] = opt_line.split(":", 1)[1].strip()
                 build_template["CUR_CORE"] = cur_build.get("CUR_CORE")
                 if opt_line.startswith("TOOLCHAIN"):
-                    cur_build["TOOLCHAIN"] = opt_value.strip()
+                    cur_build["TOOLCHAIN"] = opt_line.split(":", 1)[1].strip()
                 build_template["TOOLCHAIN"] = cur_build.get("TOOLCHAIN")
                 if opt_line.startswith("EMBARC_ROOT"):
-                    relative_root = opt_value.strip()
+                    relative_root = opt_line.split(":", 1)[1].strip()
                     osp_root = os.path.normpath(
                         os.path.join(getcwd(), relative_root)
                     )
@@ -127,7 +126,7 @@ class Ide:
                     "EMBARC_OSP_ROOT"
                 )
                 if opt_line.startswith("COMPILE_OPT"):
-                    compile_opt_line = opt_value
+                    compile_opt_line = opt_line.split(":", 1)[1]
                     compile_opts = compile_opt_line.split()
         if update or self.buildopts:
             osppath.update_makefile(dict(build_template), getcwd())
