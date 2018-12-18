@@ -11,7 +11,7 @@ except NameError:
 import os
 import re
 import shutil
-from embarc_tools.osp import (formaturl, regex_local_ref, regex_url_ref, scms, ProcessException)
+from embarc_tools.osp import (formaturl, REGEX_LOCAL_REF, REGEX_URL_REF, SCMS, ProcessException)
 from embarc_tools.notify import print_string
 from .. download_manager import (getcwd, cd, rmtree_readonly, cwd_root, relpath)
 
@@ -28,8 +28,8 @@ class Repo(object):
     @classmethod
     def fromurl(cls, url, path=None):
         repo = cls()
-        m_local = re.match(regex_local_ref, url.strip().replace('\\', '/'))
-        m_repo_ref = re.match(regex_url_ref, url.strip().replace('\\', '/'))
+        m_local = re.match(REGEX_LOCAL_REF, url.strip().replace('\\', '/'))
+        m_repo_ref = re.match(REGEX_URL_REF, url.strip().replace('\\', '/'))
         if m_local:
             repo.name = os.path.basename(path or m_local.group(1))
             repo.path = os.path.abspath(path or os.path.join(getcwd(), m_local.group(1)))
@@ -53,8 +53,8 @@ class Repo(object):
         with open(lib) as f:
             ref = f.read(200)
 
-        m_local = re.match(regex_local_ref, ref.strip().replace('\\', '/'))
-        m_repo_ref = re.match(regex_url_ref, ref.strip().replace('\\', '/'))
+        m_local = re.match(REGEX_LOCAL_REF, ref.strip().replace('\\', '/'))
+        m_repo_ref = re.match(REGEX_URL_REF, ref.strip().replace('\\', '/'))
         if not (m_local or m_repo_ref):
             print(
                 "[embARC] File \"%s\" in \"%s\" uses a non-standard .lib file extension, which is not compatible with the mbed build tools.\n" % (os.path.basename(lib), os.path.split(lib)[0]))
