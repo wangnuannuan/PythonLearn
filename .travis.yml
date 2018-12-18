@@ -17,6 +17,7 @@ install:
   - "pip install embarc_cli"
   - "pip install coverage"
   - "pip install pycodestyle"
+  - "pip install pyflakes"
   
 before_script:
   - "embarc toolchain --toolchain gnu --install"
