@@ -10,7 +10,7 @@ import errno
 import os
 import yaml
 from embarc_tools.download_manager import getcwd
-from embarc_tools.settings import python_version
+from embarc_tools.settings import PYTHON_VERSION
 
 
 def uniqify(_list):
@@ -127,7 +127,7 @@ def pqueryOutputinline(command, console=False, **kwargs):
                 command, stdout=writer, stderr=subprocess.PIPE, shell=True, bufsize=1, **kwargs
             )
             end = ""
-            if python_version.startswith("3"):
+            if PYTHON_VERSION.startswith("3"):
                 end = "\n"
             try:
                 while True:
