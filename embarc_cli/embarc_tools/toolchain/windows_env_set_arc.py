@@ -9,7 +9,7 @@ else:
     import _winreg as winreg
 
 
-class Win32Environment:
+class Win32Environment(object):
     """Utility class to get/set windows environment variable"""
     def __init__(self, scope):
         # assert scope in ('user', 'system')
@@ -27,7 +27,7 @@ class Win32Environment:
         try:
             i = 0
             while i >= 0:
-                key_value, path, value = winreg.EnumValue(key, i)
+                key_value, _, _ = winreg.EnumValue(key, i)
                 i += 1
                 if key_value == name:
                     break

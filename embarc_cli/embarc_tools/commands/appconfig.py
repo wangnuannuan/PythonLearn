@@ -1,10 +1,9 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-from ..download_manager import getcwd, cd
-#from embarc_tools.settings import *
-from embarc_tools.utils import pquery
 import os
-from ..osp import osp
+from embarc_tools.utils import pquery
 from embarc_tools.notify import print_table
+from ..download_manager import getcwd, cd
+from ..osp import osp
 from ..builder import build
 help = "Show application config"
 

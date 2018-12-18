@@ -1,10 +1,10 @@
 from __future__ import print_function, absolute_import, unicode_literals
 import argparse
 import sys
-import pkg_resources
-from embarc_tools import commands
 import pkgutil
 import importlib
+import pkg_resources
+from embarc_tools import commands
 
 
 def import_submodules(package, recursive=True):
@@ -15,7 +15,7 @@ def import_submodules(package, recursive=True):
     :rtype: dict[str, types.ModuleType]
     """
     results = {}
-    for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
+    for _, name, is_pkg in pkgutil.walk_packages(package.__path__):
         full_name = package.__name__ + '.' + name
         results[name] = importlib.import_module(full_name)
         if recursive and is_pkg:
@@ -23,7 +23,7 @@ def import_submodules(package, recursive=True):
     return results
 
 
-subcommands = import_submodules(commands)
+SUBCOMMANDS = import_submodules(commands)
 
 
 def main():
@@ -43,7 +43,7 @@ def main():
     )
     subparsers = parser.add_subparsers(help='commands')
 
-    for name, module in subcommands.items():
+    for name, module in SUBCOMMANDS.items():
         subparser = subparsers.add_parser(name, help=module.help)
 
         module.setup(subparser)
@@ -59,7 +59,6 @@ def main():
         end_index = 0
         target = None
         j = 0
-        sys.argv[1:]
         for argv in sys.argv[2:]:
             j += 1
             distance = (j - end_index)
@@ -73,7 +72,7 @@ def main():
                     argv_list.append(argv)
             else:
                 argv_list.append(argv)
-        if len(make_list) > 0:
+        if make_list > 0:
             make_config = " ".join(make_list)
             argv_list.extend(["--make", make_config])
         if target:
@@ -82,7 +81,6 @@ def main():
     else:
         args = parser.parse_args()
 
-    verbosity = args.verbosity - args.quietness
     return args.func(args)
 
 

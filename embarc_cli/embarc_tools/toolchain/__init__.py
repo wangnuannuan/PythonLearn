@@ -1,7 +1,7 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-from embarc_tools.settings import GNU_PATH, MW_PATH, SUPPORT_TOOLCHAIN, CURRENT_PLATFORM
 from distutils.spawn import find_executable
 import os
+from embarc_tools.settings import GNU_PATH, MW_PATH, SUPPORT_TOOLCHAIN, CURRENT_PLATFORM
 
 
 TOOLCHAIN_PATHS = {
@@ -14,7 +14,7 @@ class ProcessException(Exception):
     pass
 
 
-class arcToolchain:
+class ARCtoolchain(object):
 
     def __init__():
         pass
@@ -34,8 +34,7 @@ class arcToolchain:
                 toolchian_path = os.path.split(exe)
                 TOOLCHAIN_PATHS[tool_key] = toolchian_path
                 return True
-            except Exception as e:
-                print(e)
+            except Exception:
                 return False
 
     @staticmethod
@@ -44,8 +43,7 @@ class arcToolchain:
         if tool_key not in SUPPORT_TOOLCHAIN:
             print("This toolchian is not supported")
             return False
-        else:
-            return True
+        return True
 
     @staticmethod
     def get_platform():

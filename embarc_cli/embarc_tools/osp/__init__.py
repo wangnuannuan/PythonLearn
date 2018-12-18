@@ -1,23 +1,22 @@
 from __future__ import print_function, absolute_import, unicode_literals
 import re
 import os
-from .. download_manager import (show_progress, hide_progress, getcwd)
 from embarc_tools.utils import pquery, popen
+from .. download_manager import (show_progress, hide_progress, getcwd)
 
-regex_repo_url = r'^(git\://|file\://|ssh\://|https?\://|)(([^/:@]+)(\:([^/:@]+))?@)?([^/:]{3,})(\:\d+)?[:/](.+?)(\.git|\.hg|\/?)$'
-regex_url_ref = r'^(.*/([\w.+-]+)(?:\.\w+)?)/?(?:#(.*))?$'
-regex_local_ref = r'^([\w.+-][\w./+-]*?)/?(?:#(.*))?$'
-very_verbose = False
-git_cmd = 'git'
-scms = {}
+REGEX_REPO_URL = r'^(git\://|file\://|ssh\://|https?\://|)(([^/:@]+)(\:([^/:@]+))?@)?([^/:]{3,})(\:\d+)?[:/](.+?)(\.git|\.hg|\/?)$'
+REGEX_URL_REF = r'^(.*/([\w.+-]+)(?:\.\w+)?)/?(?:#(.*))?$'
+REGEX_LOCAL_REF = r'^([\w.+-][\w./+-]*?)/?(?:#(.*))?$'
+GIT_CMD = 'git'
+SCMS = {}
 
 
 def formaturl(url, format="default"):
     url = "%s" % url
-    m = re.match(regex_repo_url, url)
+    m = re.match(REGEX_REPO_URL, url)
     if m and m.group(1) == '':   # no protocol specified, probably ssh string like "git@github.com:xxx/osp.git"
         url = 'ssh://%s%s%s/%s' % (m.group(2) or 'git@', m.group(6), m.group(7) or '', m.group(8))  # convert to common ssh URL-like format
-        m = re.match(regex_repo_url, url)
+        m = re.match(REGEX_REPO_URL, url)
 
     if m:
         if format == "ssh":
@@ -31,7 +30,7 @@ def formaturl(url, format="default"):
 
 def scm(name):
     def _scm(cls):
-        scms[name] = cls()
+        SCMS[name] = cls()
         return cls
     return _scm
 
@@ -55,13 +54,13 @@ class Git(object):
     ignore_file = os.path.join('.git', 'info', 'exclude')
 
     def init(path=None, very_verbose=False):
-        popen([git_cmd, 'init'] + ([path] if path else []) + ([] if very_verbose else ['-q']))
+        popen([GIT_CMD, 'init'] + ([path] if path else []) + ([] if very_verbose else ['-q']))
 
     def cleanup(very_verbose=False):
         print("Cleaning up Git index")
-        pquery([git_cmd, 'checkout', '--detach', 'HEAD'] + ([] if very_verbose else ['-q']))  # detach head so local branches are deletable
+        pquery([GIT_CMD, 'checkout', '--detach', 'HEAD'] + ([] if very_verbose else ['-q']))  # detach head so local branches are deletable
         branches = []
-        lines = pquery([git_cmd, 'branch']).strip().splitlines()  # fetch all local branches
+        lines = pquery([GIT_CMD, 'branch']).strip().splitlines()  # fetch all local branches
         for line in lines:
             if re.match(r'^\*?\s+\((.+)\)$', line):
                 continue
@@ -69,40 +68,40 @@ class Git(object):
             branches.append(line)
 
         for branch in branches:  # delete all local branches so the new repo clone is not poluted
-            pquery([git_cmd, 'branch', '-D', branch])
+            pquery([GIT_CMD, 'branch', '-D', branch])
 
     def clone(url, name=None, depth=None, protocol=None, very_verbose=False, verbose=False):
         if very_verbose:
-            popen([git_cmd, 'clone', formaturl(url, protocol), name] + (['--depth', depth] if depth else []) + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
+            popen([GIT_CMD, 'clone', formaturl(url, protocol), name] + (['--depth', depth] if depth else []) + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
         else:
-            pquery([git_cmd, 'clone', '--progress', formaturl(url, protocol), name] + (['--depth', depth] if depth else []), output_callback=Git.action_progress)
+            pquery([GIT_CMD, 'clone', '--progress', formaturl(url, protocol), name] + (['--depth', depth] if depth else []), output_callback=Git.action_progress)
             hide_progress()
 
     def add(dest, very_verbose=False):
         print("Adding reference " + dest)
         try:
-            popen([git_cmd, 'add', dest] + (['-v'] if very_verbose else []))
+            popen([GIT_CMD, 'add', dest] + (['-v'] if very_verbose else []))
         except ProcessException:
             pass
 
     def remove(dest, very_verbose=False):
         print("Removing reference " + dest)
         try:
-            pquery([git_cmd, 'rm', '-f', dest] + ([] if very_verbose else ['-q']))
+            pquery([GIT_CMD, 'rm', '-f', dest] + ([] if very_verbose else ['-q']))
         except ProcessException:
             pass
 
     def commit(msg=None, very_verbose=False, verbose=False):
-        popen([git_cmd, 'commit', '-a'] + (['-m', msg] if msg else []) + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
+        popen([GIT_CMD, 'commit', '-a'] + (['-m', msg] if msg else []) + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
 
     def publish(all_refs=None, very_verbose=False, verbose=False):
         if all_refs:
-            popen([git_cmd, 'push', '--all'] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
+            popen([GIT_CMD, 'push', '--all'] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
         else:
             remote = Git.getremote()
             branch = Git.getbranch()
             if remote and branch:
-                popen([git_cmd, 'push', remote, branch] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
+                popen([GIT_CMD, 'push', remote, branch] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
             else:
                 err = "Unable to publish outgoing changes for \"%s\" in \"%s\".\n" % (os.path.basename(getcwd()), getcwd())
                 if not remote:
@@ -112,17 +111,17 @@ class Git(object):
 
     def fetch(very_verbose=False, verbose=False):
         print("Fetching revisions from remote repository to \"%s\"" % os.path.basename(getcwd()))
-        popen([git_cmd, 'fetch', '--all', '--tags'] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
+        popen([GIT_CMD, 'fetch', '--all', '--tags'] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
 
     def discard(clean_files=False):
         print("Discarding local changes in \"%s\"" % os.path.basename(getcwd()))
-        pquery([git_cmd, 'reset', 'HEAD'] + ([] if very_verbose else ['-q']))  # unmarks files for commit
-        pquery([git_cmd, 'checkout', '.'] + ([] if very_verbose else ['-q']))  # undo  modified files
-        pquery([git_cmd, 'clean', '-fd'] + (['-x'] if clean_files else []) + (['-q'] if very_verbose else ['-q']))  # cleans up untracked files and folders
+        pquery([GIT_CMD, 'reset', 'HEAD'] + ([] if very_verbose else ['-q']))  # unmarks files for commit
+        pquery([GIT_CMD, 'checkout', '.'] + ([] if very_verbose else ['-q']))  # undo  modified files
+        pquery([GIT_CMD, 'clean', '-fd'] + (['-x'] if clean_files else []) + (['-q'] if very_verbose else ['-q']))  # cleans up untracked files and folders
 
     def merge(dest, very_verbose=False, verbose=False):
         print("Merging \"%s\" with \"%s\"" % (os.path.basename(getcwd()), dest))
-        popen([git_cmd, 'merge', dest] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
+        popen([GIT_CMD, 'merge', dest] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
 
     def checkout(rev, clean=False, very_verbose=False):
         if not rev:
@@ -140,11 +139,11 @@ class Git(object):
 
             if branch:
                 print("Revision \"%s\" matches a branch \"%s\" reference. Re-associating with branch" % (rev, branch))
-                popen([git_cmd, 'checkout', branch] + ([] if very_verbose else ['-q']))
+                popen([GIT_CMD, 'checkout', branch] + ([] if very_verbose else ['-q']))
                 break
 
         if not branch:
-            popen([git_cmd, 'checkout', rev] + (['-f'] if clean else []) + ([] if very_verbose else ['-q']))
+            popen([GIT_CMD, 'checkout', rev] + (['-f'] if clean else []) + ([] if very_verbose else ['-q']))
 
     def update(rev=None, clean=False, clean_files=False, is_local=False):
         if not is_local:
@@ -169,13 +168,13 @@ class Git(object):
                     print(err + " Working set is not on a branch.")
 
     def status(very_verbose=False):
-        return pquery([git_cmd, 'status', '-s'] + (['-v'] if very_verbose else []))
+        return pquery([GIT_CMD, 'status', '-s'] + (['-v'] if very_verbose else []))
 
     def dirty():
-        return pquery([git_cmd, 'status', '-uno', '--porcelain'])
+        return pquery([GIT_CMD, 'status', '-uno', '--porcelain'])
 
     def untracked():
-        return pquery([git_cmd, 'ls-files', '--others', '--exclude-standard']).splitlines()
+        return pquery([GIT_CMD, 'ls-files', '--others', '--exclude-standard']).splitlines()
 
     def outgoing():
         # Get default remote
@@ -189,17 +188,17 @@ class Git(object):
             branch = "master"
         # Check if local branch exists. If not, then just carry on
         try:
-            pquery([git_cmd, 'rev-parse', '%s' % branch])
+            pquery([GIT_CMD, 'rev-parse', '%s' % branch])
         except ProcessException:
             return 0
         # Check if remote branch exists. If not, then it's a new branch
         try:
-            if not pquery([git_cmd, 'rev-parse', '%s/%s' % (remote, branch)]):
+            if not pquery([GIT_CMD, 'rev-parse', '%s/%s' % (remote, branch)]):
                 return 1
         except ProcessException:
             return 1
         # Check for outgoing commits for the same remote branch only if it exists locally and remotely
-        return 1 if pquery([git_cmd, 'log', '%s/%s..%s' % (remote, branch, branch)]) else 0
+        return 1 if pquery([GIT_CMD, 'log', '%s/%s..%s' % (remote, branch, branch)]) else 0
 
     # Checks whether current working tree is detached
     def isdetached():
@@ -219,7 +218,7 @@ class Git(object):
     # Finds all associated remotes for the specified remote type
     def getremotes(rtype='fetch'):
         result = []
-        remotes = pquery([git_cmd, 'remote', '-v']).strip().splitlines()
+        remotes = pquery([GIT_CMD, 'remote', '-v']).strip().splitlines()
         for remote in remotes:
             remote = re.split(r'\s', remote)
             t = re.sub('[()]', '', remote[2])
@@ -229,7 +228,7 @@ class Git(object):
 
     def seturl(url):
         print("Setting url to \"%s\" in %s" % (url, getcwd()))
-        return pquery([git_cmd, 'remote', 'set-url', 'origin', url]).strip()
+        return pquery([GIT_CMD, 'remote', 'set-url', 'origin', url]).strip()
 
     def geturl():
         url = ""
@@ -241,12 +240,12 @@ class Git(object):
         return formaturl(url)
 
     def getrev():
-        return pquery([git_cmd, 'rev-parse', 'HEAD']).strip()
+        return pquery([GIT_CMD, 'rev-parse', 'HEAD']).strip()
 
     # Gets current branch or returns empty string if detached
     def getbranch(rev='HEAD'):
         try:
-            branch = pquery([git_cmd, 'rev-parse', '--symbolic-full-name', '--abbrev-ref', rev]).strip()
+            branch = pquery([GIT_CMD, 'rev-parse', '--symbolic-full-name', '--abbrev-ref', rev]).strip()
         except ProcessException:
             branch = "master"
         return branch if branch != "HEAD" else ""
@@ -254,7 +253,7 @@ class Git(object):
     # Get all refs
     def getrefs():
         try:
-            return pquery([git_cmd, 'show-ref', '--dereference']).strip().splitlines()
+            return pquery([GIT_CMD, 'show-ref', '--dereference']).strip().splitlines()
         except ProcessException:
             return []
 
@@ -287,7 +286,7 @@ class Git(object):
     # Finds branches a rev belongs to
     def revbranches(rev):
         branches = []
-        lines = pquery([git_cmd, 'branch', '-a', '--contains'] + ([rev] if rev else [])).strip().splitlines()
+        lines = pquery([GIT_CMD, 'branch', '-a', '--contains'] + ([rev] if rev else [])).strip().splitlines()
         for line in lines:
             if re.match(r'^\*?\s+\((.+)\)$', line):
                 continue
@@ -343,7 +342,7 @@ class Git(object):
             except IOError:
                 print("Unable to write ignore file in \"%s\"" % os.path.join(getcwd(), Git.ignore_file), 1)
 
-    def action_progress(line, sep):
+    def action_progress(line):
         m = re.match(r'([\w :]+)\:\s*(\d+)% \((\d+)/(\d+)\)', line)
         if m:
             if m.group(1) == "remote: Compressing objects" and int(m.group(4)) > 100:

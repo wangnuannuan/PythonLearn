@@ -8,8 +8,8 @@ MW_PATH = ""
 SUPPORT_TOOLCHAIN = ["gnu", "mw"]
 OSP_PATH = ""
 CURRENT_PLATFORM = platform.system()
-python_version = platform.python_version()
-MakefileNames = ['Makefile', 'makefile', 'GNUMakefile']
+PYTHON_VERSION = platform.python_version()
+MAKEFILENAMES = ['Makefile', 'makefile', 'GNUMakefile']
 MIDDLEWARE = [
     "aws",
     "coap",
@@ -27,11 +27,20 @@ MIDDLEWARE = [
     "u8glib",
     "wakaama"
 ]
+
 LIBRARIES = ["clib", "secureshield"]
+
+BUILD_CONFIG_TEMPLATE = {
+    "APPL": "",
+    "BOARD": "",
+    "BD_VER": "",
+    "CUR_CORE": "",
+    "TOOLCHAIN": "",
+}
 
 
 def get_input(input_str):
-    if python_version.startswith("2"):
+    if PYTHON_VERSION.startswith("2"):
         return raw_input(input_str)
     else:
         return input(input_str)

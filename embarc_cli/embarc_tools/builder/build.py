@@ -1,12 +1,15 @@
 from __future__ import print_function, absolute_import, unicode_literals
-from .. download_manager import mkdir, delete_dir_files, cd
-from embarc_tools.notify import (print_string, print_table)
-from ..osp import osp
-import collections
-from embarc_tools.utils import pqueryOutputinline, pqueryTemporaryFile
 import sys
 import os
 import time
+import collections
+from embarc_tools.settings import build_config_template
+from embarc_tools.utils import pqueryOutputinline, pqueryTemporaryFile
+from embarc_tools.notify import (print_string, print_table)
+from .. download_manager import mkdir, delete_dir_files, cd
+from ..osp import osp
+
+
 # from embarc_tools.settings import *
 
 BUILD_OPTION_NAMES = ['BOARD', 'BD_VER', 'CUR_CORE', 'TOOLCHAIN', 'OLEVEL', 'V', 'DEBUG', 'SILENT', 'JTAG']
@@ -15,7 +18,7 @@ BUILD_CFG_NAMES = ['EMBARC_ROOT', 'OUT_DIR_ROOT', 'COMPILE_OPT', 'CXX_COMPILE_OP
 BUILD_SIZE_SECTION_NAMES = ['text', 'data', 'bss']
 
 
-class embARC_Builder:
+class embARC_Builder(object):
     def __init__(self, osproot=None, buildopts=None, outdir=None):
         self.buildopts = dict()
         make_options = ' '
@@ -38,8 +41,6 @@ class embARC_Builder:
                     option = str(opt) + '=' + self.buildopts[opt] + ' '
                     make_options += option
         self.make_options = make_options
-
-        pass
 
     @staticmethod
     def build_common_check(app):
@@ -178,7 +179,7 @@ class embARC_Builder:
             if "SILENT=1" not in build_precmd:
                 build_precmd = "{} SILENT=1 ".format(build_precmd)
 
-        if type(target) is str or target is None:
+        if isinstance(target, str) or target is None:
             build_cmd = build_precmd + " " + str(target)
         else:
             build_status['reason'] = "Unrecognized build target"
@@ -403,7 +404,7 @@ class embARC_Builder:
     def get_makefile_config(self, build_template=None):
         current_build_templates = dict()
         ospclass = osp.OSP()
-        makefile, current_build_templates = ospclass.get_makefile_config(current_build_templates)
+        _, current_build_templates = ospclass.get_makefile_config(current_build_templates)
         osp_root = current_build_templates.get("EMBARC_OSP_ROOT", None)
         if osp_root:
             osp_root = osp_root.replace("\\", "/")
@@ -466,13 +467,6 @@ class embARC_Builder:
 
     def get_build_template(self):
 
-        build_template = {
-            "APPL": "",
-            "BOARD": "",
-            "BD_VER": "",
-            "CUR_CORE": "",
-            "TOOLCHAIN": "",
-
-        }
+        build_template = BUILD_CONFIG_TEMPLATE
         build_template = collections.OrderedDict()
         return build_template

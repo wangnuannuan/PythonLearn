@@ -1,17 +1,16 @@
 from __future__ import print_function, absolute_import, unicode_literals
-from embarc_tools.download_manager import getcwd
-from embarc_tools.settings import python_version
 from functools import reduce
-import yaml
+import random
+import time
+import io
+import sys
 import operator
 import subprocess
 import errno
 import os
-import signal
-import sys
-import io
-import time
-import random
+import yaml
+from embarc_tools.download_manager import getcwd
+from embarc_tools.settings import python_version
 
 
 def uniqify(_list):
@@ -47,27 +46,14 @@ def merge_recursive(*args):
             output[key] = merge_recursive(*[x[key] for x in args if key in x])
 
         return output
-    else:
-        return reduce(operator.add, args)
+    return reduce(operator.add, args)
 
 
 class ProcessException(Exception):
     pass
 
 
-def killchildprocess(pid):
-    if pid is None:
-        pass
-    else:
-        try:
-            os.killpg(os.getpgid(pid), 9)
-        except AttributeError:
-            os.kill(pid, signal.SIGTERM)
-        except Exception as e:
-            print("can not kill for : {}".format(e))
-
-
-def popen(command, stdin=None, **kwargs):
+def popen(command, **kwargs):
     proc = None
     try:
         proc = subprocess.Popen(command, **kwargs)

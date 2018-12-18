@@ -1,21 +1,21 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-from ..download_manager import generate_yaml, edit_yaml, cd
-from embarc_tools.notify import (print_string, print_table, COLORS)
-from embarc_tools.settings import MakefileNames, get_input, OSP_DIRS
-import yaml
 import os
+import yaml
+from embarc_tools.notify import (print_string, print_table, COLORS)
+from embarc_tools.settings import MAKEFILENAMES, get_input, OSP_DIRS
 from embarc_tools.exporter import Exporter
+from ..download_manager import generate_yaml, edit_yaml, cd
 
 
 class OSP(object):
-    def __init__(self, file="osp.yaml"):
+    def __init__(self, osp_file="osp.yaml"):
         self.path = os.path.join(os.path.expanduser("~"), '.embarc_cli')
         if not os.path.exists(self.path):
             try:
                 os.mkdir(self.path)
             except (IOError, OSError):
                 pass
-        self.file = file
+        self.file = osp_file
 
         fl = os.path.join(self.path, self.file)
         if not os.path.exists(fl):
@@ -35,8 +35,8 @@ class OSP(object):
             with open(fl) as f:
                 self.cfg_dict = yaml.load(f)
                 if self.cfg_dict:
-                    for key, path_dict in self.cfg_dict.items():
-                        for url_, path_ in path_dict.items():
+                    for _, path_dict in self.cfg_dict.items():
+                        for _, path_ in path_dict.items():
                             if path == path_:
                                 return
                 path_num = 0
@@ -60,7 +60,7 @@ class OSP(object):
             with open(fl) as f:
                 self.cfg_dict = yaml.load(f)
                 if self.cfg_dict:
-                    for path, path_dict in self.cfg_dict.items():
+                    for _, path_dict in self.cfg_dict.items():
                         if path_dict.get("local", None):
                             osp_root = path_dict["local"]
                             if self.is_osp(osp_root):
@@ -174,13 +174,13 @@ class OSP(object):
         board_path = board_version_path_dict[bd_version]
         cur_core_file = cur_core + ".tcf" if cur_core else cur_core
         if os.path.exists(board_path):
-            for root, dirs, files in os.walk(board_path, topdown=True):
+            for root, _, files in os.walk(board_path, topdown=True):
                 if cur_core_file in files:
                     result.append(cur_core)
                     break
                 for file in files:
                     filename, filesuffix = os.path.splitext(file)
-                    if not filesuffix == ".tcf":
+                    if filesuffix != ".tcf":
                         continue
                     else:
                         result.append(filename)
@@ -188,7 +188,7 @@ class OSP(object):
         return result
 
     def get_makefile(self, app_path):
-        for makefile in MakefileNames:
+        for makefile in MAKEFILENAMES:
             makefile_path = os.path.join(app_path, makefile)
             if os.path.exists(makefile_path) and os.path.isfile(makefile_path):
                 return makefile_path
@@ -234,7 +234,7 @@ class OSP(object):
         '''
         print_string("Read makefile and get configuration ")
         makefile = None
-        for file in MakefileNames:
+        for file in MAKEFILENAMES:
             if os.path.exists(file) and os.path.isfile(file):
                 makefile = file
 

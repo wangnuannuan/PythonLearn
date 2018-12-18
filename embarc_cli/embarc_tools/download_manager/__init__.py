@@ -190,7 +190,7 @@ def untar(file, path):
 def extract_file(file, path):
     extract_file_name = None
     extract_file_path = None
-    filename, filesuffix = os.path.splitext(file)
+    _, filesuffix = os.path.splitext(file)
     if filesuffix == ".gz":
         extract_file_name = untar(file, path)
     elif filesuffix == ".zip":

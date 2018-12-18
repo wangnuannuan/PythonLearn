@@ -1,8 +1,8 @@
 from __future__ import print_function, absolute_import, unicode_literals
-from jinja2 import FileSystemLoader
-from jinja2.environment import Environment
 import os
 from os.path import join, dirname, abspath, exists
+from jinja2 import FileSystemLoader
+from jinja2.environment import Environment
 
 
 class Exporter(object):

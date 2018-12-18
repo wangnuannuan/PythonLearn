@@ -1,10 +1,10 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-from embarc_tools.project import Generator
 import os
+from embarc_tools.project import Generator
 from embarc_tools.settings import get_input
+from embarc_tools.notify import print_string
 from ..download_manager import cd
 from ..osp import (osp)
-from embarc_tools.notify import print_string
 help = "Ide generator"
 
 

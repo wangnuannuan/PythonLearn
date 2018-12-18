@@ -1,12 +1,13 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-from embarc_tools.toolchain import arcToolchain
 from distutils.spawn import find_executable
-from embarc_tools.utils import pquery
 import re
 import os
+from embarc_tools.toolchain import ARCtoolchain
+from embarc_tools.utils import pquery
 
 
-class Mw(arcToolchain):
+
+class Mw(ARCtoolchain):
     version = "2017.09"
     path = None
     executable_name = "ccac"
@@ -35,10 +36,10 @@ class Mw(arcToolchain):
             self.version = version
 
     def download(self, version=None, path=None):
-        print("Can not download metaware using cli")
+        print("Can not download metaware using cli {} {}".format(version, path))
         return
 
-    def extract_file(self, pack=None, path=None):
+    def extract_file(self):
         '''extract gnu file from pack to path;
         pack - the path of the compressed package
         path - the compressed package is extracted to this path

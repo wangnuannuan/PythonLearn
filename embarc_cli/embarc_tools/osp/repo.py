@@ -8,12 +8,12 @@ except NameError:
     # Python 3
     basestring = str
     from urllib.parse import urlparse, quote
-from .. download_manager import (getcwd, cd, rmtree_readonly, cwd_root, relpath)
+import os
+import re
+import shutil
 from embarc_tools.osp import (formaturl, regex_local_ref, regex_url_ref, scms, ProcessException)
 from embarc_tools.notify import print_string
-import shutil
-import re
-import os
+from .. download_manager import (getcwd, cd, rmtree_readonly, cwd_root, relpath)
 
 
 class Repo(object):
@@ -102,12 +102,12 @@ class Repo(object):
 
         return "directory" if depth == 0 else "repo"
 
-    def revtype(self, rev=None, ret_type=True, ret_rev=True, fmt=3):
-        if rev is None or len(rev) == 0:
+    def revtype(self, rev=None, fmt=3):
+        if rev is None or (not rev):
             output = ('latest' if fmt & 1 else '') + (' revision in the current branch' if fmt & 2 else '')
         elif re.match(r'^([a-fA-F0-9]{6,40})$', rev) or re.match(r'^([0-9]+)$', rev):
             revtags = self.gettags(rev) if rev else []
-            output = ('rev ' if fmt & 1 else '') + (('#' + rev[:12] + ((' (tag' + ('s' if len(revtags) > 1 else '') + ': ' + ', '.join(revtags[0:2]) + ')') if len(revtags) else '')) if fmt & 2 and rev else '')
+            output = ('rev ' if fmt & 1 else '') + (('#' + rev[:12] + ((' (tag' + ('s' if len(revtags) > 1 else '') + ': ' + ', '.join(revtags[0:2]) + ')') if revtags else '')) if fmt & 2 and rev else '')
         else:
             output = ('branch/tag' if fmt & 1 else '') + (' "' + rev + '"' if fmt & 2 else '')
 
@@ -277,8 +277,8 @@ class Repo(object):
                 lib_repo = Repo.fromurl(f.read().strip())
                 if (formaturl(lib_repo.url, 'https') == formaturl(url, 'https') and  # match URLs in common schema (https)
                         (lib_repo.rev == self.rev or                         # match revs, even if rev is None (valid for repos with no revisions)
-                            (lib_repo.rev and self.rev and
-                                lib_repo.rev == self.rev[0:len(lib_repo.rev)]))):  # match long and short rev formats
+                         (lib_repo.rev and self.rev and
+                          lib_repo.rev == self.rev[0:len(lib_repo.rev)]))):  # match long and short rev formats
                     return
 
         if up.hostname == "github.com":

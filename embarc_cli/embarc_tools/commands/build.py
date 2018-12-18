@@ -1,7 +1,7 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
+import os
 from ..builder import build
 from ..download_manager import cd, generate_file
-import os
 help = "Build application"
 
 

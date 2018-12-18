@@ -1,11 +1,13 @@
 from __future__ import print_function, absolute_import, unicode_literals, unicode_literals
 import os
-from ..osp import osp
-from ..download_manager import mkdir, getcwd
+import collections
 from embarc_tools.settings import get_input, SUPPORT_TOOLCHAIN
 from embarc_tools.notify import (print_string, print_table)
 from embarc_tools.exporter import Exporter
-import collections
+from embarc_tools.settings import build_config_template
+from ..osp import osp
+from ..download_manager import mkdir, getcwd
+
 help = "Create a new application"
 
 
@@ -65,15 +67,8 @@ def build_config(args):
     cur_core = args.cur_core
     toolchain = args.toolchain
     # config = dict()
-    config = {
-        "APPL": "",
-        "BOARD": "",
-        "BD_VER": "",
-        "CUR_CORE": "",
-        "TOOLCHAIN": "",
-        "EMBARC_OSP_ROOT": "",
-
-    }
+    config = build_config_template
+    config["EMBARC_OSP_ROOT"] = str()
     config = collections.OrderedDict()
     config["APPL"] = args.application
     osp_root = osppath.is_osp(input_root)

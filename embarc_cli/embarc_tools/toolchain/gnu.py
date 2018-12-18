@@ -1,16 +1,19 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-from embarc_tools.toolchain import arcToolchain, ProcessException
-from distutils.spawn import find_executable
-from embarc_tools.utils import pquery
+import urllib2
+import shutil
 import re
 import os
-from .. download_manager import (download_file, extract_file, getcwd, mkdir, delete_dir_files)
-import shutil
+from distutils.spawn import find_executable
+from embarc_tools.toolchain import ARCtoolchain, ProcessException
+from embarc_tools.utils import pquery
 from embarc_tools.notify import print_string
-import urllib2
+from .. download_manager import (download_file, extract_file, getcwd, mkdir, delete_dir_files)
 
 
-class Gnu(arcToolchain):
+
+
+
+class Gnu(ARCtoolchain):
     '''
     version: default version is 2017.09
     root_url: from this url to down load gnu
@@ -138,7 +141,7 @@ class Gnu(arcToolchain):
             return latesturl
         except urllib2.URLError as e:
             if hasattr(e, "code"):
-                print_string(e.code, level="warning")
+                print_string(e, level="warning")
             if hasattr(e, "reason"):
                 print_string(e.reason, level="warning")
         else:

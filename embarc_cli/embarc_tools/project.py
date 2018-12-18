@@ -1,21 +1,22 @@
 from __future__ import print_function, absolute_import, unicode_literals
+import os
+import random
+import collections
 from embarc_tools.utils import merge_recursive, uniqify, pquery
 from embarc_tools.exporter import Exporter
 from embarc_tools.osp import osp
-import os
-import random
 from embarc_tools.notify import (print_string, print_table)
-import collections
 from embarc_tools.download_manager import cd, getcwd
+from embarc_tools.settings import BUILD_CONFIG_TEMPLATE
 
 
-class Generator:
+class Generator(object):
 
-    def generate(self, path=None, buildopts=None):
+    def generate(self, buildopts=None):
         yield Ide(buildopts=buildopts)
 
 
-class Ide:
+class Ide(object):
     def __init__(self, path=None, buildopts=None):
         self.ide = {}
         self.ide["common"] = {}
@@ -50,23 +51,14 @@ class Ide:
         return cproject_template
 
     def _get_build_template(self):
-
-        build_template = {
-            "APPL": "",
-            "BOARD": "",
-            "BD_VER": "",
-            "CUR_CORE": "",
-            "TOOLCHAIN": "",
-        }
-
-        return build_template
+        return build_config_template
 
     def _get_project_conf_template(self):
         cproject_template = self._get_cproject_template()
         build_template = self._get_build_template()
 
         osppath = osp.OSP()
-        makefile, cur_build = osppath.get_makefile_config(
+        _, cur_build = osppath.get_makefile_config(
             build_template, verbose=True
         )
         build_template = collections.OrderedDict()
@@ -79,18 +71,16 @@ class Ide:
         ).replace("\\", "/").strip("../")
 
         make_tool = "make"
-        '''if cur_build.get("TOOLCHAIN") == "mw":
-            make_tool = "gmake" '''
         opt_command = [make_tool]
         opt_command.append("opt")
         if update or self.buildopts:
             if update:
                 opt_command.append("EMBARC_ROOT={}".format(osp_root))
             if self.buildopts:
-                newBuildConfigString = [
+                new_build_config = [
                     "%s=%s" % (key, value) for (key, value) in self.buildopts.items()
                 ]
-                opt_command.extend(newBuildConfigString)
+                opt_command.extend(new_build_config)
         cmd_output = pquery(opt_command)
         includes = list()
         compile_opts = ""
@@ -165,7 +155,7 @@ class Ide:
                 "description": core_description
             }
         }
-        for core, settings in cproject_template["core"].items():
+        for core, _ in cproject_template["core"].items():
             core_id = random.randint(1000000000, 2000000000)
             cproject_template["core"][core]["id"] = core_id
 
@@ -207,8 +197,7 @@ class Ide:
         link_folders = uniqify(link_folders)
 
         need_pop = list()
-        for i in range(len(link_folders)):
-            link = link_folders[i]
+        for link in link_folders:
             for path in link_folders:
                 if path != link and path.startswith(link):
                     need_pop.append(path)
@@ -248,12 +237,12 @@ class Ide:
         osp_root = self.ide["common"]["root"]
         for folder in virtual_folders:
             folder_path = os.path.join(osp_root, folder)
-            for file in os.listdir(folder_path):
-                file_path = os.path.join(folder_path, file)
+            for file_name in os.listdir(folder_path):
+                file_path = os.path.join(folder_path, file_name)
                 if os.path.isfile(file_path):
                     relative_path = os.path.join(
                         folder,
-                        file
+                        file_name
                     ).replace("\\", "/")
                     link_files.append(relative_path)
         current_virtual_folders = list()
@@ -275,11 +264,11 @@ class Ide:
     def _dict_elim_none(dic_to_clean):
         dic = dic_to_clean
         try:
-            for k, v in dic_to_clean.items():
-                if type(v) is list:
-                    dic[k] = Ide._list_elim_none(v)
-                elif type(v) is dict:
-                    dic[k] = Ide._dict_elim_none(v)
+            for key, value in dic_to_clean.items():
+                if isinstance(value, list):
+                    dic[key] = Ide._list_elim_none(value)
+                elif isinstance(value, dict):
+                    dic[key] = Ide._dict_elim_none(value)
         except AttributeError:
             pass
         return dic
@@ -288,18 +277,17 @@ class Ide:
         if key_values in source:
             for attribute, data in source[key_values].items():
                 if attribute in destination:
-
-                    if type(destination[attribute]) is list:
-                        if type(data) is list:
+                    if isinstance(destination[attribute], list):
+                        if isinstance(data, list) is list:
                             destination[attribute].extend(data)
                         else:
                             destination[attribute].append(data)
-                    elif type(destination[attribute]) is dict:
+                    elif isinstance(destination[attribute], list):
                         destination[attribute] = Ide._dict_elim_none(
                             merge_recursive(destination[attribute], data)
                         )
                     else:
-                        if type(data) is list:
+                        if isinstance(data, list) is list:
                             if data[0]:
                                 destination[attribute] = data[0]
                         else:
