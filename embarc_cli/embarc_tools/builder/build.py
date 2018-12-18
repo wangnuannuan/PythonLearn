@@ -167,7 +167,7 @@ class embARC_Builder:
             return build_status
 
         # Check and create output directory
-        if not os.path.isdir(self.outdir) and self.outdir is not None:
+        if (self.outdir is not None) and (not os.path.isdir(self.outdir)):
             print_string("Create application output directory: " + self.outdir)
             os.makedirs(self.outdir)
 
