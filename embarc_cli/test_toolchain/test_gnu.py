@@ -1,5 +1,5 @@
 from __future__ import print_function, division
-from embarc_tools.toolchain import gnu, metaware, arcToolchain
+from embarc_tools.toolchain import gnu, metaware, ARCtoolchain
 import unittest
 import os, shutil
 
@@ -11,13 +11,13 @@ class TestToolchain(unittest.TestCase):
         self.pack = os.path.join(os.getcwd(),"arc_gnu_2018.09_prebuilt_elf32_le_linux_install.tar.gz")
 
     def test_is_support(self):
-        result = arcToolchain.is_supported("gnu")
+        result = ARCtoolchain.is_supported("gnu")
         self.assertTrue(result)
-        result = arcToolchain.is_supported("mw")
+        result = ARCtoolchain.is_supported("mw")
         self.assertTrue(result)
 
     def test_get_platform(self):
-        result = arcToolchain.get_platform()
+        result = ARCtoolchain.get_platform()
         self.assertIn(result, ["Windows", "Linux"])
 
     def test_check_version(self):

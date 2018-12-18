@@ -3,7 +3,7 @@ import sys
 import os
 import time
 import collections
-from embarc_tools.settings import build_config_template
+from embarc_tools.settings import BUILD_CONFIG_TEMPLATE
 from embarc_tools.utils import pqueryOutputinline, pqueryTemporaryFile
 from embarc_tools.notify import (print_string, print_table)
 from .. download_manager import mkdir, delete_dir_files, cd

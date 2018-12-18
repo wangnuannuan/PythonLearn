@@ -51,7 +51,7 @@ class Ide(object):
         return cproject_template
 
     def _get_build_template(self):
-        return build_config_template
+        return BUILD_CONFIG_TEMPLATE
 
     def _get_project_conf_template(self):
         cproject_template = self._get_cproject_template()
