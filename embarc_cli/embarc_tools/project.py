@@ -98,8 +98,8 @@ class Ide:
         relative_root = ""
         if cmd_output:
             opt_lines = cmd_output.splitlines()
-            opt_value = opt_line.split(":", 1)[1]
             for opt_line in opt_lines:
+                opt_value = opt_line.split(":", 1)[1]
                 if opt_line.startswith("APPL"):
                     cur_build["APPL"] = opt_value.strip()
                 build_template["APPL"] = cur_build.get("APPL")
