@@ -13,6 +13,10 @@ def deploy():
     file = "index.tar.gz"
     tar = tarfile.open(file, "w:gz")
     tar.add(pythonversion + "index.html")
+    for root, _, files in os.walk("coverage"):
+        for file in files:
+            fullpath=os.path.join(root, file)
+            tar.add(fullpath,arcname=file) 
     tar.close()
     repo_slug = os.environ.get("TRAVIS_REPO_SLUG")
     gh_token = os.environ.get("GH_TOKEN")
@@ -42,7 +46,7 @@ def get_allcase(case_path):
     return discover
 
 def before_install():
-    os.system("pycodestyle embarc_tools")
+    os.system("pycodestyle embarc_tools --ignore=E501")
     os.system("pyflakes embarc_tools")
     gnutoolchain = gnu.Gnu()
     gnu_tgz_path = gnutoolchain.download(version="2018.09")
@@ -60,7 +64,6 @@ if __name__ == '__main__':
     runner = HTMLTestRunner.HTMLTestRunner(stream=ftp, verbosity=2, title=pythonversion)
     runner.run(get_allcase("."))
     ftp.close()
-    deploy()
     COV.stop()
     COV.save()
     print('Coverage Summary:')
@@ -68,6 +71,7 @@ if __name__ == '__main__':
     basedir = os.path.abspath(os.path.dirname(__file__))
     covdir = os.path.join(basedir, 'coverage')
     COV.html_report(directory=covdir)
+    deploy()
     print('HTML version: file://%s/index.html' % covdir)
     print("See test result from https://wangnuannuan.github.io/PythonLearn")
     COV.erase()

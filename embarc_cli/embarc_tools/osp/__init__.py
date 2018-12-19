@@ -113,7 +113,7 @@ class Git(object):
         print("Fetching revisions from remote repository to \"%s\"" % os.path.basename(getcwd()))
         popen([GIT_CMD, 'fetch', '--all', '--tags'] + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
 
-    def discard(clean_files=False):
+    def discard(clean_files=False, very_verbose=False):
         print("Discarding local changes in \"%s\"" % os.path.basename(getcwd()))
         pquery([GIT_CMD, 'reset', 'HEAD'] + ([] if very_verbose else ['-q']))  # unmarks files for commit
         pquery([GIT_CMD, 'checkout', '.'] + ([] if very_verbose else ['-q']))  # undo  modified files

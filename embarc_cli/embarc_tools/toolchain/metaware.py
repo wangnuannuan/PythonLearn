@@ -6,7 +6,6 @@ from embarc_tools.toolchain import ARCtoolchain
 from embarc_tools.utils import pquery
 
 
-
 class Mw(ARCtoolchain):
     version = "2017.09"
     path = None

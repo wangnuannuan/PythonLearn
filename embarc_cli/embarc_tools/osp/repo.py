@@ -161,7 +161,7 @@ class Repo(object):
                 pass
 
     def getscm(self):
-        for name, scm in scms.items():
+        for name, scm in SCMS.items():
             if os.path.isdir(os.path.join(self.path, '.' + name)):
                 return scm
 
@@ -200,7 +200,7 @@ class Repo(object):
 
     def clone(self, url, path, rev=None, depth=None, protocol=None, offline=False, **kwargs):
         # Sorted so repositories that match urls are attempted first
-        for scm in scms.values():
+        for scm in SCMS.values():
 
             main = True
             cache = self.get_cache(url, scm.name)
