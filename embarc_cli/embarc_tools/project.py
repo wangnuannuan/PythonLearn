@@ -7,6 +7,7 @@ from embarc_tools.exporter import Exporter
 from embarc_tools.osp import osp
 from embarc_tools.notify import (print_string, print_table)
 from embarc_tools.download_manager import cd, getcwd
+from embarc_tools.toolchain import gnu
 from embarc_tools.settings import BUILD_CONFIG_TEMPLATE
 
 
@@ -58,14 +59,29 @@ class Ide(object):
         build_template = self._get_build_template()
 
         osppath = osp.OSP()
+        gnu_class = gnu.Gnu()
         _, cur_build = osppath.get_makefile_config(
             build_template, verbose=True
         )
         build_template = collections.OrderedDict()
         osp_root, update = osppath.check_osp(cur_build["EMBARC_OSP_ROOT"])
 
+        gnu_root_path = os.path.dirname(gnu_class.path)
+        openocd_cfg = os.path.join(gnu_root_path, 
+            "share", 
+            "openocd", 
+            "script", 
+            "board", 
+            "snps_em_sk.cfg"
+        )
+        openocd_bin = os.path.join(gnu_root_path, "bin", "openocd.exe")
+
         cur_build["EMBARC_OSP_ROOT"] = osp_root
         self.ide["common"]["root"] = osp_root
+        self.ide["common"]["nsim"] = os.environ.get("NSIM_HOME", None)
+        self.ide["common"]["nsim_port"] = 49105
+        self.ide["common"]["openocd_cfg"] = openocd_cfg.replace("\\", "/")
+        self.ide["common"]["openocd_bin"] = openocd_bin.replace("\\", "/")
         self.ide["common"]["folder"] = os.path.relpath(
             getcwd(), osp_root
         ).replace("\\", "/").strip("../")
@@ -168,7 +184,9 @@ class Ide(object):
             include = include.replace("\\", "/")
             cproject_template["includes"].append(include)
 
-        self.ide["toolchain"] = build_template["TOOLCHAIN"]
+        self.ide["common"]["toolchain"] = build_template["TOOLCHAIN"]
+        self.ide["common"]["board"] = build_template.get("BOARD", None)
+        self.ide["common"]["bd_ver"] = build_template.get("BD_VER", None)
         self.ide["common"]["links_folder"] = list()
         self.ide["common"]["links_file"] = list()
 
@@ -303,11 +321,12 @@ class Ide(object):
 
             self.get_asm_c_include()
             outdir = "."
+            launch = self.ide["common"]["name"] + ".launch"
 
-            exporter = Exporter(self.ide["toolchain"])
+            exporter = Exporter(self.ide["common"]["toolchain"])
             print_string(
-                "Start to generate IDE project accroding to templates \
-                (.project.tmpl and .cproject.tmpl)"
+                "Start to generate IDE project accroding to templates" +
+                " (.project.tmpl and .cproject.tmpl)"
             )
             exporter.gen_file_jinja(
                 "project.tmpl", self.ide["common"], ".project", outdir
@@ -315,12 +334,15 @@ class Ide(object):
             exporter.gen_file_jinja(
                 ".cproject.tmpl", self.ide["exporter"], ".cproject", outdir
             )
+            exporter.gen_file_jinja(
+                ".launch.tmpl", self.ide["exporter"], launch, outdir
+            )
             print_string(
                 "Finish generate IDE project and the files are in " +
                 os.path.abspath(outdir)
             )
             print_string(
-                "Open ARC GNU IDE (version) Eclipse \
-                - >File >Open Projects from File System >Paste " +
+                "Open ARC GNU IDE (version) Eclipse "+
+                "- >File >Open Projects from File System >Paste\n" +
                 os.path.abspath(outdir)
             )

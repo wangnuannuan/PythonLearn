@@ -4,14 +4,14 @@ import collections
 from embarc_tools.settings import get_input, SUPPORT_TOOLCHAIN
 from embarc_tools.notify import (print_string, print_table)
 from embarc_tools.exporter import Exporter
-from embarc_tools.settings import build_config_template
+from embarc_tools.settings import BUILD_CONFIG_TEMPLATE
 from ..osp import osp
 from ..download_manager import mkdir, getcwd
 
 help = "Create a new application"
 
 
-def run(args):
+def run(args, remainder=None):
 
     olevel = args.olevel
     application = args.application
@@ -67,7 +67,7 @@ def build_config(args):
     cur_core = args.cur_core
     toolchain = args.toolchain
     # config = dict()
-    config = build_config_template
+    config = BUILD_CONFIG_TEMPLATE
     config["EMBARC_OSP_ROOT"] = str()
     config = collections.OrderedDict()
     config["APPL"] = args.application

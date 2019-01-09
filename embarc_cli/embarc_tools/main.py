@@ -53,35 +53,8 @@ def main():
     if len(sys.argv) == 1:
         return parser.print_help()
 
-    elif len(sys.argv) > 1 and sys.argv[1] == "build":
-        argv_list.append(sys.argv[1])
-        make_list = list()
-        end_index = 0
-        target = None
-        j = 0
-        for argv in sys.argv[2:]:
-            j += 1
-            distance = (j - end_index)
-            if "=" in argv:
-                end_index = j
-                make_list.append(argv)
-            elif distance == 1:
-                if "-" not in argv:
-                    target = argv
-                else:
-                    argv_list.append(argv)
-            else:
-                argv_list.append(argv)
-        if make_list > 0:
-            make_config = " ".join(make_list)
-            argv_list.extend(["--make", make_config])
-        if target:
-            argv_list.extend(["--target", target])
-        args = parser.parse_args(argv_list)
-    else:
-        args = parser.parse_args()
-
-    return args.func(args)
+    args, remainder = parser.parse_known_args()
+    return args.func(args, remainder)
 
 
 if __name__ == '__main__':

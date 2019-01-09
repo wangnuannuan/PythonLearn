@@ -8,7 +8,7 @@ from ..builder import build
 help = "Show application config"
 
 
-def run(args):
+def run(args, remainder=None):
     root = getcwd()
     app_path = None
 

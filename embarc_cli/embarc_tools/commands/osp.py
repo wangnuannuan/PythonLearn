@@ -6,7 +6,7 @@ from ..download_manager import getcwd
 help = "Set embarc osp"
 
 
-def run(args):
+def run(args, remainder=None):
     if not any([args.list, args.clone]):
         msg = "Please select a parameter [--clone, --list]"
         print_string(msg, level="warning")

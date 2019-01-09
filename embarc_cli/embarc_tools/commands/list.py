@@ -6,7 +6,7 @@ from ..notify import (print_string, print_table)
 help = "Build configurations in embarc osp"
 
 
-def run(args):
+def run(args, remainder=None):
     osp_root = args.osp
     osppath = osp.OSP()
     if not any([args.board, args.bd_ver, args.core, args.toolchain, args.middleware, args.libraries]):

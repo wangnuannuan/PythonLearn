@@ -174,6 +174,11 @@ class embARC_Builder(object):
         build_precmd = "make "
         if parallel:
             build_precmd = "{} -j {}".format(build_precmd, str(parallel))
+
+        if target != "info":
+            build_config_template = self.get_build_template()
+            with cd(app_realpath):
+                self.get_makefile_config(build_config_template) 
         build_precmd = "{} {}".format(build_precmd, self.make_options)
         if silent:
             if "SILENT=1" not in build_precmd:
@@ -186,15 +191,12 @@ class embARC_Builder(object):
             build_status['result'] = False
             return build_status
 
-        if target != "info":
-            build_config_template = self.get_build_template()
-            with cd(app_realpath):
-                self.get_makefile_config(build_config_template)
-            build_cmd_list = build_cmd.split()
-            for i in range(len(build_cmd_list)):
-                if build_cmd_list[i].startswith("EMBARC_ROOT"):
-                    build_cmd_list[i] = "EMBARC_ROOT=" + self.osproot
-            build_cmd = " ".join(build_cmd_list)
+
+        build_cmd_list = build_cmd.split()
+        for i in range(len(build_cmd_list)):
+            if build_cmd_list[i].startswith("EMBARC_ROOT"):
+                build_cmd_list[i] = "EMBARC_ROOT=" + self.osproot
+        build_cmd = " ".join(build_cmd_list)
         print_string("Build command: {} ".format(build_cmd))
         build_status['build_cmd'] = build_cmd
         print_string("Start to build application")
@@ -414,47 +416,40 @@ class embARC_Builder(object):
             new_osp_dict = {"EMBARC_OSP_ROOT": osp_root}
             ospclass.update_makefile(new_osp_dict, os.getcwd())
 
-        make_tool = "make"
-        if current_build_templates.get("TOOLCHAIN") == "mw":
-            make_tool = "gmake"
-        opt_command = [make_tool]
-        opt_command.append(str("opt"))
-        try:
-            returncode, cmd_output = pqueryTemporaryFile(opt_command)
-            if not returncode:
-                if cmd_output:
-                    for opt_line in cmd_output:
-                        if opt_line.startswith("APPL"):
-                            current_build_templates["APPL"] = (opt_line.split(":", 1)[1]).strip()
-
-                        build_template["APPL"] = current_build_templates.get("APPL")
-                        if opt_line.startswith("BOARD"):
-                            current_build_templates["BOARD"] = (opt_line.split(":", 1)[1]).strip()
-                        build_template["BOARD"] = current_build_templates.get("BOARD")
-                        if opt_line.startswith("BD_VER"):
-                            current_build_templates["BD_VER"] = (opt_line.split(":", 1)[1]).strip()
-                        build_template["BD_VER"] = current_build_templates.get("BD_VER")
-                        if opt_line.startswith("CUR_CORE"):
-                            current_build_templates["CUR_CORE"] = (opt_line.split(":", 1)[1]).strip()
-                        build_template["CUR_CORE"] = current_build_templates.get("CUR_CORE")
-                        if opt_line.startswith("TOOLCHAIN"):
-                            current_build_templates["TOOLCHAIN"] = (opt_line.split(":", 1)[1]).strip()
-                        build_template["TOOLCHAIN"] = current_build_templates.get("TOOLCHAIN")
-                        if opt_line.startswith("EMBARC_ROOT"):
-                            relative_root = (opt_line.split(":", 1)[1]).strip()
-                            current_build_templates["EMBARC_OSP_ROOT"] = os.path.normpath(os.path.join(os.getcwd(), relative_root))
-                        build_template["EMBARC_OSP_ROOT"] = current_build_templates.get("EMBARC_OSP_ROOT")
-        except Exception as e:
-            print_string("Error: {}".format(e))
-            sys.exit(1)
+        build_template["APPL"] = current_build_templates.get("APPL", False)
+        build_template["BOARD"] = current_build_templates.get("BOARD", False)
+        build_template["BD_VER"] = current_build_templates.get("BD_VER", False)
+        build_template["CUR_CORE"] = current_build_templates.get("CUR_CORE", False)
+        build_template["TOOLCHAIN"] = current_build_templates.get("TOOLCHAIN", False)
+        build_template["EMBARC_OSP_ROOT"] = current_build_templates.get("EMBARC_OSP_ROOT", False)
 
         for option in self.make_options.split(" "):
             if "=" in option:
                 [key, value] = option.split("=")
                 if key in build_template:
                     build_template[key] = value
-        print_string("Current configuration ")
 
+        if not all(build_template.values()):
+            try:
+                returncode, cmd_output = pqueryTemporaryFile(["make", "opt"])
+                if not returncode and cmd_output:
+                    for key, value in build_template.items():
+                        if not value:
+                            for opt_line in cmd_output:
+                                if key != "EMBARC_OSP_ROOT" and opt_line.startswith(key):
+                                    build_template[key] = (opt_line.split(":", 1)[1]).strip()
+                                elif key == "EMBARC_OSP_ROOT" and opt_line.startswith("EMBARC_ROOT"):
+                                    relative_root = (opt_line.split(":", 1)[1]).strip()
+                                    build_template[key] = os.path.normpath(os.path.join(os.getcwd(), relative_root))
+                                else:
+                                    pass
+            except Exception as e:
+                print_string("Error: {}".format(e))
+                sys.exit(1)
+
+        current_build_list = ["%s=%s"%(opt, build_template[opt]) for opt in BUILD_CONFIG_TEMPLATE.keys()]
+        self.make_options = " ".join(current_build_list)
+        print_string("Current configuration ")
         table_head = list()
         table_content = list()
         for key, value in build_template.items():

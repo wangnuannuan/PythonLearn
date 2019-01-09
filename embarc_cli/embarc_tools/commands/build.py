@@ -5,7 +5,7 @@ from ..download_manager import cd, generate_file
 help = "Build application"
 
 
-def run(args):
+def run(args, remainder=None):
     buildopts = dict()
     osproot = None
     curdir = args.outdir
@@ -40,18 +40,14 @@ def run(args):
 
     builder = build.embARC_Builder(osproot, buildopts, curdir)
 
-    if args.make:
-        make_config = get_config(args.make)
+    if remainder:
+        make_config, target= get_config(remainder)
+        if target:
+            args.target = target
+
         current_options = builder.buildopts
-        make_options = dict()
+        current_options.update(make_config)
         make_config_update = list()
-
-        for config in make_config:
-            key = config.split("=")
-
-            make_options[key[0]] = key[1]
-        current_options.update(make_options)
-
         for key, value in current_options.items():
             option = "%s=%s" % (key, value)
             make_config_update.append(option)
@@ -81,17 +77,18 @@ def run(args):
         if information["result"]:
             generate_file(".build", information["build_cmd"], path=app_path)
 
-        # if not information["result"]:
-            # print_string(information["reason"])
-
 
 def get_config(config):
-    if type(config) == list:
-        if len(config) == 1 and " " in config[0]:
-            config = config[0].split(" ")
-    else:
-        config = config.split(" ")
-    return config
+    make_config = dict()
+    target = None
+    if config:
+        for key in config:
+            if "=" in key:
+                config_pair = key.split("=")
+                make_config[config_pair[0]] = config_pair[1]
+            else:
+                target = key
+    return make_config, target
 
 
 def setup(subparser):
@@ -111,5 +108,3 @@ def setup(subparser):
         "-j", "--parallel", default=False, help="Build application with -j")
     subparser.add_argument(
         "--target", default="elf", help="Choose build target, default target is elf and options are [elf, bin, hex, size] ")
-    subparser.add_argument(
-        "--make", nargs='*', help="Build application with config like 'BOARD=emsk BD_VER=11 CORE=arcem4 TOOLCHAIN=gnu")

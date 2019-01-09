@@ -8,7 +8,7 @@ from ..osp import (osp)
 help = "Ide generator"
 
 
-def run(args):
+def run(args, remainder=None):
     buildopts = dict()
     osppath = osp.OSP()
     path = None

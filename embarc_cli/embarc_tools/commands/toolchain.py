@@ -4,7 +4,7 @@ from ..toolchain import gnu, metaware
 help = "Download and install toolchain(gnu)"
 
 
-def run(args):
+def run(args, remainder=None):
     toolchain_class = None
     if args.toolchain == "gnu":
         toolchain_class = gnu.Gnu()
