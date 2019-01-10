@@ -54,34 +54,78 @@ class Ide(object):
     def _get_build_template(self):
         return BUILD_CONFIG_TEMPLATE
 
+    def _set_debug_configuration(self):
+    	common = self.ide["common"]
+    	nsim_home = os.environ.get("NSIM_HOME", "").replace("\\", "/")
+    	gnu_class = gnu.Gnu()
+    	gnu_root_path = os.path.dirname(gnu_class.path)
+    	openocd_bin = os.path.join(gnu_root_path, "bin", "openocd.exe")
+    	openocd_cfg = None
+    	if common["board"] == "emsk":
+    		openocd_cfg = "snps_em_sk"
+    	else:
+    		openocd_cfg = "snps_" + common["board"]
+
+    	osppath = osp.OSP()
+
+    	support_board = osppath.support_board(common["root"])
+
+        openocd_cfg_dir = os.path.join(gnu_root_path, 
+            "share", 
+            "openocd", 
+            "scripts", 
+            "board" 
+        )
+        in_openocd_cfg_dir = os.listdir(openocd_cfg_dir)
+
+        openocd_cfg_list = list()
+        for cfg in in_openocd_cfg_dir:
+        	if cfg.startswith(openocd_cfg):
+        		openocd_cfg_list.append(cfg)
+        if not openocd_cfg_list:
+        	if common["board"] == "emsdp":
+        		openocd_cfg = os.path.join(common["root"], "board", "emsdp", openocd_cfg)
+        	else:
+        		openocd_cfg = os.path.join(openocd_cfg_dir, "snps_em_sk.cfg")
+        elif len(openocd_cfg_list) == 1:
+        	openocd_cfg = os.path.join(openocd_cfg_dir, openocd_cfg_list[0])
+        else:
+        	for cfg in openocd_cfg_list:
+        		if common["bd_ver"] in cfg:
+        			openocd_cfg = os.path.join(openocd_cfg_dir, cfg)
+        			break
+        		elif ".".join(list(common["bd_ver"])) in cfg:
+        			openocd_cfg = os.path.join(openocd_cfg_dir, cfg)
+        			break
+        		else:
+        			openocd_cfg = os.path.join(openocd_cfg_dir, "snps_em_sk.cfg")
+        self.ide["common"]["openocd_cfg"] = openocd_cfg.replace("\\", "/")
+        self.ide["common"]["openocd_bin"] = openocd_bin.replace("\\", "/")
+
+        nsim_tcf = "/".join(["etc", "tcf", "templates", "em4_dmips.tcf"])
+        nsim_tcf = "/".join([nsim_home, nsim_tcf])
+        if common["board"] == "nsim":
+        	nsim_tcf = osppath.get_tcf(common["root"], common["board"], common["bd_ver"], common["cur_core"]).replace("\\", "/")
+
+        self.ide["common"]["nsim"] = "/".join([nsim_home, "bin", "nsimdrv.exe"])
+        self.ide["common"]["nsim_tcf"] = nsim_tcf
+        self.ide["common"]["nsim_port"] = 49105
+        
+
     def _get_project_conf_template(self):
         cproject_template = self._get_cproject_template()
         build_template = self._get_build_template()
 
         osppath = osp.OSP()
-        gnu_class = gnu.Gnu()
+        
         _, cur_build = osppath.get_makefile_config(
             build_template, verbose=True
         )
         build_template = collections.OrderedDict()
         osp_root, update = osppath.check_osp(cur_build["EMBARC_OSP_ROOT"])
 
-        gnu_root_path = os.path.dirname(gnu_class.path)
-        openocd_cfg = os.path.join(gnu_root_path, 
-            "share", 
-            "openocd", 
-            "script", 
-            "board", 
-            "snps_em_sk.cfg"
-        )
-        openocd_bin = os.path.join(gnu_root_path, "bin", "openocd.exe")
-
         cur_build["EMBARC_OSP_ROOT"] = osp_root
         self.ide["common"]["root"] = osp_root
-        self.ide["common"]["nsim"] = os.environ.get("NSIM_HOME", None)
-        self.ide["common"]["nsim_port"] = 49105
-        self.ide["common"]["openocd_cfg"] = openocd_cfg.replace("\\", "/")
-        self.ide["common"]["openocd_bin"] = openocd_bin.replace("\\", "/")
         self.ide["common"]["folder"] = os.path.relpath(
             getcwd(), osp_root
         ).replace("\\", "/").strip("../")
@@ -187,6 +231,7 @@ class Ide(object):
         self.ide["common"]["toolchain"] = build_template["TOOLCHAIN"]
         self.ide["common"]["board"] = build_template.get("BOARD", None)
         self.ide["common"]["bd_ver"] = build_template.get("BD_VER", None)
+        self.ide["common"]["cur_core"] = build_template.get("CUR_CORE", None)
         self.ide["common"]["links_folder"] = list()
         self.ide["common"]["links_file"] = list()
 
@@ -199,6 +244,7 @@ class Ide(object):
         self.ide["common"]["links_file"].extend(link_files)
 
         self.ide["common"]["virtual_folders"] = uniqify(virtual_folders)
+        self._set_debug_configuration()
 
         return cproject_template
 
@@ -321,7 +367,8 @@ class Ide(object):
 
             self.get_asm_c_include()
             outdir = "."
-            launch = self.ide["common"]["name"] + ".launch"
+            print()
+            launch = self.ide["common"]["name"] + "-" + self.ide["exporter"]["core"].keys()[0] + ".launch"
 
             exporter = Exporter(self.ide["common"]["toolchain"])
             print_string(

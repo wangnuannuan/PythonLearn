@@ -186,7 +186,17 @@ class OSP(object):
                         result.append(filename)
 
         return result
-
+    def get_tcf(self, root, board, bd_version, cur_core):
+        result = None
+        board_version_path_dict = self._board_version_config(root, board, bd_version)
+        board_path = board_version_path_dict[bd_version]
+        cur_core_file = cur_core + ".tcf"
+        if os.path.exists(board_path):
+            for root, _, files in os.walk(board_path, topdown=True):
+                if cur_core_file in files:
+                    result = os.path.join(root, cur_core_file)
+                    break
+        return result
     def get_makefile(self, app_path):
         for makefile in MAKEFILENAMES:
             makefile_path = os.path.join(app_path, makefile)
