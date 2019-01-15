@@ -2,7 +2,9 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from embarc_tools.notify import print_string
 from ..toolchain import gnu, metaware
 help = "Download and install toolchain(gnu)"
-
+description = (
+        "Options can be input by command line parameter \n"
+        "via the --quick, it will get options from global settings.")
 
 def run(args, remainder=None):
     toolchain_class = None

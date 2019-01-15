@@ -14,6 +14,7 @@ SCMS = {}
 def formaturl(url, format="default"):
     url = "%s" % url
     m = re.match(REGEX_REPO_URL, url)
+    print(m)
     if m and m.group(1) == '':   # no protocol specified, probably ssh string like "git@github.com:xxx/osp.git"
         url = 'ssh://%s%s%s/%s' % (m.group(2) or 'git@', m.group(6), m.group(7) or '', m.group(8))  # convert to common ssh URL-like format
         m = re.match(REGEX_REPO_URL, url)

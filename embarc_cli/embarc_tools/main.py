@@ -24,10 +24,12 @@ def import_submodules(package, recursive=True):
 
 
 SUBCOMMANDS = import_submodules(commands)
-
+ver = pkg_resources.require("embarc_cli")[0].version
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(prog='mbed',
+    description="Command-line tool for embARC OSP - https://embarc.org/embarc_osp\nversion %s\n\nUse \"embarc <command> -h|--help\" for detailed help.\nOnline manual and guide available at https://github.com/foss-for-synopsys-dwc-arc-processors/embarc-cli" % ver,
+    formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
         '-v', dest='verbosity', action='count', default=0,
         help='Increase the verbosity of the output'
@@ -43,11 +45,22 @@ def main():
     )
     subparsers = parser.add_subparsers(help='commands')
 
+    current_command = ["new", "build", "appconfig", "config"]
+    subcommand = SUBCOMMANDS.keys()
+    for key in subcommand:
+        if not key in current_command:
+            current_command.append(key)
+    for key in current_command:
+        subparser = subparsers.add_parser(key, help=SUBCOMMANDS[key].help, description=SUBCOMMANDS[key].description)
+        SUBCOMMANDS[key].setup(subparser)
+        subparser.set_defaults(func=SUBCOMMANDS[key].run)
+    '''
     for name, module in SUBCOMMANDS.items():
-        subparser = subparsers.add_parser(name, help=module.help)
+        subparser = subparsers.add_parser(name, help=module.help, description=module.description)
 
         module.setup(subparser)
         subparser.set_defaults(func=module.run)
+    '''
     args = None
     argv_list = list()
     if len(sys.argv) == 1:
@@ -62,3 +75,4 @@ if __name__ == '__main__':
         main()
     except (KeyboardInterrupt):
         print("Terminate batch job")
+        sys.exit(255)

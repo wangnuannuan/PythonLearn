@@ -8,7 +8,7 @@ APPL ?= {{APPL}}
 
 # Optimization Level
 # Please Refer to toolchain_xxx.mk for this option
-OLEVEL ?= {{olevel}}
+OLEVEL ?= {{OLEVEL}}
 
 ##
 # Current Board And Core
@@ -43,24 +43,24 @@ TOOLCHAIN ?= {{TOOLCHAIN}}
 # you need to set the option to -lm
 ##
 #APPL_LIBS ?=
-OS_SEL ?= {{os}}
-LIB_SEL ?= {{lib}}
+OS_SEL ?= {{OS_SEL}}
+LIB_SEL ?= {{LIB_SEL}}
 #
 # root dir of embARC
 #
 EMBARC_ROOT = {{EMBARC_OSP_ROOT}}
 
-MID_SEL = {{middleware}}
+MID_SEL = {{MIDDLEWARE}}
 
 # application source dirs
-APPL_CSRC_DIR = {{csrc}} 
-APPL_ASMSRC_DIR = {{asmsrc}} 
+APPL_CSRC_DIR = {{APPL_CSRC_DIR}} 
+APPL_ASMSRC_DIR = {{APPL_ASMSRC_DIR}} 
 
 # application include dirs
-APPL_INC_DIR = {{include}} 
+APPL_INC_DIR = {{APPL_INC_DIR}} 
 
 # application defines
-APPL_DEFINES = {{defines}} 
+APPL_DEFINES = {{APPL_DEFINES}} 
 
 # include current project makefile
 COMMON_COMPILE_PREREQUISITES += makefile

@@ -6,10 +6,12 @@ from embarc_tools.notify import (print_string, print_table)
 from embarc_tools.exporter import Exporter
 from embarc_tools.settings import BUILD_CONFIG_TEMPLATE
 from ..osp import osp
-from ..download_manager import mkdir, getcwd
+from ..download_manager import mkdir, getcwd, generate_json
 
 help = "Create a new application"
-
+description = (
+        "Options can be input by command line parameter \n"
+        "via the --quick, it will get options from global settings.")
 
 def run(args, remainder=None):
 
@@ -36,24 +38,27 @@ def run(args, remainder=None):
         table_content.append(value)
     print_table([table_head, [table_content]])
 
-    config["olevel"] = olevel
+    config["OLEVEL"] = olevel
     app_path = os.path.join(getcwd(), application)
     config["EMBARC_OSP_ROOT"] = config["EMBARC_OSP_ROOT"].replace("\\", "/")
-    config["middleware"] = args.middleware
-    config["csrc"] = args.csrc
-    config["asmsrc"] = args.asmsrc
-    config["include"] = args.include
-    config["defines"] = args.defines
-    config["os"] = args.os
-    config["lib"] = args.library
+    app_json_path = os.path.join(app_path, "embarc_app.json")
+    generate_json(config, app_json_path)
+    config["MIDDLEWARE"] = args.middleware
+    config["APPL_CSRC_DIR"] = args.csrc
+    config["APPL_ASMSRC_DIR"] = args.asmsrc
+    config["APPL_INC_DIR"] = args.include
+    config["APPL_DEFINES"] = args.defines
+    config["OS_SEL"] = args.os
+    config["LIB_SEL"] = args.library
     print_string("Start to generate makefile and main.c ")
     exporter = Exporter("application")
     exporter.gen_file_jinja("makefile.tmpl", config, "makefile", application)
     exporter.gen_file_jinja("main.c.tmpl", config, "main.c", application)
     print_string("Finish generate makefile and main.c, and they are in " + app_path)
-    print(args.csrc)
     if args.csrc != ".":
         mkdir(os.path.join(getcwd(), application, args.csrc))
+
+
 
 
 def build_config(args):

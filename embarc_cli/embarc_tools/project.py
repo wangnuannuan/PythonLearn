@@ -114,17 +114,8 @@ class Ide(object):
 
     def _get_project_conf_template(self):
         cproject_template = self._get_cproject_template()
-        build_template = self._get_build_template()
 
-        osppath = osp.OSP()
-        
-        _, cur_build = osppath.get_makefile_config(
-            build_template, verbose=True
-        )
-        build_template = collections.OrderedDict()
-        osp_root, update = osppath.check_osp(cur_build["EMBARC_OSP_ROOT"])
-
-        cur_build["EMBARC_OSP_ROOT"] = osp_root
+        osp_root = self.buildopts["EMBARC_OSP_ROOT"]
         self.ide["common"]["root"] = osp_root
         self.ide["common"]["folder"] = os.path.relpath(
             getcwd(), osp_root
@@ -132,15 +123,13 @@ class Ide(object):
 
         make_tool = "make"
         opt_command = [make_tool]
+        self.buildopts.update(EMBARC_ROOT = self.buildopts.pop("EMBARC_OSP_ROOT"))
+        build_command_list = ["%s=%s" % (key, value) for (key, value) in self.buildopts.items()]
+        self.ide["common"]["build_command"] = " ".join(build_command_list)
+        
+        opt_command.extend(build_command_list)
         opt_command.append("opt")
-        if update or self.buildopts:
-            if update:
-                opt_command.append("EMBARC_ROOT={}".format(osp_root))
-            if self.buildopts:
-                new_build_config = [
-                    "%s=%s" % (key, value) for (key, value) in self.buildopts.items()
-                ]
-                opt_command.extend(new_build_config)
+
         cmd_output = pquery(opt_command)
         includes = list()
         compile_opts = ""
@@ -148,37 +137,11 @@ class Ide(object):
         if cmd_output:
             opt_lines = cmd_output.splitlines()
             for opt_line in opt_lines:
-                if opt_line.startswith("APPL"):
-                    cur_build["APPL"] = opt_line.split(":", 1)[1].strip()
-                build_template["APPL"] = cur_build.get("APPL")
-                if opt_line.startswith("BOARD"):
-                    cur_build["BOARD"] = opt_line.split(":", 1)[1].strip()
-                build_template["BOARD"] = cur_build.get("BOARD")
-                if opt_line.startswith("BD_VER"):
-                    cur_build["BD_VER"] = opt_line.split(":", 1)[1].strip()
-                build_template["BD_VER"] = cur_build.get("BD_VER")
-                if opt_line.startswith("CUR_CORE"):
-                    cur_build["CUR_CORE"] = opt_line.split(":", 1)[1].strip()
-                build_template["CUR_CORE"] = cur_build.get("CUR_CORE")
-                if opt_line.startswith("TOOLCHAIN"):
-                    cur_build["TOOLCHAIN"] = opt_line.split(":", 1)[1].strip()
-                build_template["TOOLCHAIN"] = cur_build.get("TOOLCHAIN")
-                if opt_line.startswith("EMBARC_ROOT"):
-                    relative_root = opt_line.split(":", 1)[1].strip()
-                    osp_root = os.path.normpath(
-                        os.path.join(getcwd(), relative_root)
-                    )
-                    self.ide["common"]["root"] = osp_root.replace("\\", "/")
-                    self.ide['common']['osp_root'] = os.path.basename(osp_root)
-                    cur_build["EMBARC_OSP_ROOT"] = osp_root
-                build_template["EMBARC_OSP_ROOT"] = cur_build.get(
-                    "EMBARC_OSP_ROOT"
-                )
                 if opt_line.startswith("COMPILE_OPT"):
                     compile_opt_line = opt_line.split(":", 1)[1]
                     compile_opts = compile_opt_line.split()
-        if update or self.buildopts:
-            osppath.update_makefile(dict(build_template), getcwd())
+                    break
+
         print_string("Get inculdes and defines ")
         if compile_opts != "" and relative_root != "":
             for comp_opt in compile_opts:
@@ -197,18 +160,11 @@ class Ide(object):
 
                     cproject_template["defines"].append(define)
 
-        print_string("Current configuration ")
-        table_head = list()
-        table_content = list()
-        for key, value in build_template.items():
-            table_head.append(key)
-            table_content.append(value)
-        msg = [table_head, [table_content]]
-        print_table(msg)
-        build_template["OUT_DIR_ROOT"] = "${ProjDirPath}"
+        
+        self.buildopts["OUT_DIR_ROOT"] = "${ProjDirPath}"
 
-        cur_core = build_template["CUR_CORE"]
-        self.ide["common"]["name"] = build_template["APPL"]
+        cur_core = self.buildopts["CUR_CORE"]
+        self.ide["common"]["name"] = self.buildopts["APPL"]
         core_description = "ARC {}".format(cur_core.upper())
         cproject_template["core"] = {
             cur_core: {
@@ -228,16 +184,16 @@ class Ide(object):
             include = include.replace("\\", "/")
             cproject_template["includes"].append(include)
 
-        self.ide["common"]["toolchain"] = build_template["TOOLCHAIN"]
-        self.ide["common"]["board"] = build_template.get("BOARD", None)
-        self.ide["common"]["bd_ver"] = build_template.get("BD_VER", None)
-        self.ide["common"]["cur_core"] = build_template.get("CUR_CORE", None)
+        self.ide["common"]["toolchain"] = self.buildopts["TOOLCHAIN"]
+        self.ide["common"]["board"] = self.buildopts.get("BOARD", None)
+        self.ide["common"]["bd_ver"] = self.buildopts.get("BD_VER", None)
+        self.ide["common"]["cur_core"] = self.buildopts.get("CUR_CORE", None)
         self.ide["common"]["links_folder"] = list()
         self.ide["common"]["links_file"] = list()
 
         link_folders, link_files, virtual_folders = self.set_link_folders(
             includes,
-            cur_build
+            self.buildopts
         )
 
         self.ide["common"]["links_folder"].extend(link_folders)
@@ -361,13 +317,15 @@ class Ide(object):
     def get_asm_c_include(self):
         self.ide["exporter"] = self._get_project_conf_template()
         self.ide["exporter"].update(self.ide["common"])
+        '''
+        updata app.json
+        '''
 
     def generate(self):
         with cd(self.ide["common"]["path"]):
 
             self.get_asm_c_include()
             outdir = "."
-            print()
             launch = self.ide["common"]["name"] + "-" + self.ide["exporter"]["core"].keys()[0] + ".launch"
 
             exporter = Exporter(self.ide["common"]["toolchain"])

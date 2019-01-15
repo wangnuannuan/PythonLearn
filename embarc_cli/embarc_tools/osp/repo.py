@@ -115,7 +115,7 @@ class Repo(object):
 
     @classmethod
     def isurl(cls, url):
-        return re.match(regex_url_ref, url.strip().replace('\\', '/'))
+        return re.match(REGEX_URL_REF, url.strip().replace('\\', '/'))
 
     @classmethod
     def isinsecure(cls, url):

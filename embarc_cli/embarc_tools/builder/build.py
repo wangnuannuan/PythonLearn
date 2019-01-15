@@ -3,29 +3,22 @@ import sys
 import os
 import time
 import collections
-from embarc_tools.settings import BUILD_CONFIG_TEMPLATE
+from embarc_tools.settings import BUILD_CONFIG_TEMPLATE, BUILD_OPTION_NAMES, BUILD_INFO_NAMES, BUILD_CFG_NAMES, BUILD_SIZE_SECTION_NAMES, get_config
 from embarc_tools.utils import pqueryOutputinline, pqueryTemporaryFile
 from embarc_tools.notify import (print_string, print_table)
-from .. download_manager import mkdir, delete_dir_files, cd
+from .. download_manager import mkdir, delete_dir_files, cd, generate_json
 from ..osp import osp
 
 
-# from embarc_tools.settings import *
-
-BUILD_OPTION_NAMES = ['BOARD', 'BD_VER', 'CUR_CORE', 'TOOLCHAIN', 'OLEVEL', 'V', 'DEBUG', 'SILENT', 'JTAG']
-BUILD_INFO_NAMES = ['EMBARC_ROOT', 'OUT_DIR_ROOT', 'BUILD_OPTION', 'APPLICATION_NAME', 'APPLICATION_LINKSCRIPT', 'APPLICATION_ELF', 'APPLICATION_BIN', 'APPLICATION_HEX', 'APPLICATION_MAP', 'APPLICATION_DUMP', 'APPLICATION_DASM', 'MIDDLEWARE', 'PERIPHERAL']
-BUILD_CFG_NAMES = ['EMBARC_ROOT', 'OUT_DIR_ROOT', 'COMPILE_OPT', 'CXX_COMPILE_OPT', 'ASM_OPT', 'AR_OPT', 'LINK_OPT', 'DEBUGGER', 'DBG_HW_FLAGS', 'MDB_NSIM_OPT']
-BUILD_SIZE_SECTION_NAMES = ['text', 'data', 'bss']
-
 
 class embARC_Builder(object):
-    def __init__(self, osproot=None, buildopts=None, outdir=None):
+    def __init__(self, osproot=None, buildopts=None, outdir=None, embarc_config="embarc_app.json"):
         self.buildopts = dict()
         make_options = ' '
         if osproot is not None and os.path.isdir(osproot):
             self.osproot = os.path.realpath(osproot)
-            self.buildopts["EMBARC_ROOT"] = self.osproot
-            make_options += 'EMBARC_ROOT=' + str(self.osproot) + ' '
+            self.buildopts["EMBARC_OSP_ROOT"] = self.osproot
+            # make_options += 'EMBARC_ROOT=' + str(self.osproot) + ' '
         else:
             self.osproot = None
         if outdir is not None:
@@ -35,12 +28,13 @@ class embARC_Builder(object):
             self.outdir = None
 
         if buildopts is not None:
+            self.buildopts.update(buildopts)
             for opt in BUILD_OPTION_NAMES:
                 if opt in buildopts:
-                    self.buildopts[opt] = str(buildopts[opt]).strip()
                     option = str(opt) + '=' + self.buildopts[opt] + ' '
                     make_options += option
         self.make_options = make_options
+        self.embarc_config = embarc_config
 
     @staticmethod
     def build_common_check(app):
@@ -133,17 +127,6 @@ class embARC_Builder(object):
             build_status["reason"] = "Coverity Format Errors into HTML Failed!"
             return build_status
 
-        print_string("BEGIN SECTION Coverity Send E-mail Notifications")
-        coverity_manage = "cov-manage-im --mode notification --execute --view 'Default' --host %s --user %s --password %s" % (
-            self.coverity_server,
-            self.user, self.password
-        )
-        returncode = os.system(coverity_manage)
-        if returncode != 0:
-            build_status["result"] = False
-            build_status["reason"] = " Coverity Send E-mail Notifications Failed!"
-            return build_status
-
         print_string("BEGIN SECTION Coverity Commit defects to {} steam {}".format(self.coverity_server, self.coverity_steam))
         coverity_commit = "cov-commit-defects --dir %s --host %s --stream %s --user %s --password %s" % (
             self.coverity_data_dir,
@@ -155,6 +138,17 @@ class embARC_Builder(object):
             build_status["reason"] = "Coverity Commit defects Failed!"
             return build_status
 
+        print_string("BEGIN SECTION Coverity Send E-mail Notifications")
+        coverity_manage = "cov-manage-im --mode notification --execute --view 'Default' --host %s --user %s --password %s" % (
+            self.coverity_server,
+            self.user, self.password
+        )
+        returncode = os.system(coverity_manage)
+        if returncode != 0:
+            build_status["result"] = False
+            build_status["reason"] = " Coverity Send E-mail Notifications Failed!"
+            return build_status
+            
         return build_status
 
     def build_target(self, app, target=None, parallel=8, coverity=False, silent=False):
@@ -403,52 +397,59 @@ class embARC_Builder(object):
         build_status = self.build_target(app, target=str('boardclean'), parallel=parallel)
         return build_status
 
+
     def get_makefile_config(self, build_template=None):
         current_build_templates = dict()
         ospclass = osp.OSP()
-        _, current_build_templates = ospclass.get_makefile_config(current_build_templates)
-        osp_root = current_build_templates.get("EMBARC_OSP_ROOT", None)
-        if osp_root:
-            osp_root = osp_root.replace("\\", "/")
+        build_template["APPL"] = self.buildopts.get("APPL", False)
+        build_template["BOARD"] = self.buildopts.get("BOARD", False)
+        build_template["BD_VER"] = self.buildopts.get("BD_VER", False)
+        build_template["CUR_CORE"] = self.buildopts.get("CUR_CORE", False)
+        build_template["TOOLCHAIN"] = self.buildopts.get("TOOLCHAIN", False)
+        build_template["OLEVEL"] = self.buildopts.get("OLEVEL", False)
 
+        osp_root = self.buildopts.get("EMBARC_OSP_ROOT", False)
         osp_root, update = ospclass.check_osp(osp_root)
-        if update:
-            new_osp_dict = {"EMBARC_OSP_ROOT": osp_root}
-            ospclass.update_makefile(new_osp_dict, os.getcwd())
+        self.make_options += 'EMBARC_ROOT=' + str(osp_root) + ' '
+        self.buildopts["EMBARC_OSP_ROOT"] = osp_root
+        build_template["EMBARC_OSP_ROOT"] = osp_root
 
-        build_template["APPL"] = current_build_templates.get("APPL", False)
-        build_template["BOARD"] = current_build_templates.get("BOARD", False)
-        build_template["BD_VER"] = current_build_templates.get("BD_VER", False)
-        build_template["CUR_CORE"] = current_build_templates.get("CUR_CORE", False)
-        build_template["TOOLCHAIN"] = current_build_templates.get("TOOLCHAIN", False)
-        build_template["EMBARC_OSP_ROOT"] = current_build_templates.get("EMBARC_OSP_ROOT", False)
+        if not all(build_template.values()):
+            default_makefile_config = dict()
 
-        for option in self.make_options.split(" "):
-            if "=" in option:
-                [key, value] = option.split("=")
-                if key in build_template:
-                    build_template[key] = value
+            _, default_makefile_config = ospclass.get_makefile_config(default_makefile_config)
+            for key, value in build_template.items():
+                if not value:
+                    build_template[key] = default_makefile_config.get(key, False)
+            self.buildopts.update(build_template)
+
 
         if not all(build_template.values()):
             try:
-                returncode, cmd_output = pqueryTemporaryFile(["make", "opt"])
+                returncode, cmd_output = pqueryTemporaryFile(["make", "info"])
+                default_build_option = None
                 if not returncode and cmd_output:
+                    for line in cmd_output:
+                        if line.startswith("BUILD_OPTION"):
+                            default_build_option = (opt_line.split(":", 1)[1]).strip()
+                            break
+                        else: 
+                            pass
+                    default_build_option_dict = get_config(default_build_option)
                     for key, value in build_template.items():
                         if not value:
-                            for opt_line in cmd_output:
-                                if key != "EMBARC_OSP_ROOT" and opt_line.startswith(key):
-                                    build_template[key] = (opt_line.split(":", 1)[1]).strip()
-                                elif key == "EMBARC_OSP_ROOT" and opt_line.startswith("EMBARC_ROOT"):
-                                    relative_root = (opt_line.split(":", 1)[1]).strip()
-                                    build_template[key] = os.path.normpath(os.path.join(os.getcwd(), relative_root))
-                                else:
-                                    pass
+                            build_template[key] = default_build_option_dict[key]
+                    self.buildopts.update(build_template)
             except Exception as e:
                 print_string("Error: {}".format(e))
                 sys.exit(1)
 
         current_build_list = ["%s=%s"%(opt, build_template[opt]) for opt in BUILD_CONFIG_TEMPLATE.keys()]
         self.make_options = " ".join(current_build_list)
+
+        self.buildopts.update(build_template)
+        generate_json(self.buildopts, self.embarc_config)
+
         print_string("Current configuration ")
         table_head = list()
         table_content = list()
@@ -456,6 +457,7 @@ class embARC_Builder(object):
             table_head.append(key)
             table_content.append(value)
         msg = [table_head, [table_content]]
+        print(msg)
         print_table(msg)
         self.osproot = osp_root
         return build_template

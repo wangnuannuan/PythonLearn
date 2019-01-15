@@ -1,57 +1,53 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
 import os
+from embarc_tools.project import Generator
+from embarc_tools.settings import get_input, get_config
 from ..builder import build
-from ..download_manager import cd, generate_file
+from ..download_manager import cd, generate_file, getcwd, read_json
 help = "Build application"
-
+description = (
+        "Compile code using toolchain\n"
+        "Currently supported Toolchain: GNU, MetaWare.")
 
 def run(args, remainder=None):
-    buildopts = dict()
     osproot = None
     curdir = args.outdir
     app_path = None
-    recordBuildConfig = None
+    recordBuildConfig = dict()
     if args.path:
         app_path = args.path
+    else:
+        app_path = getcwd()
 
-    if os.path.exists(app_path) and os.path.isdir(app_path):
-        with cd(app_path):
-            if os.path.exists(".build"):
-                with open(".build", "r") as f:
-                    content = f.read().splitlines()
-                    if len(content) > 0:
-                        recordBuildConfig = (content[0]).split()
-    if recordBuildConfig is not None:
-        for recoreOpt in recordBuildConfig:
-            if "=" in recoreOpt:
-                opt, value = recoreOpt.split("=")
-                if opt in build.BUILD_OPTION_NAMES:
-                    buildopts[opt] = recoreOpt.split("=")[1]
+    if not (os.path.exists(app_path) and os.path.isdir(app_path)):
+        print("[embARC] This is not a valid application path")
+        return
+
+    embarc_config = args.app_config
+    if not (embarc_config and os.path.exists(embarc_config)):
+        embarc_config = os.path.join(app_path, "embarc_app.json")
+    
+    if os.path.exists(embarc_config):
+        recordBuildConfig = read_json(embarc_config)
 
     parallel = args.parallel
     if args.board:
-        buildopts["BOARD"] = args.board
+        recordBuildConfig["BOARD"] = args.board
     if args.bd_ver:
-        buildopts["BD_VER"] = args.bd_ver
+        recordBuildConfig["BD_VER"] = args.bd_ver
     if args.core:
-        buildopts["CUR_CORE"] = args.core
+        recordBuildConfig["CUR_CORE"] = args.core
     if args.toolchain:
-        buildopts["TOOLCHAIN"] = args.toolchain
-
-    builder = build.embARC_Builder(osproot, buildopts, curdir)
-
+        recordBuildConfig["TOOLCHAIN"] = args.toolchain
     if remainder:
         make_config, target= get_config(remainder)
         if target:
             args.target = target
+        recordBuildConfig.update(make_config)
 
-        current_options = builder.buildopts
-        current_options.update(make_config)
-        make_config_update = list()
-        for key, value in current_options.items():
-            option = "%s=%s" % (key, value)
-            make_config_update.append(option)
-        builder.make_options = " ".join(make_config_update)
+
+    builder = build.embARC_Builder(osproot, recordBuildConfig, curdir)
+
     if args.target:
         information = None
         if args.target == "elf":
@@ -74,21 +70,22 @@ def run(args, remainder=None):
             information = builder.build_target(app_path, target=args.target, parallel=False, coverity=False)
         else:
             print("[embARC] Please choose right target")
-        if information["result"]:
-            generate_file(".build", information["build_cmd"], path=app_path)
 
-
-def get_config(config):
-    make_config = dict()
-    target = None
-    if config:
-        for key in config:
-            if "=" in key:
-                config_pair = key.split("=")
-                make_config[config_pair[0]] = config_pair[1]
-            else:
-                target = key
-    return make_config, target
+    if args.export:
+        with cd(app_path):
+            if os.path.exists(".project") and os.path.exists(".cproject"):
+                while True:
+                    yes = get_input("The IDE project already exists, recreate and overwrite the old files [Y/N]  ")
+                    if yes in ["yes", "Y", "y"]:
+                        break
+                    elif yes in ["no", "n", "N"]:
+                        return
+                    else:
+                        continue
+            generator = Generator()
+            recordBuildConfig = read_json(embarc_config)
+            for project in generator.generate(buildopts=recordBuildConfig):
+                project.generate()
 
 
 def setup(subparser):
@@ -103,8 +100,12 @@ def setup(subparser):
     subparser.add_argument(
         "--core", help="Build using the given CORE")
     subparser.add_argument(
-        "--toolchain", help="Build using the given TOOLCHAIN")
+        "-t", "--toolchain", help="Build toolchain. Example: gnu, mw")
     subparser.add_argument(
         "-j", "--parallel", default=False, help="Build application with -j")
     subparser.add_argument(
         "--target", default="elf", help="Choose build target, default target is elf and options are [elf, bin, hex, size] ")
+    subparser.add_argument(
+        "-g", "--export", action="store_true", help="Generate IDE project file for your application")
+    subparser.add_argument(
+        "--app_config", help="Application configuration. Default is to look for 'embarc_app.json")
