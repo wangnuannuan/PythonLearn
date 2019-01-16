@@ -73,8 +73,9 @@ class Gnu(ARCtoolchain):
             pack_tgz = "arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz"
         else:
             url = "https://github.com" + self._lastest_url()
+            print(url)
             version = re.search(r"[0-9]*\.[0-9]*", url).group(0)
-            pack_tgz = "arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz"
+            pack_tgz = url.rsplit("/", 1)[1]
 
         if path is None:
             path = getcwd()
@@ -126,7 +127,8 @@ class Gnu(ARCtoolchain):
 
     def _lastest_url(self):
         pattern = re.compile('<ul.*?class="mt-1 mt-md-2">(.*?)</ul>', re.S | re.M)
-        pattern2 = re.compile('<a.*?href=(.*?)rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<strong.*?</a>', re.S | re.M)
+        pattern2 = re.compile('<a.*?href=(.*?) rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<strong.*?</a>', re.S | re.M)
+        pack_format =  "_ide_win_install.exe" if self.get_platform() == "Windows" else "_prebuilt_elf32_le_linux_install.tar.gz"
         try:
             request = Request(self.root_url)
             response = urlopen(request)
@@ -138,9 +140,8 @@ class Gnu(ARCtoolchain):
             for item in items:
                 itemsnow = re.findall(pattern2, item)
                 for i in itemsnow:
-                    if "_prebuilt_elf32_le_linux_install.tar.gz" in i:
-                        latesturl = i
-                    if latesturl:
+                    if pack_format in i:
+                        latesturl = i.strip('"')
                         break
                 if latesturl:
                     break

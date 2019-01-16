@@ -63,10 +63,10 @@ def run(args, remainder=None):
 
 def build_config(args):
     osppath = osp.OSP()
-    osppath.list_path()
     input_root = args.osp_root
     if not input_root:
-        input_root = get_input("[embARC] Choose osp root or set another path as osp root: ")
+        osppath.list_path()
+        input_root = get_input("[embARC] Choose osp root path num or set another path as osp root: ")
     board = args.board
     bd_ver = args.bd_ver
     cur_core = args.cur_core
@@ -82,7 +82,7 @@ def build_config(args):
         msg = "What you choose is not a valid osp root"
         print_string(msg, level="warning")
 
-        osp_root = osppath.get_path()
+        osp_root = osppath.get_global()
         if osp_root:
             print_string("Here choose " + osp_root + "as osp root")
         else:

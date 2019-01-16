@@ -1,14 +1,14 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
 import os
-import yaml
-from embarc_tools.notify import (print_string, print_table, COLORS)
-from embarc_tools.settings import MAKEFILENAMES, get_input, OSP_DIRS
+import sys
+from embarc_tools.notify import (print_string, print_table, COLORS, colorstring_to_escapecode)
+from embarc_tools.settings import MAKEFILENAMES, get_input, OSP_DIRS, EMBARC_OSP_URL
 from embarc_tools.exporter import Exporter
-from ..download_manager import generate_yaml, edit_yaml, cd
+from ..download_manager import generate_yaml, edit_yaml, cd, read_json, generate_json
 
 
 class OSP(object):
-    def __init__(self, osp_file="osp.yaml"):
+    def __init__(self, osp_file="osp.json"):
         self.path = os.path.join(os.path.expanduser("~"), '.embarc_cli')
         if not os.path.exists(self.path):
             try:
@@ -19,63 +19,122 @@ class OSP(object):
 
         fl = os.path.join(self.path, self.file)
         if not os.path.exists(fl):
-            self.cfg_dict = None
+            self.cfg_dict = dict()
             try:
-                generate_yaml(fl, self.cfg_dict)
+                generate_json(fl, self.cfg_dict)
             except Exception as e:
                 print("[embARC] Write file failed: {}".format(e))
         else:
-            self.cfg_dict = yaml.load(fl)
-        self.current = self.get_path()
+            self.cfg_dict = read_json(fl)
 
-    def set_path(self, path, url=None):
+
+    def get_path(self, path): # find if path exists in osp.json
         fl = os.path.join(self.path, self.file)
         path = path.replace("\\", "/")
         try:
-            with open(fl) as f:
-                self.cfg_dict = yaml.load(f)
-                if self.cfg_dict:
-                    for _, path_dict in self.cfg_dict.items():
-                        for _, path_ in path_dict.items():
-                            if path == path_:
-                                return
-                path_num = 0
-                if self.cfg_dict:
-                    path_num = len(self.cfg_dict)
+            self.cfg_dict = read_json(fl)
+            current_paths = self.cfg_dict.get("list", False)
+            if current_paths:
+                for current_path in current_paths:
+                    if path == current_path.get("local", False):
+                        return True
                 else:
-                    self.cfg_dict = dict()
-                path_key = "path" + str(path_num + 1)
-                self.cfg_dict[path_key] = dict()
-                self.cfg_dict[path_key]["git"] = url
-                self.cfg_dict[path_key]["local"] = path
-                self.current = path
-                edit_yaml(fl, self.cfg_dict)
+                    return False
+            return False
 
         except IOError:
             raise IOError("Can not open file %s ." % fl)
 
-    def get_path(self):
+
+    def get_global(self):
         fl = os.path.join(self.path, self.file)
         try:
-            with open(fl) as f:
-                self.cfg_dict = yaml.load(f)
-                if self.cfg_dict:
-                    for _, path_dict in self.cfg_dict.items():
-                        if path_dict.get("local", None):
-                            osp_root = path_dict["local"]
-                            if self.is_osp(osp_root):
-                                return osp_root
-                return None
+            self.cfg_dict = read_json(fl)
+            current_global = self.cfg_dict.get("global", False)
+            remote = current_global["remote"] if current_global["remote"] != EMBARC_OSP_URL else "embarc_osp_gh_url"
+            local = current_global["local"]
+            sys.stdout.write(colorstring_to_escapecode('green'))
+            sys.stdout.write("* source: %s -> local: %s \n" % (remote, local))
+            sys.stdout.write(colorstring_to_escapecode('default'))
+            if current_global:
+                sys.stdout.write("\n   Note embarc_osp_gh_url: %s \n" % (EMBARC_OSP_URL))
+
+            return current_global
+        except IOError:
+            raise IOError("Can not open file %s ." % fl)
+
+
+    def set_path(self, name, source_type, path, url=None):
+        fl = os.path.join(self.path, self.file)
+        path = path.replace("\\", "/")
+        if not self.is_osp(path):
+            print_string("This is not a valid EMBARC_OSP_ROOT")
+            return False
+        try:
+            self.cfg_dict = read_json(fl)
+
+            current_paths = self.cfg_dict.get(name, False)
+            if current_paths:
+                print_string("%s already exists" % name)
+                return False
+            else:
+                self.cfg_dict[name] = {"type": source_type, "directory": path}
+                if url:
+                    self.cfg_dict[name]["source"] = url
+                generate_json(self.cfg_dict, fl)
+                return True
 
         except IOError:
             raise IOError("Can not open file %s ." % fl)
+
+    def rename(self, old, new):
+        fl = os.path.join(self.path, self.file)
+        try:
+            self.cfg_dict = read_json(fl)
+            if self.cfg_dict.get(old, False):
+                self.cfg_dict.update(new = self.cfg_dict.pop(old))
+                generate_json(self.cfg_dict, fl)
+                return True
+            else:
+                print_string("%s not exists" % old)
+                return False
+            
+        except IOError:
+            raise IOError("Can not open file %s ." % fl)
+
+    def remove_path(self, name):
+        fl = os.path.join(self.path, self.file)
+        path = path.replace("\\", "/")
+        try:
+            self.cfg_dict = read_json(fl)
+            if self.cfg_dict.get(name, False):
+                self.cfg_dict.pop(name)
+                generate_json(self.cfg_dict, fl)
+            else:
+                print_string("%s not exists" % name)
+        except IOError:
+            raise IOError("Can not open file %s ." % fl)
+
+    def set_global(self, path, url=None):
+        fl = os.path.join(self.path, self.file)
+        path = path.replace("\\", "/")
+        if not self.is_osp(path):
+            print_string("This is not a valid EMBARC_OSP_ROOT")
+            return False
+        try:
+            self.set_path(path, url)
+            self.cfg_dict = read_json(fl)
+            self.cfg_dict = {"remote": url, "local": path}
+            generate_json(self.cfg_dict, fl)
+        except IOError:
+            raise IOError("Can not open file %s ." % fl)
+
 
     def clear_path(self):
         fl = os.path.join(self.path, self.file)
         try:
             self.cfg_dict = dict()
-            edit_yaml(fl, self.cfg_dict)
-
+            generate_json(self.cfg_dict, fl)
         except IOError:
             raise IOError("Can not open file %s ." % fl)
 
@@ -83,37 +142,34 @@ class OSP(object):
         fl = os.path.join(self.path, self.file)
 
         try:
-            with open(fl) as f:
-                self.cfg_dict = yaml.load(f)
+            self.cfg_dict = read_json(fl)
+            current_global = self.cfg_dict.get("global", False)
+            current_paths = self.cfg_dict.get("list", False)
+            if current_paths:
+                i = 0
+                for current_path in current_paths:
+                    i = i + 1
+                    remote = current_path["remote"]
+                    if remote == EMBARC_OSP_URL:
+                        remote = "embarc_osp_gh_url"
+                    local = current_path["local"]
+                    if current_path == current_global: 
+                        sys.stdout.write(colorstring_to_escapecode('green'))
+                        sys.stdout.write("%d) * source: %s -> local: %s global \n" % (i, remote, local))
+                        sys.stdout.write(colorstring_to_escapecode('default'))
+                    else:
+                        sys.stdout.write("%d) source: %s -> local: %s \n" % (i, remote, local))
+                if i > 0:
+                    sys.stdout.write("\n   Note embarc_osp_gh_url: %s \n" % (EMBARC_OSP_URL))
 
-                table_head = ["osp"]
-                table_content = list()
-                if self.cfg_dict:
-                    for path, path_dict in self.cfg_dict.items():
-                        table_content.append([path])
-                        string_list = list()
-                        for (key, value) in path_dict.items():
-                            if value == self.current:
-                                value = COLORS['green'] + value + COLORS['default']
-                            string_list.append(" %s: %s" % (key, value))
-                        # string_list = [ " %s: %s" % (key, value) for (key, value) in path_dict.items()]
-                        string = "\n".join(string_list)
-                        table_content.append([string])
-                    msg = [table_head, table_content]
-                    print_table(msg)
-                else:
-                    print_string("There is no valid osp root path in record")
+
+            else:
+                print_string("There is no valid osp root path in record")
 
         except IOError:
             raise IOError("Can not open file %s ." % fl)
 
     def is_osp(self, path):
-        if self.cfg_dict:
-            for key, path_dict in self.cfg_dict.items():
-                if path == key:
-                    if "local" in path_dict:
-                        path = path_dict["local"]
-                        return path
         if os.path.exists(path) and os.path.isdir(path):
             for files in OSP_DIRS:
                 files_path = os.path.join(path, files)
@@ -121,8 +177,7 @@ class OSP(object):
                     pass
                 else:
                     return False
-            self.set_path(path=path, url=None)
-            return path
+            return True
         else:
             return False
 
