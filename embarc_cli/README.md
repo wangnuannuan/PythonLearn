@@ -1,7 +1,7 @@
 ## Introduction
 embARC CLI is the name of the embARC command-line tool, packaged as `embarc_tools`. embARC CLI support for embARC application creation, build and config, use of the embARC Open Software Platform.
 
-This document covers the installations and usage of embARC CLI.
+This document covers the installation and usage of embARC CLI.
 ## Usage
 The basic workflow for embARC CLI is to:
 1. Create a application.
