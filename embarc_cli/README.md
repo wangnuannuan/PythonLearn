@@ -289,7 +289,7 @@ C:\WINDOWS\system32\cmd.exe /C if exist  .sc.project   C:\WINDOWS\system32\cmd.e
 ```
 
 #### Export Eclipse IDE file
-If you need to dbug your code, you can export your source tree to IDE project file to use the IDE's debugging facilities. embARC CLI supports exporting to Eclipse using GNU or MetaWare.
+If you need to debug your code, you can export your source tree to IDE project file to use the IDE's debugging facilities. embARC CLI supports exporting to Eclipse using GNU or MetaWare.
 
 For example:
 ```
