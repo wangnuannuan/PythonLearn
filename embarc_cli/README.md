@@ -321,7 +321,7 @@ $ embarc build  --export
 C:\Users\jingru\Documents\embarc\testcli\helloworld
 ```
 - Open **ARC GNU IDE 2018.09 Eclipse**, click **File -> Open Projects from File System** .
-- Paste `C:\Users\jingru\Documents\embarc\testcli\helloworld` to **Import source**, and click **Finish**.You can your project in **Project Explorer** view.
+- Paste `C:\Users\jingru\Documents\embarc\testcli\helloworld` to **Import source**, and click **Finish**.You can see your project in **Project Explorer** view.
 
   <img width="500" src="https://github.com/wangnuannuan/PythonLearn/raw/master/pic/import.PNG"/>
 
