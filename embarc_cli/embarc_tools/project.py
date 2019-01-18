@@ -129,7 +129,7 @@ class Ide(object):
 
         opt_command.extend(build_command_list)
         opt_command.append("opt")
-
+        print_string("Run command [make opt]")
         cmd_output = pquery(opt_command)
         includes = list()
         compile_opts = ""
@@ -140,12 +140,16 @@ class Ide(object):
                 if opt_line.startswith("COMPILE_OPT"):
                     compile_opt_line = opt_line.split(":", 1)[1]
                     compile_opts = compile_opt_line.split()
+                if opt_line.startswith("EMBARC_ROOT"):
+                    relative_root = opt_line.split(":", 1)[1].strip()
+                if compile_opts != "" and relative_root != "":
                     break
 
         print_string("Get inculdes and defines ")
         if compile_opts != "" and relative_root != "":
             for comp_opt in compile_opts:
                 if comp_opt.startswith("-I"):
+
                     inc_path = comp_opt.replace("-I", "", 1)
                     if inc_path.startswith(relative_root):
                         inc_path = os.path.relpath(inc_path, relative_root)

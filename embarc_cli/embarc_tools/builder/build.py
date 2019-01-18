@@ -177,8 +177,7 @@ class embARC_Builder(object):
         if silent:
             if "SILENT=1" not in build_precmd:
                 build_precmd = "{} SILENT=1 ".format(build_precmd)
-
-        if isinstance(target, str) or target is None:
+        if isinstance(target, str) or target is not None:
             build_cmd = build_precmd + " " + str(target)
         else:
             build_status['reason'] = "Unrecognized build target"
@@ -207,7 +206,7 @@ class embARC_Builder(object):
                 else:
                     build_status["build_msg"] = ["Build Coverity successfully"]
         else:
-            if target not in ["opt", "info", "size"]:
+            if target not in ["opt", "info", "size", "all"]:
                 with cd(app_realpath):
                     try:
                         return_code = os.system(build_cmd)
@@ -407,22 +406,23 @@ class embARC_Builder(object):
         build_template["CUR_CORE"] = self.buildopts.get("CUR_CORE", False)
         build_template["TOOLCHAIN"] = self.buildopts.get("TOOLCHAIN", False)
         build_template["OLEVEL"] = self.buildopts.get("OLEVEL", False)
-
         osp_root = self.buildopts.get("EMBARC_OSP_ROOT", False)
-        osp_root, update = ospclass.check_osp(osp_root)
-        self.make_options += 'EMBARC_ROOT=' + str(osp_root) + ' '
-        self.buildopts["EMBARC_OSP_ROOT"] = osp_root
-        build_template["EMBARC_OSP_ROOT"] = osp_root
 
         if not all(build_template.values()):
             default_makefile_config = dict()
-
             _, default_makefile_config = ospclass.get_makefile_config(default_makefile_config)
+            if not osp_root:
+                osp_root = default_makefile_config.get("EMBARC_OSP_ROOT")
             for key, value in build_template.items():
                 if not value:
                     build_template[key] = default_makefile_config.get(key, False)
             self.buildopts.update(build_template)
 
+ 
+        osp_root, update = ospclass.check_osp(osp_root)
+        self.make_options += 'EMBARC_ROOT=' + str(osp_root) + ' '
+        self.buildopts["EMBARC_OSP_ROOT"] = osp_root
+        build_template["EMBARC_OSP_ROOT"] = osp_root
 
         if not all(build_template.values()):
             try:
@@ -431,11 +431,11 @@ class embARC_Builder(object):
                 if not returncode and cmd_output:
                     for line in cmd_output:
                         if line.startswith("BUILD_OPTION"):
-                            default_build_option = (opt_line.split(":", 1)[1]).strip()
+                            default_build_option = str(line.split(":", 1)[1]).split()
                             break
                         else:
                             pass
-                    default_build_option_dict = get_config(default_build_option)
+                    default_build_option_dict, _ = get_config(default_build_option)
                     for key, value in build_template.items():
                         if not value:
                             build_template[key] = default_build_option_dict[key]
@@ -457,7 +457,6 @@ class embARC_Builder(object):
             table_head.append(key)
             table_content.append(value)
         msg = [table_head, [table_content]]
-        print(msg)
         print_table(msg)
         self.osproot = osp_root
         return build_template

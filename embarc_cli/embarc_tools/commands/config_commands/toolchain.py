@@ -7,7 +7,8 @@ from ...download_manager import getcwd, download_file
 from ...toolchain import gnu, metaware
 help = "Get, set toolchain configuration options."
 usage = ("\n    embarc config toolchain [--version] [--download] gnu\n"
-        "    embarc config toolchain [--version] mw")
+        "    embarc config toolchain mw\n"
+        "    embarc config toolchain --set <toolchain>\n")
 
 def run(args, remainder=None):
     if len(remainder) == 1 and remainder[0] in SUPPORT_TOOLCHAIN:
@@ -37,12 +38,25 @@ def run(args, remainder=None):
                 print_string("There is no MetaWare in this platform, please install it")
         else:
             print_string("This toolchain {} is not supported now".format(toolchain))
+    elif not remainder:
+        if args.set:
+            if args.set in SUPPORT_TOOLCHAIN:
+                print_string("Set %s as global TOOLCHAIN" % args.set)
+                osppath = osp.OSP()
+                osppath.set_global("TOOLCHAIN", args.set)
+            else:
+                print_string("Only support GNU and MetaWare now")
+        else:
+            print("usage: " + usage)
     else:
         print("usage: " + usage)
         return
 
 def setup(subparser):
+    subparser.usage = usage
     subparser.add_argument(
-        "--version", action='store_true', help="Show toolchain version.")
+        "--version", action='store_true', help="Choose toolchain version.")
     subparser.add_argument(
         "--download", action='store_true', help="Downlad the latested toolchain only support gnu.")
+    subparser.add_argument(
+        "--set", help="Set a toolchain as global setting.")

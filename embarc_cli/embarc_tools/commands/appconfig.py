@@ -1,5 +1,6 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
 import os
+import collections
 from embarc_tools.settings import SUPPORT_TOOLCHAIN, OLEVEL
 from embarc_tools.utils import pquery
 from embarc_tools.notify import print_string, print_table
@@ -26,8 +27,13 @@ def run(args, remainder=None):
     if makefile:
         embarc_config = os.path.join(app_path, "embarc_app.json")
         defaultBuildConfig = dict()
+        defaultBuildConfig = collections.OrderedDict()
+        _, defaultBuildConfig = osppath.get_makefile_config(defaultBuildConfig)
         if os.path.exists(embarc_config):
-            defaultBuildConfig = read_json(embarc_config)
+            print_string("Read embarc_config.json")
+            recordConfig = read_json(embarc_config)
+            defaultBuildConfig.update(recordConfig)
+
         if args.osp_root:
             osp_root, _ = osppath.check_osp(args.osp_root)
             defaultBuildConfig["EMBARC_OSP_ROOT"] = osp_root.replace("\\", "/")
@@ -42,22 +48,6 @@ def run(args, remainder=None):
             defaultBuildConfig["TOOLCHAIN"] = args.toolchain
         if args.olevel and args.olevel in OLEVEL:
             defaultBuildConfig["OLEVEL"] = args.olevel
-
-        if args.middleware:
-            defaultBuildConfig["MIDDLEWARE"] = args.middleware
-        if args.csrc:
-            defaultBuildConfig["APPL_CSRC_DIR"] = args.csrc
-            mkdir(os.path.join(app_path, args.csrc))
-        if args.asmsrc:
-            defaultBuildConfig["APPL_ASMSRC_DIR"] = args.asmsrc
-        if args.include:
-            defaultBuildConfig["APPL_INC_DIR"] = args.include
-        if args.defines:
-            defaultBuildConfig["APPL_DEFINES"] = args.defines
-        if args.os:
-            defaultBuildConfig["OS_SEL"] = args.os
-        if args.library:
-            defaultBuildConfig["LIB_SEL"] = args.library
 
         generate_json(defaultBuildConfig, embarc_config)
         print_string("Current configuraion")
@@ -76,30 +66,17 @@ def run(args, remainder=None):
 
 def setup(subparser):
     subparser.add_argument(
-        "-a", "--application", help="Application to be created")
+        "-a", "--application", help="Specify the path of the application")
     subparser.add_argument(
-        "-b", "--board", help="Choose board")
+        "-b", "--board", help="Set board")
     subparser.add_argument(
-        "--bd_ver", help="Choose board version")
+        "--bd_ver", help="Set board version")
     subparser.add_argument(
-        "--cur_core", help="Choose core")
+        "--cur_core", help="Set core")
     subparser.add_argument(
-        "--toolchain", help="Choose toolchain")
+        "--toolchain", help="Set toolchain")
     subparser.add_argument(
-        "--osp_root", help="Choose embARC osp root path")
+        "--osp_root", help="Set embARC osp root path")
     subparser.add_argument(
-        "-o", "--olevel", help="Choose olevel")
-    subparser.add_argument(
-        '-m', '--middleware', action='store', help='Choose a middleware')
-    subparser.add_argument(
-        '--csrc', action='store', help='Application source dirs')
-    subparser.add_argument(
-        '--asmsrc', action='store', help='Application source dirs')
-    subparser.add_argument(
-        '--include', action='store', help='Application include dirs')
-    subparser.add_argument(
-        '--defines', action='store', help='Application defines')
-    subparser.add_argument(
-        '--os', action='store', help='Choose os')
-    subparser.add_argument(
-        '--library', action='store', help='Choose library')
+        "-o", "--olevel", help="Set olevel")
+

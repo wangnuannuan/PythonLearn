@@ -44,28 +44,57 @@ class OSP(object):
 
         except IOError:
             raise IOError("Can not open file %s ." % fl)
+    
+    def generate_global(self):
+        file = "global_config.json"
+        config_file = os.path.join(self.path, file)
+        global_config = dict()
+        global_config["EMBARC_OSP_ROOT"] = str()
+        global_config["TOOLCHAIN"] = str()
+        global_config["BUILD_CONFIG"] = dict()
+        global_config["BUILD_CONFIG"]["BOARD"] = False
+        global_config["BUILD_CONFIG"]["BD_VER"] = False
+        global_config["BUILD_CONFIG"]["CUR_CORE"] = False
+        generate_json(global_config, config_file)
 
-
-    def get_global(self):
-        fl = os.path.join(self.path, self.file)
-        if not os.path.exists(fl):
-            self.cfg_dict = dict()
-            generate_json(self.cfg_dict, fl)
+    def set_global(self, config, value):
+        file = "global_config.json"
+        config_file = os.path.join(self.path, file)
+        if not os.path.exists(config_file):
+            self.generate_global()  
         try:
-            self.cfg_dict = read_json(fl)
-            current_global = self.cfg_dict.get("global", False)
-            remote = current_global["remote"] if current_global["remote"] != EMBARC_OSP_URL else "embarc_osp_gh_url"
-            local = current_global["local"]
-            sys.stdout.write(colorstring_to_escapecode('green'))
-            sys.stdout.write("* source: %s -> local: %s \n" % (remote, local))
-            sys.stdout.write(colorstring_to_escapecode('default'))
-            if current_global:
-                sys.stdout.write("\n   Note embarc_osp_gh_url: %s \n" % (EMBARC_OSP_URL))
-
-            return current_global
+            global_config = read_json(config_file)
+            if global_config.get(config, False) != False:
+                global_config[config] = value
+            elif global_config.get("BUILD_CONFIG", False) != False:
+                build_config = global_config["BUILD_CONFIG"]
+                if build_config.get(config, False) != False:
+                    global_config["BUILD_CONFIG"][config] = value
+                else:
+                    return False
+            else:
+                return False
+            generate_json(global_config, config_file)
         except IOError:
-            raise IOError("Can not open file %s ." % fl)
+            raise IOError("Can not open file %s ." % config_file)
 
+    def get_global(self, name):
+        file = "global_config.json"
+        config_file = os.path.join(self.path, file)
+        if not os.path.exists(config_file):
+            self.generate_global()
+        else:
+            global_config = read_json(config_file)
+            if global_config.get(name, False):
+                return global_config[name]
+            elif global_config.get("BUILD_CONFIG", False):
+                build_config = global_config["BUILD_CONFIG"]
+                if build_config.get(name, False):
+                    return global_config["BUILD_CONFIG"][name]
+                else:
+                    return False
+            else:
+                return False
 
     def set_path(self, name, source_type, path, url=None):
         fl = os.path.join(self.path, self.file)
@@ -101,7 +130,8 @@ class OSP(object):
         try:
             self.cfg_dict = read_json(fl)
             if self.cfg_dict.get(old, False):
-                self.cfg_dict.update(new = self.cfg_dict.pop(old))
+                self.cfg_dict[new] = self.cfg_dict[old]
+                self.cfg_dict.pop(old)
                 generate_json(self.cfg_dict, fl)
                 return True
             else:
@@ -116,7 +146,6 @@ class OSP(object):
         if not os.path.exists(fl):
             self.cfg_dict = dict()
             generate_json(self.cfg_dict, fl)
-        path = path.replace("\\", "/")
         try:
             self.cfg_dict = read_json(fl)
             if self.cfg_dict.get(name, False):
@@ -126,24 +155,6 @@ class OSP(object):
                 print_string("%s not exists" % name)
         except IOError:
             raise IOError("Can not open file %s ." % fl)
-
-    def set_global(self, path, url=None):
-        fl = os.path.join(self.path, self.file)
-        if not os.path.exists(fl):
-            self.cfg_dict = dict()
-            generate_json(self.cfg_dict, fl)
-        path = path.replace("\\", "/")
-        if not self.is_osp(path):
-            print_string("This is not a valid EMBARC_OSP_ROOT")
-            return False
-        try:
-            self.set_path(path, url)
-            self.cfg_dict = read_json(fl)
-            self.cfg_dict = {"remote": url, "local": path}
-            generate_json(self.cfg_dict, fl)
-        except IOError:
-            raise IOError("Can not open file %s ." % fl)
-
 
     def clear_path(self):
         fl = os.path.join(self.path, self.file)
@@ -158,6 +169,8 @@ class OSP(object):
         if not os.path.exists(fl):
             self.cfg_dict = dict()
             generate_json(self.cfg_dict, fl)
+        if current:
+            current = current.replace("\\", "/")
         try:
             self.cfg_dict = read_json(fl)
             if self.cfg_dict:
@@ -165,14 +178,14 @@ class OSP(object):
                     for key, value in self.cfg_dict.items():
                         if value.get("directory", False) == current:
                             sys.stdout.write(colorstring_to_escapecode('green'))
-                            sys.stdout.write(" * %s\n" % key)
+                            sys.stdout.write("  * %s\n" % key)
                             for source_type, source_value in value.items():
-                                sys.stdout.write(" %s： %s\n" % (source_type, source_value))
+                                sys.stdout.write("    %s: %s\n" % (source_type, source_value))
                             sys.stdout.write(colorstring_to_escapecode('default'))
                         else:
-                            sys.stdout.write(" %s\n" % key)
+                            sys.stdout.write("  %s\n" % key)
                             for source_type, source_value in value.items():
-                                sys.stdout.write(" %s： %s\n" % (source_type, source_value))
+                                sys.stdout.write("    %s: %s\n" % (source_type, source_value))
                         sys.stdout.write("\n")
                 return self.cfg_dict
             else:

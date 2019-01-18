@@ -24,10 +24,12 @@ def run(args, remainder=None):
         return
 
     embarc_config = args.app_config
+
     if not (embarc_config and os.path.exists(embarc_config)):
         embarc_config = os.path.join(app_path, "embarc_app.json")
 
     if os.path.exists(embarc_config):
+        print("[embARC] Read embarc_app.json")
         recordBuildConfig = read_json(embarc_config)
 
     parallel = args.parallel
@@ -39,12 +41,13 @@ def run(args, remainder=None):
         recordBuildConfig["CUR_CORE"] = args.core
     if args.toolchain:
         recordBuildConfig["TOOLCHAIN"] = args.toolchain
+    if args.olevel:
+        recordBuildConfig["OLEVEL"] = args.olevel
     if remainder:
         make_config, target= get_config(remainder)
         if target:
             args.target = target
         recordBuildConfig.update(make_config)
-
 
     builder = build.embARC_Builder(osproot, recordBuildConfig, curdir)
 
@@ -100,12 +103,14 @@ def setup(subparser):
     subparser.add_argument(
         "--core", help="Build using the given CORE")
     subparser.add_argument(
+        "-o", "--olevel", help="Build using the given OLEVEL")
+    subparser.add_argument(
         "-t", "--toolchain", help="Build toolchain. Example: gnu, mw")
     subparser.add_argument(
         "-j", "--parallel", default=False, help="Build application with -j")
     subparser.add_argument(
-        "--target", default="elf", help="Choose build target, default target is elf and options are [elf, bin, hex, size] ")
+        "--target", default="all", choices=["elf", "bin", "hex", "size", "info", "opt" "all", "run", "clean"], help="Choose build target, default target is all and options are [elf, bin, hex, size] ")
     subparser.add_argument(
         "-g", "--export", action="store_true", help="Generate IDE project file for your application")
     subparser.add_argument(
-        "--app_config", help="Application configuration. Default is to look for 'embarc_app.json")
+        "--app_config", help="Specify application configuration. Default is to look for 'embarc_app.json")
