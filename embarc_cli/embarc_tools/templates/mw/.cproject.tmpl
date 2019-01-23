@@ -21,7 +21,7 @@
 					<folderInfo id="com.arc.cdt.toolchain.av2em.exeReleaseToolChain.{{settings.id}}.233171701" name="/" resourcePath="">
 						<toolChain id="com.arc.cdt.toolchain.av2em.exeReleaseToolChain.1487233303" superClass="com.arc.cdt.toolchain.av2em.exeReleaseToolChain">
 							<targetPlatform id="hcTargetPlatform.1529162684" isAbstract="false" name="Generic platform" superClass="hcTargetPlatform"/>
-							<builder buildPath="${workspace_loc:/{{name}}}" cleanBuildTarget="clean" id="makeBuilder.751345405" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="makeBuilder"/>
+							<builder buildPath="${workspace_loc:/{{name}}}" cleanBuildTarget="{{build_command}} clean" id="makeBuilder.751345405" incrementalBuildTarget="{{build_command}} all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="makeBuilder"/>
 							<tool id="arc.cdt.toolchain.av2em.exeCompilerRelease.129548542" superClass="arc.cdt.toolchain.av2em.exeCompilerRelease">
 								<option id="arc.compiler.options.defines.435704226" superClass="arc.compiler.options.defines" valueType="definedSymbols">
 									{% for value in defines %}

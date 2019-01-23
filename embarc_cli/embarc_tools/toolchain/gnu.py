@@ -92,7 +92,8 @@ class Gnu(ARCtoolchain):
                 print_string(msg, level="error")
                 gnu_tgz_path = None
         self.pack = gnu_tgz_path
-        return gnu_tgz_path
+        self.extract_file(gnu_tgz_path)
+        return self.path
 
     def extract_file(self, pack=None, path=None):
         '''extract gnu file from pack to path;

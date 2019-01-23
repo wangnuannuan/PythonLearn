@@ -20,7 +20,7 @@ install:
   - "pip install pyflakes"
   
 before_script:
-  - "embarc toolchain --toolchain gnu --install"
+  - "embarc config toolchain --download gnu"
   - "export PATH=$PATH:/home/travis/build/wangnuannuan/PythonLearn/embarc_cli/2018.09/bin"
 
 script: 
