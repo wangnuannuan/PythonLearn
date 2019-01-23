@@ -1,10 +1,10 @@
 ## Introduction
 embARC CLI is the name of the embARC command-line tool, packaged as `embarc_tools`. embARC CLI support for embARC application creation, build and config, use of the embARC Open Software Platform.
 
-This document covers the installation and usage of embARC CLI.
+This document covers the installations and usage of embARC CLI.
 ## Usage
 The basic workflow for embARC CLI is to:
-1. Create an application.
+1. Create a application.
 2. Config the application.
 3. Build the application code.
 
@@ -239,7 +239,7 @@ state: READY
 You can specify parameters in two ways:
 1. Use `--xxx`:
 ```
-$ embarc build  --board iotdk --bd_ver 10 --core arcem9d
+$ embarc build  --board iotdk --bd_ver 10 --core arcem9d --target all
 [embARC] Read embarc_app.json
 [embARC] Build target: all
 [embARC] Current configuration
@@ -269,7 +269,7 @@ $ embarc build  --board iotdk --bd_ver 10 --core arcem9d
 "Linking               : " obj_iotdk_10/gnu_arcem9d/helloworld_gnu_arcem9d.elf
 [embARC] Completed in: (97.7479999065)s
 ```
-2. Use `BOARD=iotdk BD_VER=10 CUR_CORE=arcem9d`, this is the default format when you build with `make` command:
+2. Use `BOARD=iotdk BD_VER=10 CUR_CORE=arcem9d clean`, this is the default format when you build with `make` command:
 ```
 $ embarc build BOARD=iotdk BD_VER=10 CUR_CORE=arcem9d clean
 [embARC] Read embarc_app.json
@@ -288,8 +288,12 @@ C:\WINDOWS\system32\cmd.exe /C if exist  .sc.project   C:\WINDOWS\system32\cmd.e
 [embARC] Completed in: (1.96500015259)s
 ```
 
+<span class="tips">**Tip:** embARC defines different build targets for selected configuration. A detailed command-specific help is available by using `make --help`. You can specify a target : 
+1. `embarc build --target xxx`.
+2. `embarc build [other paramters] xxx`, embARC CLI will choose the last parameter as target.
+
 #### Export Eclipse IDE file
-If you need to debug your code, you can export your source tree to IDE project file to use the IDE's debugging facilities. embARC CLI supports exporting to Eclipse using GNU or MetaWare.
+If you need to dbug your code, you can export your source tree to IDE project file to use the IDE's debugging facilities. embARC CLI supports exporting to Eclipse using GNU or MetaWare.
 
 For example:
 ```
@@ -321,7 +325,7 @@ $ embarc build  --export
 C:\Users\jingru\Documents\embarc\testcli\helloworld
 ```
 - Open **ARC GNU IDE 2018.09 Eclipse**, click **File -> Open Projects from File System** .
-- Paste `C:\Users\jingru\Documents\embarc\testcli\helloworld` to **Import source**, and click **Finish**.You can see your project in **Project Explorer** view.
+- Paste `C:\Users\jingru\Documents\embarc\testcli\helloworld` to **Import source**, and click **Finish**.You can your project in **Project Explorer** view.
 
   <img width="500" src="https://github.com/wangnuannuan/PythonLearn/raw/master/pic/import.PNG"/>
 
@@ -351,7 +355,7 @@ Currently supported options: `osp`, `toolchain`, `build_cfg`. A detailed command
 You can use `embarc config osp` to config the `EMBARC_OSP_ROOT`.
 The commands for `embarc config osp` are:
 
-- `embarc config osp --add <name> <url/path> [<dest>]` to add `EMBARC_OSP_ROOT` to a global file `osp.json`. This file is save in current user folder.
+- `embarc config osp --add <name> <url/path> [<dest>]` to add `EMBARC_OSP_ROOT` to a global file `osp.json`. This file is save in current user folder. Parameter `<url/path>` can be: HTTPS URL, local path or zip file path.
 - `embarc config osp --rename <oldname> <newname>` to rename a `EMBARC_OSP_ROOT`.
 - `embarc config osp --remove <name>` to remove the path from `osp.json`.
 - `embarc config osp --list` to show all recorded paths.
@@ -444,7 +448,7 @@ $ embarc config osp --remove rename
     type: git
 ```
 
-You can use `embarc config toolchain` to config `TOOLCHAIN`. Currently supported toolchain are GNU and MetaWare.
+You can use `embarc config toolchain` to config `TOOLCHAIN`. Currently supported toolchains are GNU and MetaWare.
 
 You can check the current toolchain in your platform.
 ```
