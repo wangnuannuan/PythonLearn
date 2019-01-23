@@ -33,14 +33,6 @@ def main():
     description="Command-line tool for embARC OSP - https://embarc.org/embarc_osp\nversion %s\n\nUse \"embarc <command> -h|--help\" for detailed help.\nOnline manual and guide available at https://github.com/foss-for-synopsys-dwc-arc-processors/embarc-cli" % ver,
     formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument(
-        '-v', dest='verbosity', action='count', default=0,
-        help='Increase the verbosity of the output'
-    )
-    parser.add_argument(
-        '-q', dest='quietness', action='count', default=0,
-        help='Decrease the verbosity of the output'
-    )
-    parser.add_argument(
         "--version", action='version',
         version=pkg_resources.require("embarc_cli")[0].version,
         help="Display version"

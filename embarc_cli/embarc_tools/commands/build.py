@@ -109,7 +109,7 @@ def setup(subparser):
     subparser.add_argument(
         "-j", "--parallel", default=False, help="Build application with -j")
     subparser.add_argument(
-        "--target", default="all", choices=["elf", "bin", "hex", "size", "info", "opt" "all", "run", "clean"], help="Choose build target, default target is all and options are [elf, bin, hex, size] ")
+        "--target", default="all", choices=["elf", "bin", "hex", "size", "info", "opt" "all", "run", "clean"], help="Choose build target, default target is all")
     subparser.add_argument(
         "-g", "--export", action="store_true", help="Generate IDE project file for your application")
     subparser.add_argument(

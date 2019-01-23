@@ -138,7 +138,7 @@ class embARC_Builder(object):
             build_status["reason"] = "Coverity Commit defects Failed!"
             return build_status
 
-        print_string("BEGIN SECTION Coverity Send E-mail Notifications")
+        '''print_string("BEGIN SECTION Coverity Send E-mail Notifications")
         coverity_manage = "cov-manage-im --mode notification --execute --view 'Default' --host %s --user %s --password %s" % (
             self.coverity_server,
             self.user, self.password
@@ -147,31 +147,19 @@ class embARC_Builder(object):
         if returncode != 0:
             build_status["result"] = False
             build_status["reason"] = " Coverity Send E-mail Notifications Failed!"
-            return build_status
+            return build_status'''
 
         return build_status
 
-    def build_target(self, app, target=None, parallel=8, coverity=False, silent=False):
-        app_realpath, build_status = self.build_common_check(app)
-        build_status['build_target'] = target
-        build_status['time_cost'] = 0
-        print_string("Build target: {} " .format(target))
-
-        if not build_status['result']:
-            return build_status
-
-        # Check and create output directory
-        if (self.outdir is not None) and (not os.path.isdir(self.outdir)):
-            print_string("Create application output directory: " + self.outdir)
-            os.makedirs(self.outdir)
-
+    def get_build_cmd(self, app, target=None, parallel=8, silent=False):
+        build_status = dict()
         build_precmd = "make "
         if parallel:
             build_precmd = "{} -j {}".format(build_precmd, str(parallel))
 
         if target != "info":
             build_config_template = self.get_build_template()
-            with cd(app_realpath):
+            with cd(app):
                 self.get_makefile_config(build_config_template)
         build_precmd = "{} {}".format(build_precmd, self.make_options)
         if silent:
@@ -192,6 +180,29 @@ class embARC_Builder(object):
         build_cmd = " ".join(build_cmd_list)
         print_string("Build command: {} ".format(build_cmd))
         build_status['build_cmd'] = build_cmd
+
+        return build_status
+        
+
+    def build_target(self, app, target=None, parallel=8, coverity=False, silent=False):
+        app_realpath, build_status = self.build_common_check(app)
+        build_status['build_target'] = target
+        build_status['time_cost'] = 0
+        print_string("Build target: {} " .format(target))
+
+        if not build_status['result']:
+            return build_status
+
+        # Check and create output directory
+        if (self.outdir is not None) and (not os.path.isdir(self.outdir)):
+            print_string("Create application output directory: " + self.outdir)
+            os.makedirs(self.outdir)
+
+        current_build_cmd = self.get_build_cmd(app_realpath, target, parallel, silent)
+        build_status.update(current_build_cmd)
+        build_cmd = build_status.get('build_cmd', None)
+
+
         print_string("Start to build application")
         return_code = 0
         time_pre = time.time()

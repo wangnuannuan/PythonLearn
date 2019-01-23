@@ -35,6 +35,8 @@ def run(args, remainder=None):
                     dest = None
             if os.path.exists(url) and os.path.isdir(url):
                 source_type = "local"
+                msg = "Add this local (%s) to user profile osp.json" % (url)
+                print_string(msg, level="error")
                 osppath.set_path(name, source_type, url)
 
             elif os.path.exists(url) and os.path.isfile(url):
@@ -103,7 +105,7 @@ def run(args, remainder=None):
                 app_setting = read_json("embarc_app.json")
                 current_osp = app_setting.get("EMBARC_OSP_ROOT", False)
             else:
-                _, app_setting = get_makefile_config(app_setting)
+                _, app_setting = osppath.get_makefile_config(app_setting)
                 current_osp = app_setting.get("EMBARC_OSP_ROOT", False)
         if current_paths:
             osppath.list_path(show=True, current=current_osp)
@@ -113,7 +115,7 @@ def setup(subparser):
     subparser.add_argument(
         "--add", action='store_true',  help='Fetch the remote source code and add it to osp.json')
     subparser.add_argument(
-        '-s', '--set',  help="Set a global EMBARC_OSP_ROOT")
+        '-s', '--set',  help="Set a global EMBARC_OSP_ROOT, make sure you have added it to osp.json")
     subparser.add_argument(
         "--rename", action='store_true', help="Rename osp source code.")
     subparser.add_argument(

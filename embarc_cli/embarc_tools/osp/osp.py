@@ -52,9 +52,9 @@ class OSP(object):
         global_config["EMBARC_OSP_ROOT"] = str()
         global_config["TOOLCHAIN"] = str()
         global_config["BUILD_CONFIG"] = dict()
-        global_config["BUILD_CONFIG"]["BOARD"] = False
-        global_config["BUILD_CONFIG"]["BD_VER"] = False
-        global_config["BUILD_CONFIG"]["CUR_CORE"] = False
+        global_config["BUILD_CONFIG"]["BOARD"] = str()
+        global_config["BUILD_CONFIG"]["BD_VER"] = str()
+        global_config["BUILD_CONFIG"]["CUR_CORE"] = str()
         generate_json(global_config, config_file)
 
     def set_global(self, config, value):
@@ -251,9 +251,9 @@ class OSP(object):
     def get_tcfs(self, root, board, bd_version, cur_core=None):
         result = []
         board_version_path_dict = self._board_version_config(root, board, bd_version)
-        board_path = board_version_path_dict[bd_version]
+        board_path = board_version_path_dict.get(bd_version, False)
         cur_core_file = cur_core + ".tcf" if cur_core else cur_core
-        if os.path.exists(board_path):
+        if board_path and os.path.exists(board_path):
             for root, _, files in os.walk(board_path, topdown=True):
                 if cur_core_file in files:
                     result.append(cur_core)
