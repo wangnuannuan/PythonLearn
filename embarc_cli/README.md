@@ -1,10 +1,10 @@
 ## Introduction
 embARC CLI is the name of the embARC command-line tool, packaged as `embarc_tools`. embARC CLI support for embARC application creation, build and config, use of the embARC Open Software Platform.
 
-This document covers the installations and usage of embARC CLI.
+This document covers the installation and usage of embARC CLI.
 ## Usage
 The basic workflow for embARC CLI is to:
-1. Create a application.
+1. Create an application.
 2. Config the application.
 3. Build the application code.
 
@@ -289,7 +289,7 @@ C:\WINDOWS\system32\cmd.exe /C if exist  .sc.project   C:\WINDOWS\system32\cmd.e
 ```
 
 #### Export Eclipse IDE file
-If you need to dbug your code, you can export your source tree to IDE project file to use the IDE's debugging facilities. embARC CLI supports exporting to Eclipse using GNU or MetaWare.
+If you need to debug your code, you can export your source tree to IDE project file to use the IDE's debugging facilities. embARC CLI supports exporting to Eclipse using GNU or MetaWare.
 
 For example:
 ```
@@ -321,7 +321,7 @@ $ embarc build  --export
 C:\Users\jingru\Documents\embarc\testcli\helloworld
 ```
 - Open **ARC GNU IDE 2018.09 Eclipse**, click **File -> Open Projects from File System** .
-- Paste `C:\Users\jingru\Documents\embarc\testcli\helloworld` to **Import source**, and click **Finish**.You can your project in **Project Explorer** view.
+- Paste `C:\Users\jingru\Documents\embarc\testcli\helloworld` to **Import source**, and click **Finish**.You can see your project in **Project Explorer** view.
 
   <img width="500" src="https://github.com/wangnuannuan/PythonLearn/raw/master/pic/import.PNG"/>
 
