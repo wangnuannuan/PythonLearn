@@ -73,7 +73,6 @@ class Gnu(ARCtoolchain):
             pack_tgz = "arc_gnu_" + version + "_prebuilt_elf32_le_linux_install.tar.gz"
         else:
             url = "https://github.com" + self._lastest_url()
-            print(url)
             version = re.search(r"[0-9]*\.[0-9]*", url).group(0)
             pack_tgz = url.rsplit("/", 1)[1]
 
@@ -92,8 +91,7 @@ class Gnu(ARCtoolchain):
                 print_string(msg, level="error")
                 gnu_tgz_path = None
         self.pack = gnu_tgz_path
-        self.extract_file(gnu_tgz_path)
-        return self.path
+        return gnu_tgz_path
 
     def extract_file(self, pack=None, path=None):
         '''extract gnu file from pack to path;
@@ -110,7 +108,8 @@ class Gnu(ARCtoolchain):
             return False
 
         else:
-            version = re.search(r"[0-9]*\.[0-9]*", pack).group(0)
+            file = pack.rsplit("/", 1)[1]
+            version = re.search(r"[0-9]*\.[0-9]*", file).group(0)
             if version in os.listdir(path):
                 delete_dir_files(version, True)
             try:
