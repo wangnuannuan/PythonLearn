@@ -114,12 +114,9 @@ class Gnu(ARCtoolchain):
                 delete_dir_files(version, True)
             try:
                 gnu_file_path = extract_file(pack, path)
+                return gnu_file_path
             except Exception as e:
                 print(e)
-            if gnu_file_path is not None:
-                self.path = os.path.join(path, version, "bin")
-                shutil.move(gnu_file_path, version)
-                return self.path
 
     def set_env(self, path=None):
         '''set environment'''
