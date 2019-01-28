@@ -23,6 +23,6 @@ before_script:
   - bash .ci/script.sh
 
 script: 
-  - "embarc osp --clone"
+  - "embarc config osp --add embarc_osp https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_osp"
   - "cd embarc_cli"
   - "python maintest.py"
