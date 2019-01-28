@@ -19,4 +19,11 @@ if [ -d $TOOLCHAIN_CACHE_FOLDER ] ; then
     fi
 fi
 
-
+if [ -d $ARC_DEV_TOOL_ROOT ] ; then
+    bash .ci/linux_env_set_arc.sh -t $TOOLCHAIN -r $ARC_DEV_TOOL_ROOT || die
+    [ ! -e "arctool.env" ] && die "arctool.env doesn't exist"
+    source arctool.env || die
+    rm -rf arctool.env || die
+else
+    die "The toolchain path does not exist "
+fi
