@@ -5,7 +5,7 @@ die() {
 }
 
 echo "${EXAMPLE[0]}"
-
+TOOLCHAIN="gnu"
 TOOLCHAIN_CACHE_FOLDER=".cache/toolchain"
 ARC_DEV_GNU_ROOT="/u/arcgnu_verif/gnu_builds"
 
