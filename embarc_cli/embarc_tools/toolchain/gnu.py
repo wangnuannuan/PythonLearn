@@ -117,6 +117,12 @@ class Gnu(ARCtoolchain):
                 return gnu_file_path
             except Exception as e:
                 print(e)
+            '''
+            if gnu_file_path is not None:
+                self.path = os.path.join(path, version, "bin")
+                shutil.move(gnu_file_path, version)
+                return self.path
+            '''
 
     def set_env(self, path=None):
         '''set environment'''
