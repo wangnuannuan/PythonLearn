@@ -182,7 +182,7 @@ class embARC_Builder(object):
         build_status['build_cmd'] = build_cmd
 
         return build_status
-        
+
 
     def build_target(self, app, target=None, parallel=8, coverity=False, silent=False):
         app_realpath, build_status = self.build_common_check(app)
@@ -429,7 +429,7 @@ class embARC_Builder(object):
                     build_template[key] = default_makefile_config.get(key, False)
             self.buildopts.update(build_template)
 
- 
+
         osp_root, update = ospclass.check_osp(osp_root)
         self.make_options += 'EMBARC_ROOT=' + str(osp_root) + ' '
         self.buildopts["EMBARC_OSP_ROOT"] = osp_root

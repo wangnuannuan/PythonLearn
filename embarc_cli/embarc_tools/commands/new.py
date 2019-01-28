@@ -36,7 +36,7 @@ def run(args, remainder=None):
         table_content.append(value)
     print_table([table_head, [table_content]])
 
-    
+
     app_path = os.path.join(getcwd(), application)
     config["EMBARC_OSP_ROOT"] = config["EMBARC_OSP_ROOT"].replace("\\", "/")
     app_json_path = os.path.join(app_path, "embarc_app.json")
@@ -100,7 +100,7 @@ def build_config(args):
         config["TOOLCHAIN"] = toolchain
         config["EMBARC_OSP_ROOT"] = os.path.abspath(osp_root)
         return config
-    
+
     if not application:
         while True:
             application = get_input("[embARC] Input application name: ")
@@ -171,7 +171,7 @@ def build_config(args):
             break
     config["TOOLCHAIN"] = toolchain
     config["EMBARC_OSP_ROOT"] = os.path.abspath(osp_root)
-    
+
     return config
 
 

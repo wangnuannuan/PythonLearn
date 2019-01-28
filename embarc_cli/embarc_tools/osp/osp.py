@@ -45,7 +45,7 @@ class OSP(object):
 
         except IOError:
             raise IOError("Can not open file %s ." % fl)
-    
+
     def generate_global(self):
         file = "global_config.json"
         config_file = os.path.join(self.path, file)
@@ -62,7 +62,7 @@ class OSP(object):
         file = "global_config.json"
         config_file = os.path.join(self.path, file)
         if not os.path.exists(config_file):
-            self.generate_global()  
+            self.generate_global()
         try:
             global_config = read_json(config_file)
             if global_config.get(config, False) != False:
@@ -261,7 +261,7 @@ class OSP(object):
                         result.extend(board_opt_line.split())
                         break
         return result
-        
+
     def supported_boards(self, root):
         app = "example/baremetal/arc_feature/timer_interrupt"
         app_path = os.path.join(root, app)

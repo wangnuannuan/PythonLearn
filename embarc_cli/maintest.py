@@ -16,7 +16,7 @@ def deploy():
     for root, _, files in os.walk("coverage"):
         for file in files:
             fullpath=os.path.join(root, file)
-            tar.add(fullpath,arcname=file) 
+            tar.add(fullpath,arcname=file)
     tar.close()
     repo_slug = os.environ.get("TRAVIS_REPO_SLUG")
     gh_token = os.environ.get("GH_TOKEN")
