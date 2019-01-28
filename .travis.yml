@@ -20,8 +20,7 @@ install:
   - "pip install pyflakes"
   
 before_script:
-  - "embarc config toolchain --download gnu"
-  - "export PATH=$PATH:/home/travis/build/wangnuannuan/PythonLearn/embarc_cli/2018.09/bin"
+  - bash .ci/script.sh
 
 script: 
   - "embarc osp --clone"
