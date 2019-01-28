@@ -48,11 +48,6 @@ def get_allcase(case_path):
 def before_install():
     os.system("pycodestyle embarc_tools --ignore=E501")
     os.system("pyflakes embarc_tools")
-    gnutoolchain = gnu.Gnu()
-    gnu_tgz_path = gnutoolchain.download(version="2018.09")
-    pack = "arc_gnu_2018.09_prebuilt_elf32_le_linux_install.tar.gz"
-    path = gnutoolchain.extract_file(pack)
-    gnutoolchain.set_env(path=path)
 
 if __name__ == '__main__':
     COV = coverage.coverage(branch=True, include='./embarc_tools/*')
