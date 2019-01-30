@@ -127,8 +127,8 @@ def pqueryOutputinline(command, console=False, **kwargs):
                 command, stdout=writer, stderr=subprocess.PIPE, shell=True, bufsize=1, **kwargs
             )
             end = ""
-            if PYTHON_VERSION.startswith("3"):
-                end = "\n"
+            # if PYTHON_VERSION.startswith("3"):
+            #    end = "\n"
             try:
                 while True:
                     decodeline = reader.read().decode()
