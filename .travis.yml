@@ -1,6 +1,10 @@
 
 language: python
-cache: pip
+cache:
+  pip: true
+  directories:
+    - .cache/result
+    - .cache/toolchain
 python:
   - "2.7"
   - "3.6"

@@ -16,11 +16,10 @@ pythonversion = os.environ.get("TRAVIS_PYTHON_VERSION")
 def deploy():
     file = "index.tar.gz"
     tar = tarfile.open(file, "w:gz")
-    tar.add(pythonversion + "index.html")
-    for root, _, files in os.walk("coverage"):
-        for file in files:
-            fullpath = os.path.join(root, file)
-            tar.add(fullpath, arcname=file)
+    for version in os.listdir(".cache/result"):
+        print(version)
+        if "index.html" in version:
+            tar.add(version)
     tar.close()
     repo_slug = os.environ.get("TRAVIS_REPO_SLUG")
     gh_token = os.environ.get("GH_TOKEN")
@@ -80,7 +79,7 @@ if __name__ == '__main__':
     COV = coverage.coverage(branch=True, include='./embarc_tools/*')
     COV.start()
     before_install()
-    testfilepath = pythonversion + "index.html"
+    testfilepath = ".cache/result/" + pythonversion + "index.html"
     ftp = open(testfilepath, 'wb')
     # runner = unittest.TextTestRunner()
     runner = HTMLTestRunner.HTMLTestRunner(stream=ftp, verbosity=2, title=pythonversion)
@@ -93,7 +92,8 @@ if __name__ == '__main__':
     basedir = os.path.abspath(os.path.dirname(__file__))
     covdir = os.path.join(basedir, 'coverage')
     COV.html_report(directory=covdir)
-    deploy()
+    if os.environ.get("TRAVIS_BUILD_STAGE_NAME") == "Deploy":
+        deploy()
     print('HTML version: file://%s/index.html' % covdir)
     print("See test result from https://wangnuannuan.github.io/PythonLearn")
     COV.erase()
