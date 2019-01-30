@@ -13,12 +13,9 @@ class TestIde(unittest.TestCase):
         self.app_path = os.path.join(self.osp_root, "example/baremetal/blinky")
 
     def test_generate(self):
-        with cd(self.app_path):
-            popen(["embarc", "build", "-g"])
-            file1 = ".project"
-            file2 = ".cproject"
-            self.assertTrue(os.path.exists(os.path.join(self.app_path, file1)))
-            self.assertTrue(os.path.exists(os.path.join(self.app_path,file2)))
+        popen(["python","embarc_tools/main.py", "build", "--path", self.app_path, "-g"])
+        self.assertTrue(os.path.exists(os.path.join(self.app_path, file1)))
+        self.assertTrue(os.path.exists(os.path.join(self.app_path,file2)))
 
     def tearDown(self):
         file1 = ".project"
