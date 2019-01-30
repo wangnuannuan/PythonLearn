@@ -22,12 +22,12 @@ install:
   - "pip install coverage"
   - "pip install pycodestyle"
   - "pip install pyflakes"
-  - pip install awscli
+  - "pip install awscli"
 before_script:
 
   - mkdir -p .cache/toolchain
   - bash .ci/script.sh
-  - aws s3 sync s3://travis-build-stages-shared-storage-test/.cache/toolchain .cache/toolchain
+#  - aws s3 sync s3://travis-build-stages-shared-storage-test/.cache/toolchain .cache/toolchain addon base on aws too
 
 script: 
   - "cd embarc_cli"
@@ -43,6 +43,7 @@ jobs:
     - stage: deploy
       script: 
         - "cd embarc_cli"
-        - "python maintest.py"
+        #- "python maintest.py"
       after_success:
-              - aws s3 rm --recursive s3://travis-build-stages-shared-storage-test/.cache/toolchain # clean up after ourselves
+        - echo finish
+            #- aws s3 rm --recursive s3://travis-build-stages-shared-storage-test/.cache/toolchain # clean up after ourselves

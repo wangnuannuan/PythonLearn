@@ -14,13 +14,9 @@ pythonversion = os.environ.get("TRAVIS_PYTHON_VERSION")
 
 
 def deploy():
-    popen(["ls"])
     file = "index.tar.gz"
     tar = tarfile.open(file, "w:gz")
-    for version in os.listdir(".cache/result"):
-        print(version)
-        if "index.html" in version:
-            tar.add(version)
+    tar.add(pythonversion + "index.html")
     tar.close()
     repo_slug = os.environ.get("TRAVIS_REPO_SLUG")
     gh_token = os.environ.get("GH_TOKEN")
@@ -33,12 +29,9 @@ def deploy():
         git.fetch()
         popen(["git", "checkout", "-b", "gh-pages", "origin/gh-pages"])
         copy_file("../index.tar.gz", ".")
-        popen(["ls"])
-        delete_dir_files(pythonversion + "index.html")
         print("start untar file index.tar.gz")
         untar(file, ".")
         print("delete index.tar.gz")
-        popen(["ls"])
         delete_dir_files(file)
         git.add("--all")
         git.commit("deploy html")
@@ -46,7 +39,6 @@ def deploy():
             print("start to deploy")
             git.publish()
         except Exception as e:
-            print("pull code")
             popen(["git", "pull", url, "gh-pages"])
             git.publish()
         # popen(["git", "push", url, "gh-pages:gh-pages"])
@@ -77,15 +69,10 @@ def before_install():
         ospclass.set_global(config, str("new_osp"))
 
 if __name__ == '__main__':
-    if os.environ.get("TRAVIS_BUILD_STAGE_NAME") == "Deploy":
-        deploy()
-        print("See test result from https://wangnuannuan.github.io/PythonLearn")
-        os.exit(0)
     COV = coverage.coverage(branch=True, include='./embarc_tools/*')
     COV.start()
     before_install()
-    mkdir(".cache/result")
-    testfilepath = ".cache/result/" + pythonversion + "index.html"
+    testfilepath = pythonversion + "index.html"
     ftp = open(testfilepath, 'wb')
     # runner = unittest.TextTestRunner()
     runner = HTMLTestRunner.HTMLTestRunner(stream=ftp, verbosity=2, title=pythonversion)
@@ -98,5 +85,7 @@ if __name__ == '__main__':
     basedir = os.path.abspath(os.path.dirname(__file__))
     covdir = os.path.join(basedir, 'coverage')
     COV.html_report(directory=covdir)
+    deploy()
     print('HTML version: file://%s/index.html' % covdir)
+    print("See test result from https://wangnuannuan.github.io/PythonLearn")
     COV.erase()
