@@ -33,4 +33,6 @@ script:
 jobs:
   include:
     - stage: deploy
-      script: ls -a
+      script: 
+        - "cd embarc_cli"
+        - "python maintest.py"

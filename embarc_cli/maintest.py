@@ -76,9 +76,14 @@ def before_install():
         ospclass.set_global(config, str("new_osp"))
 
 if __name__ == '__main__':
+    if os.environ.get("TRAVIS_BUILD_STAGE_NAME") == "Deploy":
+        deploy()
+        print("See test result from https://wangnuannuan.github.io/PythonLearn")
+        os.exit(0)
     COV = coverage.coverage(branch=True, include='./embarc_tools/*')
     COV.start()
     before_install()
+    mkdir(".cache/result")
     testfilepath = ".cache/result/" + pythonversion + "index.html"
     ftp = open(testfilepath, 'wb')
     # runner = unittest.TextTestRunner()
@@ -92,8 +97,5 @@ if __name__ == '__main__':
     basedir = os.path.abspath(os.path.dirname(__file__))
     covdir = os.path.join(basedir, 'coverage')
     COV.html_report(directory=covdir)
-    if os.environ.get("TRAVIS_BUILD_STAGE_NAME") == "Deploy":
-        deploy()
     print('HTML version: file://%s/index.html' % covdir)
-    print("See test result from https://wangnuannuan.github.io/PythonLearn")
     COV.erase()
