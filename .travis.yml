@@ -10,34 +10,23 @@ python:
 #sudo: false # Use container-based infrastructure
 sudo: required
 dist: trusty
-
+install:
+  - "sudo apt-get update"
+  - "sudo apt-get install lib32z1"
+  - "sudo apt-get install dos2unix"
+  - "pip install embarc_cli"
+  - "pip install coverage"
+  - "pip install pycodestyle"
+  - "pip install pyflakes"
   
+before_script:
+  - bash .ci/script.sh
 
+script: 
+  - "cd embarc_cli"
+  - "python maintest.py"
 
 jobs:
   include:
-    - stage: build
-      install:
-        - "sudo apt-get update"
-        - "sudo apt-get install lib32z1"
-        - "sudo apt-get install dos2unix"
-        - "pip install embarc_cli"
-        - "pip install coverage"
-        - "pip install pycodestyle"
-        - "pip install pyflakes"
-      before_script:
-        - bash .ci/script.sh
-
-      script: 
-        - "cd embarc_cli"
-        - "python maintest.py"
-      matrix:
-        include:
-          - python: 2.7
-          - python: 3.6
-          - python: 3.5
-          - python: 3.4
-          - python: pypy        
-      
-    - stage: unit tests
-      script: echo two
+    - stage: deploy
+      script: echo one
