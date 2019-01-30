@@ -4,10 +4,12 @@ import HTMLTestRunner
 import coverage
 import os
 import tarfile
-from embarc_tools.osp import repo, Git
+from embarc_tools.osp import repo, Git, osp
 from embarc_tools.download_manager import mkdir, cd, copy_file, untar, getcwd, delete_dir_files
 from embarc_tools.utils import popen
 from embarc_tools.toolchain import gnu
+from embarc_tools.settings import EMBARC_OSP_URL
+from embarc_tools.notify import print_string
 pythonversion = os.environ.get("TRAVIS_PYTHON_VERSION")
 
 
@@ -52,7 +54,21 @@ def get_allcase(case_path):
 def before_install():
     os.system("pycodestyle embarc_tools --ignore=E501")
     os.system("pyflakes embarc_tools")
-
+    ospclass = osp.OSP()
+    url = EMBARC_OSP_URL
+    osprepo = repo.Repo.fromurl(url)
+    path = getcwd()
+    source_type = "git"
+    name = "new_osp"
+    if not os.path.exists(name):
+        print_string("Start clone {}".format(osprepo.name))
+        osprepo.clone(osprepo.url, path=os.path.join(path, name), rev=None, depth=None, protocol=None, offline=False)
+        print_string("Finish clone {}".format(osprepo.name))
+        ospclass.set_path(name, source_type, os.path.join(path, name), url)
+        print_string("Add (%s) to user profile osp.json" % os.path.join(path, osprepo.name))
+    if ospclass.get_path(str("new_osp")):
+        config = "EMBARC_OSP_ROOT"
+        ospclass.set_global(config, str("new_osp"))
 
 if __name__ == '__main__':
     COV = coverage.coverage(branch=True, include='./embarc_tools/*')

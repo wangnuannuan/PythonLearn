@@ -44,6 +44,7 @@ class TestToolchain(unittest.TestCase):
 
     def test_set_toolchain_env(self):
         current_platform = ARCtoolchain.get_platform()
+        platform = CURRENT_PLATFORM
         if platform == "Windows":
             from embarc_tools.toolchain import windows_env_set_arc
             env_obj = windows_env_set_arc.Win32Environment(scope="user")
@@ -57,6 +58,8 @@ class TestToolchain(unittest.TestCase):
                 with open(bashrc) as f:
                     lines = f.read().splitlines()
                     print(lines)
+            except Exception as e:
+                print(e)
         # self.gnu.set_toolchain_env("")
 
     def tearDown(self):

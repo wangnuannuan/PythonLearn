@@ -104,8 +104,7 @@ class Gnu(ARCtoolchain):
             return False
 
         else:
-            file = pack.rsplit("/", 1)[1]
-            version = re.search(r"[0-9]*\.[0-9]*", file).group(0)
+            version = re.search(r"[0-9]*\.[0-9]*", pack).group(0)
             if version in os.listdir(path):
                 delete_dir_files(version, True)
             try:

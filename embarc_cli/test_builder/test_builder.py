@@ -3,6 +3,8 @@ from embarc_tools.builder import build
 from embarc_tools.osp import osp, repo
 from embarc_tools.utils import popen
 from embarc_tools.download_manager import getcwd
+from embarc_tools.settings import EMBARC_OSP_URL
+from embarc_tools.notify import print_string
 import unittest
 import os
 import shutil
@@ -13,21 +15,13 @@ class TestBuilder(unittest.TestCase):
         super(TestBuilder, self).setUp()
         ospclass = osp.OSP()
         ospclass.list_path()
+        if ospclass.get_path(str("new_osp")):
+            config = "EMBARC_OSP_ROOT"
+            ospclass.set_global(config, str("new_osp"))
         self.osp_root = ospclass.get_path("new_osp")
-        if not self.osp_root:
-            url = "https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_osp"
-            osprepo = repo.Repo.fromurl(url)
-            path = getcwd()
-            if not os.path.exists(osprepo.name):
-                osprepo.clone(osprepo.url, path=os.path.join(path, osprepo.name), rev=None, depth=None, protocol=None, offline=False)
-                ospclass.set_path(os.path.join(path, osprepo.name), osprepo.url)
-            self.osp_root = os.path.join(path, osprepo.name)
         self.app_path = os.path.join(self.osp_root, "example/baremetal/blinky")
         self.buildopts = {"BOARD": "emsk", "BD_VER": "11", "CUR_CORE": "arcem6", "TOOLCHAIN": "gnu"}
         self.app_builder = build.embARC_Builder(osproot=self.osp_root, buildopts=self.buildopts)
-        if osppath.get_path(str("new_osp")):
-            config = "EMBARC_OSP_ROOT"
-            osppath.set_global(config, str("new_osp"))
 
     def test_build_common_check(self):
         app_path = self.app_path
@@ -37,7 +31,7 @@ class TestBuilder(unittest.TestCase):
 
     def test_build_target(self):
         popen(["ls"])
-        popen(["python", "embarc_tools/main.py", "new", "--quickly"])
+        popen(["python", "embarc_tools/main.py", "new", "--quick"])
         app_path = os.path.join(getcwd(), "helloworld") # self.app_path
         build_status = self.app_builder.build_target(app_path, target='size')
         self.app_builder.clean(app_path)
@@ -50,10 +44,7 @@ class TestBuilder(unittest.TestCase):
     def test_build_elf(self):
         app_path = self.app_path
         build_status = self.app_builder.build_elf(app_path, pre_clean=False, post_clean=False)
-        print(build_status['build_cmd'])
-        print(build_status['time_cost'])
-        print(build_status['build_msg'])
-
+        print(build_status)
         self.app_builder.distclean(self.app_path)
 
     def test_build_bin_hex(self):
