@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='embarc_cli',
-    version='0.0.3',
+    version='0.1.77',
     description='This is a tool for Embedded Development with embARC',
     author='Jingru',
     author_email='1961295051@qq.com',
@@ -23,6 +23,5 @@ setup(
         'Jinja2'
     ],
 
-    include_package_data=True,
+    include_package_data = True,
 )
-

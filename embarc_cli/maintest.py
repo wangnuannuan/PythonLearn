@@ -36,6 +36,7 @@ def deploy():
         print("start untar file index.tar.gz")
         untar(file, ".")
         print("delete index.tar.gz")
+        popen(["ls"])
         delete_dir_files(file)
         git.add("--all")
         git.commit("deploy html")
