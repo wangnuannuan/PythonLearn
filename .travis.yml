@@ -24,6 +24,8 @@ install:
   - "pip install pyflakes"
   
 before_script:
+  - pip install --user awscli
+  - mkdir -p .cache/toolchain
   - bash .ci/script.sh
   - aws s3 sync s3://travis-build-stages-shared-storage-test/.cache/toolchain .cache/toolchain
 
