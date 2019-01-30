@@ -7,7 +7,8 @@ COLOR = False
 CLI_COLOR_MAP = {
     "info": "white",
     "warning": "yellow",
-    "error": "red"
+    "error": "red",
+    "success": "green"
 }
 
 COLOR_MATCHER = re.compile(r"(\w+)(\W+on\W+\w+)?")

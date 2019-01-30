@@ -127,16 +127,19 @@ def edit_yaml(filename, data):
         print("[embARC] Write to file %s" % file)
         return 0
 
+
 def read_json(path):
-    retult = None
+    result = None
     with open(path, "r") as f:
         result = json.load(f)
     return result
+
 
 def generate_json(data, path):
     with open(path, "w") as f:
         json.dump(data, f, indent=4)
         f.close()
+
 
 def copy_file(src, dst):
     """ Implement the behaviour of "shutil.copy(src, dst)" without copying the

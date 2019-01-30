@@ -1,18 +1,18 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
 import os
-import sys
 from embarc_tools.notify import print_string
-from embarc_tools.settings import EMBARC_OSP_URL, get_input
+from embarc_tools.settings import EMBARC_OSP_URL
 from ...osp import repo, osp
-from ...download_manager import getcwd, download_file, read_json
-from ...toolchain import gnu, metaware
+from ...download_manager import getcwd, read_json, unzip
+
 help = "Get, set or unset osp configuration."
 
 usage = ("\n    embarc config osp --add <name> <url/path> [<dest>]\n"
-        "    embarc config osp --set <name>\n"
-        "    embarc config osp --rename <oldname> <newname>\n"
-        "    embarc config osp --remove <name>\n"
-        "    embarc config osp --list")
+         "    embarc config osp --set <name>\n"
+         "    embarc config osp --rename <oldname> <newname>\n"
+         "    embarc config osp --remove <name>\n"
+         "    embarc config osp --list")
+
 
 def run(args, remainder=None):
     osppath = osp.OSP()
@@ -35,9 +35,11 @@ def run(args, remainder=None):
                     dest = None
             if os.path.exists(url) and os.path.isdir(url):
                 source_type = "local"
+                url = os.path.abspath(url)
                 msg = "Add this local (%s) to user profile osp.json" % (url)
-                print_string(msg, level="error")
+                print_string(msg)
                 osppath.set_path(name, source_type, url)
+                args.list = True
 
             elif os.path.exists(url) and os.path.isfile(url):
                 if url.endswith("zip"):
@@ -50,6 +52,8 @@ def run(args, remainder=None):
                     else:
                         source_type = "zip"
                         osppath.set_path(name, source_type, path, url)
+                        print_string("Add (%s) to user profile osp.json" % path)
+                        args.list = True
             elif url == EMBARC_OSP_URL:
                 osprepo = repo.Repo.fromurl(url)
                 path = dest if dest else getcwd()
@@ -60,7 +64,7 @@ def run(args, remainder=None):
                     print_string("Finish clone {}".format(osprepo.name))
                     osppath.set_path(name, source_type, os.path.join(path, name), url)
                     print_string("Add (%s) to user profile osp.json" % os.path.join(path, osprepo.name))
-                    return
+                    args.list = True
                 else:
                     print_string("There is already a folder or file named '%s' under current path" % name)
                     return
@@ -96,6 +100,7 @@ def run(args, remainder=None):
             return
 
     if args.list:
+        print_string("Current recored embARC source code")
         current_paths = osppath.list_path()
         makefile = osppath.get_makefile(getcwd())
         app_setting = dict()
@@ -110,15 +115,16 @@ def run(args, remainder=None):
         if current_paths:
             osppath.list_path(show=True, current=current_osp)
 
+
 def setup(subparser):
     subparser.usage = usage
     subparser.add_argument(
-        "--add", action='store_true',  help='Fetch the remote source code and add it to osp.json')
+        "--add", action='store_true', help='Fetch the remote source code and add it to osp.json')
     subparser.add_argument(
-        '-s', '--set',  help="Set a global EMBARC_OSP_ROOT, make sure you have added it to osp.json")
+        '-s', '--set', help="Set a global EMBARC_OSP_ROOT, make sure you have added it to osp.json")
     subparser.add_argument(
         "--rename", action='store_true', help="Rename osp source code.")
     subparser.add_argument(
-        '-rm', '--remove',  help="Remove the specified osp source code.")
+        '-rm', '--remove', help="Remove the specified osp source code.")
     subparser.add_argument(
         '-l', '--list', action='store_true', help="Show all recored embARC OSP source code")

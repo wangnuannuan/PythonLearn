@@ -1,14 +1,13 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
-import os
 from embarc_tools.notify import print_string
-from embarc_tools.settings import EMBARC_OSP_URL, get_input, SUPPORT_TOOLCHAIN
-from ...osp import repo, osp
-from ...download_manager import getcwd, download_file
+from embarc_tools.settings import get_input, SUPPORT_TOOLCHAIN
+from ...osp import osp
 from ...toolchain import gnu, metaware
 help = "Get, set toolchain configuration options."
 usage = ("\n    embarc config toolchain [--version] [--download] gnu\n"
-        "    embarc config toolchain mw\n"
-        "    embarc config toolchain --set <toolchain>\n")
+         "    embarc config toolchain mw\n"
+         "    embarc config toolchain --set <toolchain>\n")
+
 
 def run(args, remainder=None):
     if len(remainder) == 1 and remainder[0] in SUPPORT_TOOLCHAIN:
@@ -51,6 +50,7 @@ def run(args, remainder=None):
     else:
         print("usage: " + usage)
         return
+
 
 def setup(subparser):
     subparser.usage = usage

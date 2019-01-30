@@ -6,7 +6,6 @@ except ImportError:
     # Fall back to Python 2's urllib2
     from urllib2 import Request
     from urllib2 import urlopen
-import shutil
 import re
 import os
 from distutils.spawn import find_executable
@@ -14,9 +13,6 @@ from embarc_tools.toolchain import ARCtoolchain, ProcessException
 from embarc_tools.utils import pquery
 from embarc_tools.notify import print_string
 from .. download_manager import (download_file, extract_file, getcwd, mkdir, delete_dir_files)
-
-
-
 
 
 class Gnu(ARCtoolchain):
@@ -108,7 +104,6 @@ class Gnu(ARCtoolchain):
             return False
 
         else:
-            print(pack)
             file = pack.rsplit("/", 1)[1]
             version = re.search(r"[0-9]*\.[0-9]*", file).group(0)
             if version in os.listdir(path):
@@ -132,7 +127,7 @@ class Gnu(ARCtoolchain):
     def _lastest_url(self):
         pattern = re.compile('<ul.*?class="mt-1 mt-md-2">(.*?)</ul>', re.S | re.M)
         pattern2 = re.compile('<a.*?href=(.*?) rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<strong.*?</a>', re.S | re.M)
-        pack_format =  "_ide_win_install.exe" if self.get_platform() == "Windows" else "_prebuilt_elf32_le_linux_install.tar.gz"
+        pack_format = "_ide_win_install.exe" if self.get_platform() == "Windows" else "_prebuilt_elf32_le_linux_install.tar.gz"
         try:
             request = Request(self.root_url)
             response = urlopen(request)

@@ -45,11 +45,13 @@ BUILD_INFO_NAMES = ['EMBARC_ROOT', 'OUT_DIR_ROOT', 'BUILD_OPTION', 'APPLICATION_
 BUILD_CFG_NAMES = ['EMBARC_ROOT', 'OUT_DIR_ROOT', 'COMPILE_OPT', 'CXX_COMPILE_OPT', 'ASM_OPT', 'AR_OPT', 'LINK_OPT', 'DEBUGGER', 'DBG_HW_FLAGS', 'MDB_NSIM_OPT']
 BUILD_SIZE_SECTION_NAMES = ['text', 'data', 'bss']
 
+
 def get_input(input_str):
     if PYTHON_VERSION.startswith("2"):
         return raw_input(input_str)
     else:
         return input(input_str)
+
 
 def get_config(config):
     make_config = dict()
@@ -62,7 +64,3 @@ def get_config(config):
             else:
                 target = key
     return make_config, target
-
-
-
-

@@ -10,7 +10,6 @@ from .. download_manager import mkdir, delete_dir_files, cd, generate_json
 from ..osp import osp
 
 
-
 class embARC_Builder(object):
     def __init__(self, osproot=None, buildopts=None, outdir=None, embarc_config="embarc_app.json"):
         self.buildopts = dict()
@@ -43,9 +42,9 @@ class embARC_Builder(object):
         if not os.path.isdir(app_normpath):
             build_status['reason'] = 'Application folder doesn\'t exist!'
             build_status['result'] = False
-        if not (os.path.exists(app_normpath + '/makefile') or
-                os.path.exists(app_normpath + '/Makefile') or
-                os.path.exists(app_normpath + '/GNUmakefile')):
+        if not (os.path.exists(app_normpath + '/makefile')
+                or os.path.exists(app_normpath + '/Makefile')
+                or os.path.exists(app_normpath + '/GNUmakefile')):
             build_status['reason'] = 'Application makefile donesn\'t exist!'
             build_status['result'] = False
 
@@ -171,8 +170,6 @@ class embARC_Builder(object):
             build_status['reason'] = "Unrecognized build target"
             build_status['result'] = False
             return build_status
-
-
         build_cmd_list = build_cmd.split()
         for i in range(len(build_cmd_list)):
             if build_cmd_list[i].startswith("EMBARC_ROOT"):
@@ -180,9 +177,7 @@ class embARC_Builder(object):
         build_cmd = " ".join(build_cmd_list)
         print_string("Build command: {} ".format(build_cmd))
         build_status['build_cmd'] = build_cmd
-
         return build_status
-
 
     def build_target(self, app, target=None, parallel=8, coverity=False, silent=False):
         app_realpath, build_status = self.build_common_check(app)
@@ -201,7 +196,6 @@ class embARC_Builder(object):
         current_build_cmd = self.get_build_cmd(app_realpath, target, parallel, silent)
         build_status.update(current_build_cmd)
         build_cmd = build_status.get('build_cmd', None)
-
 
         print_string("Start to build application")
         return_code = 0
@@ -407,9 +401,8 @@ class embARC_Builder(object):
         build_status = self.build_target(app, target=str('boardclean'), parallel=parallel)
         return build_status
 
-
     def get_makefile_config(self, build_template=None):
-        current_build_templates = dict()
+        # current_build_templates = dict()
         ospclass = osp.OSP()
         build_template["APPL"] = self.buildopts.get("APPL", False)
         build_template["BOARD"] = self.buildopts.get("BOARD", False)
@@ -428,7 +421,6 @@ class embARC_Builder(object):
                 if not value:
                     build_template[key] = default_makefile_config.get(key, False)
             self.buildopts.update(build_template)
-
 
         osp_root, update = ospclass.check_osp(osp_root)
         self.make_options += 'EMBARC_ROOT=' + str(osp_root) + ' '
@@ -455,8 +447,8 @@ class embARC_Builder(object):
                 print_string("Error: {}".format(e))
                 sys.exit(1)
 
-        current_build_list = ["%s=%s"%(opt, build_template[opt]) for opt in BUILD_CONFIG_TEMPLATE.keys()]
-        self.make_options = " ".join(current_build_list)
+        current_build_list = ["%s=%s" % (opt, build_template[opt]) for opt in BUILD_CONFIG_TEMPLATE.keys()]
+        self.make_options = self.make_options + " ".join(current_build_list)
 
         self.buildopts.update(build_template)
         generate_json(self.buildopts, self.embarc_config)

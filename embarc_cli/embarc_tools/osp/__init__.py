@@ -70,7 +70,7 @@ class Git(object):
         for branch in branches:  # delete all local branches so the new repo clone is not poluted
             pquery([GIT_CMD, 'branch', '-D', branch])
 
-    def clone(url, name=None, depth=None, protocol=None, very_verbose=False, verbose=False):
+    def clone(url, name=None, depth=None, protocol=None, very_verbose=True, verbose=False):
         if very_verbose:
             popen([GIT_CMD, 'clone', formaturl(url, protocol), name] + (['--depth', depth] if depth else []) + (['-v'] if very_verbose else ([] if verbose else ['-q'])))
         else:
@@ -349,6 +349,7 @@ class Git(object):
                 show_progress('Downloading', (float(m.group(2)) / float(m.group(3))) * 20)
             if m.group(1) == "files":
                 show_progress('Downloading', (float(m.group(2)) / float(m.group(3))) * 100)
+
 
 ignores = [
     # Version control folders

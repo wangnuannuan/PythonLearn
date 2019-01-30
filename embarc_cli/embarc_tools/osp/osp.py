@@ -1,11 +1,11 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
 import os
 import sys
-from embarc_tools.notify import (print_string, print_table, COLORS, colorstring_to_escapecode)
-from embarc_tools.settings import MAKEFILENAMES, get_input, OSP_DIRS, EMBARC_OSP_URL
+from embarc_tools.notify import (print_string, colorstring_to_escapecode)
+from embarc_tools.settings import MAKEFILENAMES, get_input, OSP_DIRS
 from embarc_tools.exporter import Exporter
 from embarc_tools.utils import pquery
-from ..download_manager import generate_yaml, edit_yaml, cd, read_json, generate_json
+from ..download_manager import cd, read_json, generate_json
 
 
 class OSP(object):
@@ -22,19 +22,17 @@ class OSP(object):
         if not os.path.exists(fl):
             self.cfg_dict = dict()
             try:
-                generate_json(fl, self.cfg_dict)
+                generate_json(self.cfg_dict, fl)
             except Exception as e:
                 print("[embARC] Write file failed: {}".format(e))
         else:
             self.cfg_dict = read_json(fl)
 
-
-    def get_path(self, path): # find if path exists in osp.json
+    def get_path(self, path):  # find if path exists in osp.json
         fl = os.path.join(self.path, self.file)
         if not os.path.exists(fl):
             self.cfg_dict = dict()
             generate_json(self.cfg_dict, fl)
-        path = path.replace("\\", "/")
         try:
             self.cfg_dict = read_json(fl)
             current_paths = self.cfg_dict.get(path, False)
@@ -65,11 +63,11 @@ class OSP(object):
             self.generate_global()
         try:
             global_config = read_json(config_file)
-            if global_config.get(config, False) != False:
+            if global_config.get(config, False) is not False:
                 global_config[config] = value
-            elif global_config.get("BUILD_CONFIG", False) != False:
+            elif global_config.get("BUILD_CONFIG", False) is not False:
                 build_config = global_config["BUILD_CONFIG"]
-                if build_config.get(config, False) != False:
+                if build_config.get(config, False) is not False:
                     global_config["BUILD_CONFIG"][config] = value
                 else:
                     return False
@@ -216,7 +214,6 @@ class OSP(object):
                     result.append(file)
         return result
 
-
     def supported_olevels(self, root):
         app = "example/baremetal/arc_feature/timer_interrupt"
         app_path = os.path.join(root, app)
@@ -319,7 +316,6 @@ class OSP(object):
                         break
         return result
 
-
     def get_board_version(self, root, board, bd_version=None):
         result = []
         board_path = "board/" + board
@@ -371,6 +367,7 @@ class OSP(object):
                         result.append(filename)
 
         return result
+
     def get_tcf(self, root, board, bd_version, cur_core):
         result = None
         board_version_path_dict = self._board_version_config(root, board, bd_version)
@@ -382,6 +379,7 @@ class OSP(object):
                     result = os.path.join(root, cur_core_file)
                     break
         return result
+
     def get_makefile(self, app_path):
         for makefile in MAKEFILENAMES:
             makefile_path = os.path.join(app_path, makefile)

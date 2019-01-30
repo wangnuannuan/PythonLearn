@@ -7,6 +7,7 @@ import pkg_resources
 from embarc_tools import commands
 from embarc_tools.commands import config_commands
 
+
 def import_submodules(package, recursive=True):
     """ Import all submodules of a module, recursively, including subpackages
 
@@ -28,10 +29,13 @@ SUBCOMMANDS = import_submodules(commands, recursive=False)
 CONFIG_SUBCOMMANDS = import_submodules(config_commands)
 ver = pkg_resources.require("embarc_cli")[0].version
 
+
 def main():
-    parser = argparse.ArgumentParser(prog='embarc',
-    description="Command-line tool for embARC OSP - https://embarc.org/embarc_osp\nversion %s\n\nUse \"embarc <command> -h|--help\" for detailed help.\nOnline manual and guide available at https://github.com/foss-for-synopsys-dwc-arc-processors/embarc-cli" % ver,
-    formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(
+        prog='embarc',
+        description="Command-line tool for embARC OSP - https://embarc.org/embarc_osp\nversion %s\n\nUse \"embarc <command> -h|--help\" for detailed help.\nOnline manual and guide available at https://github.com/foss-for-synopsys-dwc-arc-processors/embarc-cli" % ver,
+        formatter_class=argparse.RawTextHelpFormatter
+    )
     parser.add_argument(
         "--version", action='version',
         version=pkg_resources.require("embarc_cli")[0].version,
@@ -42,7 +46,7 @@ def main():
     current_command = ["new", "build", "appconfig", "config"]
     subcommand = SUBCOMMANDS.keys()
     for key in subcommand:
-        if not key in current_command:
+        if key not in current_command:
             current_command.append(key)
     for key in current_command:
         subparser = subparsers.add_parser(key, help=SUBCOMMANDS[key].help, description=SUBCOMMANDS[key].description)
@@ -55,15 +59,7 @@ def main():
 
         SUBCOMMANDS[key].setup(subparser)
         subparser.set_defaults(func=SUBCOMMANDS[key].run)
-    '''
-    for name, module in SUBCOMMANDS.items():
-        subparser = subparsers.add_parser(name, help=module.help, description=module.description)
-
-        module.setup(subparser)
-        subparser.set_defaults(func=module.run)
-    '''
     args = None
-    argv_list = list()
     if len(sys.argv) == 1:
         return parser.print_help()
 

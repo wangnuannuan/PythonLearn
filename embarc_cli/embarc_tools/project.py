@@ -1,14 +1,13 @@
 from __future__ import print_function, absolute_import, unicode_literals
 import os
 import random
-import collections
 from embarc_tools.utils import merge_recursive, uniqify, pquery
 from embarc_tools.exporter import Exporter
 from embarc_tools.osp import osp
-from embarc_tools.notify import (print_string, print_table)
+from embarc_tools.notify import (print_string)
 from embarc_tools.download_manager import cd, getcwd
 from embarc_tools.toolchain import gnu
-from embarc_tools.settings import BUILD_CONFIG_TEMPLATE
+from embarc_tools.settings import BUILD_CONFIG_TEMPLATE, PYTHON_VERSION
 
 
 class Generator(object):
@@ -68,14 +67,12 @@ class Ide(object):
 
         osppath = osp.OSP()
 
-        support_board = osppath.support_board(common["root"])
-
+        # support_board = osppath.support_board(common["root"])
         openocd_cfg_dir = os.path.join(gnu_root_path,
-            "share",
-            "openocd",
-            "scripts",
-            "board"
-        )
+                                       "share",
+                                       "openocd",
+                                       "scripts",
+                                       "board")
         in_openocd_cfg_dir = os.listdir(openocd_cfg_dir)
 
         openocd_cfg_list = list()
@@ -111,7 +108,6 @@ class Ide(object):
         self.ide["common"]["nsim_tcf"] = nsim_tcf
         self.ide["common"]["nsim_port"] = 49105
 
-
     def _get_project_conf_template(self):
         cproject_template = self._get_cproject_template()
 
@@ -123,7 +119,7 @@ class Ide(object):
 
         make_tool = "make"
         opt_command = [make_tool]
-        self.buildopts.update(EMBARC_ROOT = self.buildopts.pop("EMBARC_OSP_ROOT"))
+        self.buildopts.update(EMBARC_ROOT=self.buildopts.pop("EMBARC_OSP_ROOT"))
         build_command_list = ["%s=%s" % (key, value) for (key, value) in self.buildopts.items()]
         self.ide["common"]["build_command"] = " ".join(build_command_list)
 
@@ -164,7 +160,6 @@ class Ide(object):
 
                     cproject_template["defines"].append(define)
 
-
         self.buildopts["OUT_DIR_ROOT"] = "${ProjDirPath}"
 
         cur_core = self.buildopts["CUR_CORE"]
@@ -180,7 +175,10 @@ class Ide(object):
             cproject_template["core"][core]["id"] = core_id
 
         for path in includes:
-            include = os.path.join(self.ide['common']["name"], "embARC", path)
+            if not path.startswith("obj_"):
+                include = os.path.join(self.ide['common']["name"], "embARC", path)
+            else:
+                include = os.path.join(self.ide['common']["name"], path)
 
             if path == ".":
                 include = self.ide["common"]["name"]
@@ -330,12 +328,15 @@ class Ide(object):
 
             self.get_asm_c_include()
             outdir = "."
-            launch = self.ide["common"]["name"] + "-" + self.ide["exporter"]["core"].keys()[0] + ".launch"
+            cores = self.ide["exporter"]["core"].keys()
+            if PYTHON_VERSION.startswith("3"):
+                cores = list(cores)
+            launch = self.ide["common"]["name"] + "-" + cores[0] + ".launch"
 
             exporter = Exporter(self.ide["common"]["toolchain"])
             print_string(
-                "Start to generate IDE project accroding to templates" +
-                " (.project.tmpl and .cproject.tmpl)"
+                "Start to generate IDE project accroding to templates"
+                + " (.project.tmpl and .cproject.tmpl)"
             )
             exporter.gen_file_jinja(
                 "project.tmpl", self.ide["common"], ".project", outdir
@@ -347,11 +348,11 @@ class Ide(object):
                 ".launch.tmpl", self.ide["exporter"], launch, outdir
             )
             print_string(
-                "Finish generate IDE project and the files are in " +
-                os.path.abspath(outdir)
+                "Finish generate IDE project and the files are in "
+                + os.path.abspath(outdir)
             )
             print_string(
-                "Open ARC GNU IDE (version) Eclipse "+
-                "- >File >Open Projects from File System >Paste\n" +
-                os.path.abspath(outdir)
+                "Open ARC GNU IDE (version) Eclipse "
+                + "- >File >Open Projects from File System >Paste\n"
+                + os.path.abspath(outdir)
             )

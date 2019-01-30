@@ -116,7 +116,7 @@ $ embarc new --quick
 [embARC] Start to generate makefile and main.c
 [embARC] Finish generate makefile and main.c, and they are in C:\Users\jingru\Documents\embarc\testcli\helloworld\helloworld
 ```
-
+<span class="tips">**Tip:** If you haven't set a global `EMBARC_OSP_ROOT`, it will raise `Can't get osp root from global setting`.
 When you create application with `embarc new`, it will generate a file `embarc_app.json` recording the parameters:
 ```
 {

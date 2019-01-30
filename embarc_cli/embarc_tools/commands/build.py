@@ -1,13 +1,14 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
 import os
+import sys
 from embarc_tools.project import Generator
 from embarc_tools.settings import get_input, get_config
 from ..builder import build
-from ..download_manager import cd, generate_file, getcwd, read_json
+from ..download_manager import cd, getcwd, read_json
 help = "Build application"
-description = (
-        "Compile code using toolchain\n"
-        "Currently supported Toolchain: GNU, MetaWare.")
+description = ("Compile code using toolchain\n"
+               "Currently supported Toolchain: GNU, MetaWare.")
+
 
 def run(args, remainder=None):
     osproot = None
@@ -18,6 +19,7 @@ def run(args, remainder=None):
         app_path = args.path
     else:
         app_path = getcwd()
+    app_path = os.path.abspath(app_path)
 
     if not (os.path.exists(app_path) and os.path.isdir(app_path)):
         print("[embARC] This is not a valid application path")
@@ -44,37 +46,17 @@ def run(args, remainder=None):
     if args.olevel:
         recordBuildConfig["OLEVEL"] = args.olevel
     if remainder:
-        make_config, target= get_config(remainder)
+        if (remainder[0]).startswith("-"):
+            print("embarc build: error: invalid parameter %s" % remainder[0])
+            sys.exit(1)
+        make_config, target = get_config(remainder)
         if target:
             args.target = target
         recordBuildConfig.update(make_config)
 
     builder = build.embARC_Builder(osproot, recordBuildConfig, curdir)
-
-    if args.target:
-        information = None
-        if args.target == "elf":
-            information = builder.build_elf(app_path, parallel=parallel, pre_clean=False, post_clean=False)
-        elif args.target == "bin":
-            information = builder.build_bin(app_path, parallel=parallel, pre_clean=False, post_clean=False)
-        elif args.target == "hex":
-            information = builder.build_hex(app_path, parallel=parallel, pre_clean=False, post_clean=False)
-        elif args.target == "clean":
-            information = builder.clean(app_path)
-        elif args.target == "distclean":
-            information = builder.distclean(app_path)
-        elif args.target == "boardclean":
-            information = builder.boardclean(app_path)
-        elif args.target == "info":
-            information = builder.get_build_info(app_path)
-        elif args.target == "size":
-            information = builder.get_build_size(app_path)
-        elif args.target:
-            information = builder.build_target(app_path, target=args.target, parallel=False, coverity=False)
-        else:
-            print("[embARC] Please choose right target")
-
     if args.export:
+        builder.get_build_cmd(app_path, target=None, parallel=parallel, silent=False)
         with cd(app_path):
             if os.path.exists(".project") and os.path.exists(".cproject"):
                 while True:
@@ -89,6 +71,32 @@ def run(args, remainder=None):
             recordBuildConfig = read_json(embarc_config)
             for project in generator.generate(buildopts=recordBuildConfig):
                 project.generate()
+        sys.exit(0)
+    if args.target:
+        information = None
+        if args.target == "elf":
+            information = builder.build_elf(app_path, parallel=parallel, pre_clean=False, post_clean=False)
+        elif args.target == "bin":
+            information = builder.build_bin(app_path, parallel=parallel, pre_clean=False, post_clean=False)
+        elif args.target == "hex":
+            information = builder.build_hex(app_path, parallel=parallel, pre_clean=False, post_clean=False)
+        elif args.target == "clean":
+            information = builder.clean(app_path, parallel=parallel)
+        elif args.target == "distclean":
+            information = builder.distclean(app_path, parallel=parallel)
+        elif args.target == "boardclean":
+            information = builder.boardclean(app_path, parallel=parallel)
+        elif args.target == "info":
+            information = builder.get_build_info(app_path, parallel=parallel)
+        elif args.target == "size":
+            information = builder.get_build_size(app_path, parallel=parallel)
+        elif args.target:
+            information = builder.build_target(app_path, target=args.target, parallel=parallel, coverity=False)
+        else:
+            print("[embARC] Please choose right target")
+        if information:
+            if information.get("result") is False:
+                print("[embARC] Failed: {}".format(information.get("reason")))
 
 
 def setup(subparser):
@@ -107,7 +115,7 @@ def setup(subparser):
     subparser.add_argument(
         "-t", "--toolchain", help="Build toolchain. Example: gnu, mw")
     subparser.add_argument(
-        "-j", "--parallel", default=False, help="Build application with -j")
+        "-j", "--parallel", type=int, help="Build application with -j")
     subparser.add_argument(
         "--target", default="all", choices=["elf", "bin", "hex", "size", "info", "opt" "all", "run", "clean"], help="Choose build target, default target is all")
     subparser.add_argument(

@@ -2,16 +2,15 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 import os
 import collections
 from embarc_tools.settings import SUPPORT_TOOLCHAIN, OLEVEL
-from embarc_tools.utils import pquery
 from embarc_tools.notify import print_string, print_table
-from ..download_manager import getcwd, cd, read_json, generate_json, mkdir
+from ..download_manager import getcwd, read_json, generate_json
 from ..osp import osp
-from ..builder import build
+
 help = "Get or set application config"
-description = (
-        "Show detail config.\n"
-        "Currently supported options: board, board verion, ccurrent core, toolchain, olevel and embarc root.\n"
-        "Result is to look for embarc_app.json, default options in makefile will be overridden by it")
+description = ("Show detail config.\n"
+               "Currently supported options: board, board verion, ccurrent core, toolchain, olevel and embarc root.\n"
+               "Result is to look for embarc_app.json, default options in makefile will be overridden by it")
+
 
 def run(args, remainder=None):
     root = getcwd()
@@ -57,8 +56,6 @@ def run(args, remainder=None):
         msg.append(table_content)
         print_table(msg)
 
-
-
     else:
         print_string("[embARC] Please set a valid application path")
         return
@@ -79,4 +76,3 @@ def setup(subparser):
         "--osp_root", help="Set embARC osp root path")
     subparser.add_argument(
         "-o", "--olevel", help="Set olevel")
-
