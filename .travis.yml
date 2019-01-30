@@ -25,10 +25,16 @@ install:
   
 before_script:
   - bash .ci/script.sh
+  - aws s3 sync s3://travis-build-stages-shared-storage-test/.cache/toolchain .cache/toolchain
 
 script: 
   - "cd embarc_cli"
   - "python maintest.py"
+
+addons:
+  artifacts:
+    paths:
+    - .cache/result
 
 jobs:
   include:
@@ -36,3 +42,5 @@ jobs:
       script: 
         - "cd embarc_cli"
         - "python maintest.py"
+      after_success:
+              - aws s3 rm --recursive s3://travis-build-stages-shared-storage-test/.cache/toolchain # clean up after ourselves

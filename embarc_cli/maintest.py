@@ -14,6 +14,7 @@ pythonversion = os.environ.get("TRAVIS_PYTHON_VERSION")
 
 
 def deploy():
+    popen(["ls"])
     file = "index.tar.gz"
     tar = tarfile.open(file, "w:gz")
     for version in os.listdir(".cache/result"):
