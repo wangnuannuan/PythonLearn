@@ -28,3 +28,5 @@ if [ -d $ARC_DEV_TOOL_ROOT ] ; then
 else
     die "The toolchain path does not exist "
 fi
+if [ "${TOOLCHAIN}" == "gnu" ] ; then
+    arc-elf32-gcc -v || die "ARC GNU toolchain is not installed correctly"
