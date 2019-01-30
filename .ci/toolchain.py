@@ -6,7 +6,6 @@ import shutil
 import argparse
 from embarc_tools.toolchain import gnu
 
-
 def is_number(s):
     try:
         float(s)

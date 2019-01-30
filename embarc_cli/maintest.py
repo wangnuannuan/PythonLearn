@@ -33,7 +33,9 @@ def deploy():
         git.fetch()
         popen(["git", "checkout", "-b", "gh-pages", "origin/gh-pages"])
         copy_file("../index.tar.gz", ".")
+        print("start untar file index.tar.gz")
         untar(file, ".")
+        print("delete index.tar.gz")
         delete_dir_files(file)
         git.add("--all")
         git.commit("deploy html")
@@ -41,6 +43,7 @@ def deploy():
             print("start to deploy")
             git.publish()
         except Exception as e:
+            print("pull code")
             popen(["git", "pull", url, "gh-pages"])
             git.publish()
         # popen(["git", "push", url, "gh-pages:gh-pages"])
