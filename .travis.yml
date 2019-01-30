@@ -1,27 +1,30 @@
 
 language: python
 cache: pip
-python:
-  - "2.7"
-  - "3.6"
-  - "3.5"
-  - "3.4"
-  - "pypy"
+
 #sudo: false # Use container-based infrastructure
 sudo: required
 dist: trusty
-install:
-  - "sudo apt-get update"
-  - "sudo apt-get install lib32z1"
-  - "sudo apt-get install dos2unix"
-  - "pip install embarc_cli"
-  - "pip install coverage"
-  - "pip install pycodestyle"
-  - "pip install pyflakes"
-  
-before_script:
-  - bash .ci/script.sh
-
-script: 
-  - "cd embarc_cli"
-  - "python maintest.py"
+jobs:
+  include:
+    - stage: build
+      python:
+        - "2.7"
+        - "3.6"
+        - "3.5"
+        - "3.4"
+        - "pypy"
+      install:
+        - "sudo apt-get update"
+        - "sudo apt-get install lib32z1"
+        - "sudo apt-get install dos2unix"
+        - "pip install embarc_cli"
+        - "pip install coverage"
+        - "pip install pycodestyle"
+        - "pip install pyflakes"
+      before_script: bash .ci/script.sh
+      script: 
+        - "cd embarc_cli"
+        - "python maintest.py"
+    - stage: unit tests
+      script: echo two
