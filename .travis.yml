@@ -26,11 +26,11 @@ install:
 before_script:
 
   - mkdir -p .cache/toolchain
-  - bash .ci/script.sh
+
 #  - aws s3 sync s3://travis-build-stages-shared-storage-test/.cache/toolchain .cache/toolchain addon base on aws too
 
 script: 
-  - "python embarc_cli/maintest.py"
+  - bash .ci/script.sh
 
 addons:
   artifacts:

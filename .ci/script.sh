@@ -31,3 +31,4 @@ fi
 if [ "${TOOLCHAIN}" == "gnu" ] ; then
     arc-elf32-gcc -v || die "ARC GNU toolchain is not installed correctly"
 fi
+python embarc_cli/maintest.py
