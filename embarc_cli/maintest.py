@@ -33,6 +33,8 @@ def deploy():
         git.fetch()
         popen(["git", "checkout", "-b", "gh-pages", "origin/gh-pages"])
         copy_file("../index.tar.gz", ".")
+        popen(["ls"])
+        delete_dir_files(pythonversion + "index.html")
         print("start untar file index.tar.gz")
         untar(file, ".")
         print("delete index.tar.gz")
