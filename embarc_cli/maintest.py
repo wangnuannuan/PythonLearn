@@ -50,6 +50,7 @@ def get_allcase(case_path):
 
 
 def before_install():
+
     os.system("pycodestyle embarc_tools --ignore=E501")
     os.system("pyflakes embarc_tools")
     ospclass = osp.OSP()
@@ -69,23 +70,24 @@ def before_install():
         ospclass.set_global(config, str("new_osp"))
 
 if __name__ == '__main__':
-    COV = coverage.coverage(branch=True, include='./embarc_tools/*')
-    COV.start()
-    before_install()
-    testfilepath = pythonversion + "index.html"
-    ftp = open(testfilepath, 'wb')
-    # runner = unittest.TextTestRunner()
-    runner = HTMLTestRunner.HTMLTestRunner(stream=ftp, verbosity=2, title=pythonversion)
-    runner.run(get_allcase("."))
-    ftp.close()
-    COV.stop()
-    COV.save()
-    print('Coverage Summary:')
-    COV.report()
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    covdir = os.path.join(basedir, 'coverage')
-    COV.html_report(directory=covdir)
-    deploy()
-    print('HTML version: file://%s/index.html' % covdir)
-    print("See test result from https://wangnuannuan.github.io/PythonLearn")
-    COV.erase()
+    with cd("embarc_cli"):
+        COV = coverage.coverage(branch=True, include='./embarc_tools/*')
+        COV.start()
+        before_install()
+        testfilepath = pythonversion + "index.html"
+        ftp = open(testfilepath, 'wb')
+        # runner = unittest.TextTestRunner()
+        runner = HTMLTestRunner.HTMLTestRunner(stream=ftp, verbosity=2, title=pythonversion)
+        runner.run(get_allcase("."))
+        ftp.close()
+        COV.stop()
+        COV.save()
+        print('Coverage Summary:')
+        COV.report()
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        covdir = os.path.join(basedir, 'coverage')
+        COV.html_report(directory=covdir)
+        deploy()
+        print('HTML version: file://%s/index.html' % covdir)
+        print("See test result from https://wangnuannuan.github.io/PythonLearn")
+        COV.erase()
