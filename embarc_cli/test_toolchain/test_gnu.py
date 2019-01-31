@@ -51,7 +51,6 @@ class TestToolchain(unittest.TestCase):
             # windows_env_set_arc.set_env_path(env_obj, 'Path', toolchain_root)
             # return True
         elif platform == "Linux":
-            toolchain_root = os.path.dirname(toolchain_root)
             try:
                 bashrc = os.path.join(os.path.expanduser("~"), '.bashrc')
                 content = list()
