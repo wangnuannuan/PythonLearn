@@ -103,7 +103,7 @@ def build_config(args):
 
     if not osppath.is_osp(input_root):
         input_root = osppath.get_path(input_root)
-    osp_root = input_root
+    osp_root = input_root if osppath.is_osp(input_root) else None
     if not osp_root:
         msg = "What you choose is not a valid osp root"
         print_string(msg, level="warning")

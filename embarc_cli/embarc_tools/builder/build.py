@@ -3,7 +3,7 @@ import sys
 import os
 import time
 import collections
-from embarc_tools.settings import BUILD_CONFIG_TEMPLATE, BUILD_OPTION_NAMES, BUILD_INFO_NAMES, BUILD_CFG_NAMES, BUILD_SIZE_SECTION_NAMES, get_config
+from embarc_tools.settings import BUILD_CONFIG_TEMPLATE, BUILD_OPTION_NAMES, BUILD_INFO_NAMES, BUILD_CFG_NAMES, BUILD_SIZE_SECTION_NAMES, get_config, MAKEFILENAMES
 from embarc_tools.utils import pqueryOutputinline, pqueryTemporaryFile
 from embarc_tools.notify import (print_string, print_table)
 from .. download_manager import mkdir, delete_dir_files, cd, generate_json
@@ -28,12 +28,23 @@ class embARC_Builder(object):
 
         if buildopts is not None:
             self.buildopts.update(buildopts)
-            for opt in BUILD_OPTION_NAMES:
-                if opt in buildopts:
-                    option = str(opt) + '=' + self.buildopts[opt] + ' '
-                    make_options += option
         self.make_options = make_options
         self.embarc_config = embarc_config
+
+    @staticmethod
+    def is_embarc_makefile(app):
+        with open(app) as f:
+            embarc_root = False
+            appl = False
+            lines = f.read().splitlines()
+            for line in lines:
+                if "EMBARC_ROOT" in line:
+                    embarc_root = True
+                if "APPL" in line:
+                    appl = True
+                if embarc_root and appl:
+                    return True
+            return False
 
     @staticmethod
     def build_common_check(app):
@@ -42,11 +53,18 @@ class embARC_Builder(object):
         if not os.path.isdir(app_normpath):
             build_status['reason'] = 'Application folder doesn\'t exist!'
             build_status['result'] = False
-        if not (os.path.exists(app_normpath + '/makefile')
-                or os.path.exists(app_normpath + '/Makefile')
-                or os.path.exists(app_normpath + '/GNUmakefile')):
+        current_makefile = None
+        for makename in MAKEFILENAMES:
+            if makename in os.listdir(app_normpath):
+                current_makefile = os.path.join(app_normpath, makename)
+                break
+        if not current_makefile:
             build_status['reason'] = 'Application makefile donesn\'t exist!'
             build_status['result'] = False
+        else:
+            if not embARC_Builder.is_embarc_makefile(current_makefile):
+                build_status['reason'] = 'Application makefile is invalid!'
+                build_status['result'] = False
 
         app_realpath = os.path.realpath(app_normpath)
         build_status['app_path'] = app_realpath
