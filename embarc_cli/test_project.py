@@ -13,7 +13,7 @@ class TestIde(unittest.TestCase):
         self.app_path = os.path.join(self.osp_root, "example/baremetal/blinky")
 
     def test_generate(self):
-        popen(["python","rmbarc_cli/embarc_tools/main.py", "build", "--path", self.app_path, "-g"])
+        popen(["python","embarc_cli/embarc_tools/main.py", "build", "--path", self.app_path, "-g"])
         self.assertTrue(os.path.exists(os.path.join(self.app_path, file1)))
         self.assertTrue(os.path.exists(os.path.join(self.app_path,file2)))
 
