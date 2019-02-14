@@ -1,8 +1,8 @@
-from __future__ import print_function, division, absolute_import, unicode_literals
+from __future__ import print_function, division, unicode_literals
 import os
 import sys
-from embarc_tools.project import Generator
-from embarc_tools.settings import get_input, get_config
+from ..project import Generator
+from ..settings import get_input, get_config
 from ..builder import build
 from ..download_manager import cd, getcwd, read_json
 help = "Build application"

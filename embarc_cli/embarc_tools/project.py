@@ -1,13 +1,13 @@
-from __future__ import print_function, absolute_import, unicode_literals
+from __future__ import print_function, unicode_literals
 import os
 import random
-from embarc_tools.utils import merge_recursive, uniqify, pquery
-from embarc_tools.exporter import Exporter
-from embarc_tools.osp import osp
-from embarc_tools.notify import (print_string)
-from embarc_tools.download_manager import cd, getcwd
-from embarc_tools.toolchain import gnu
-from embarc_tools.settings import BUILD_CONFIG_TEMPLATE, PYTHON_VERSION
+from .utils import merge_recursive, uniqify, pquery
+from .exporter import Exporter
+from .osp import osp
+from .notify import (print_string)
+from .download_manager import cd, getcwd
+from .toolchain import gnu
+from .settings import BUILD_CONFIG_TEMPLATE, PYTHON_VERSION
 
 
 class Generator(object):

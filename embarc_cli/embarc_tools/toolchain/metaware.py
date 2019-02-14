@@ -1,9 +1,9 @@
-from __future__ import print_function, division, absolute_import, unicode_literals
+from __future__ import print_function, division, unicode_literals
 from distutils.spawn import find_executable
 import re
 import os
-from embarc_tools.toolchain import ARCtoolchain
-from embarc_tools.utils import pquery
+from ..toolchain import ARCtoolchain
+from ..utils import pquery
 
 
 class Mw(ARCtoolchain):

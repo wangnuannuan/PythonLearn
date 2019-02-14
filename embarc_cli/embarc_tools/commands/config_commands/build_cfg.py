@@ -1,5 +1,5 @@
-from __future__ import print_function, division, absolute_import, unicode_literals
-from embarc_tools.notify import print_string
+from __future__ import print_function, division, unicode_literals
+from ...notify import print_string
 from ...osp import osp
 
 help = "Set global build configuration."

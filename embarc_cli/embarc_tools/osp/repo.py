@@ -1,4 +1,4 @@
-from __future__ import print_function, absolute_import, unicode_literals
+from __future__ import print_function, unicode_literals
 try:
     # Python 2
     basestring = (unicode, str)
@@ -11,9 +11,9 @@ except NameError:
 import os
 import re
 import shutil
-from embarc_tools.osp import (formaturl, REGEX_LOCAL_REF, REGEX_URL_REF, SCMS, ProcessException)
-from embarc_tools.notify import print_string
-from .. download_manager import (getcwd, cd, rmtree_readonly, cwd_root, relpath)
+from ..osp import (formaturl, REGEX_LOCAL_REF, REGEX_URL_REF, SCMS, ProcessException)
+from ..notify import print_string
+from ..download_manager import (getcwd, cd, rmtree_readonly, cwd_root, relpath)
 
 
 class Repo(object):

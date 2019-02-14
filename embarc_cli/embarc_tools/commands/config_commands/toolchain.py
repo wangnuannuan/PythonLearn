@@ -1,6 +1,6 @@
-from __future__ import print_function, division, absolute_import, unicode_literals
-from embarc_tools.notify import print_string
-from embarc_tools.settings import get_input, SUPPORT_TOOLCHAIN
+from __future__ import print_function, division, unicode_literals
+from ...notify import print_string
+from ...settings import get_input, SUPPORT_TOOLCHAIN
 from ...osp import osp
 from ...toolchain import gnu, metaware
 help = "Get, set toolchain configuration options."

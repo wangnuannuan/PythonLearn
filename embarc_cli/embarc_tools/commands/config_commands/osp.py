@@ -1,7 +1,7 @@
-from __future__ import print_function, division, absolute_import, unicode_literals
+from __future__ import print_function, division, unicode_literals
 import os
-from embarc_tools.notify import print_string
-from embarc_tools.settings import EMBARC_OSP_URL
+from ...notify import print_string
+from ...settings import EMBARC_OSP_URL
 from ...osp import repo, osp
 from ...download_manager import getcwd, read_json, unzip
 
@@ -118,13 +118,14 @@ def run(args, remainder=None):
 
 def setup(subparser):
     subparser.usage = usage
-    subparser.add_argument(
+    mutualex_group = subparser.add_mutually_exclusive_group()
+    mutualex_group.add_argument(
         "--add", action='store_true', help='Fetch the remote source code and add it to osp.json')
-    subparser.add_argument(
+    mutualex_group.add_argument(
         '-s', '--set', help="Set a global EMBARC_OSP_ROOT, make sure you have added it to osp.json")
-    subparser.add_argument(
+    mutualex_group.add_argument(
         "--rename", action='store_true', help="Rename osp source code.")
-    subparser.add_argument(
+    mutualex_group.add_argument(
         '-rm', '--remove', help="Remove the specified osp source code.")
     subparser.add_argument(
         '-l', '--list', action='store_true', help="Show all recored embARC OSP source code")

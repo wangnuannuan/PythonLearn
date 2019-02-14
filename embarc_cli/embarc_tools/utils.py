@@ -1,4 +1,4 @@
-from __future__ import print_function, absolute_import, unicode_literals
+from __future__ import print_function, unicode_literals
 from functools import reduce
 import random
 import time
@@ -9,8 +9,8 @@ import subprocess
 import errno
 import os
 import yaml
-from embarc_tools.download_manager import getcwd
-from embarc_tools.settings import PYTHON_VERSION
+from .download_manager import getcwd
+from .settings import PYTHON_VERSION
 
 
 def uniqify(_list):

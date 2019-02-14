@@ -1,11 +1,11 @@
-from __future__ import print_function, absolute_import, unicode_literals
+from __future__ import print_function, unicode_literals
 import argparse
 import sys
 import pkgutil
 import importlib
 import pkg_resources
-from embarc_tools import commands
-from embarc_tools.commands import config_commands
+from . import commands
+from .commands import config_commands
 
 
 def import_submodules(package, recursive=True):

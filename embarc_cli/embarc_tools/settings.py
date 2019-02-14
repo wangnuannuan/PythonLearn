@@ -1,4 +1,4 @@
-from __future__ import print_function, absolute_import, unicode_literals
+from __future__ import print_function, unicode_literals
 import platform
 
 EMBARC_OSP_URL = "https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_osp.git"

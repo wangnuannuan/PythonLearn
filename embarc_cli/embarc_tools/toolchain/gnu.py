@@ -1,4 +1,4 @@
-from __future__ import print_function, division, absolute_import, unicode_literals
+from __future__ import print_function, division, unicode_literals
 try:
     # For Python 3.0 and later
     from urllib.request import urlopen, Request
@@ -9,9 +9,9 @@ except ImportError:
 import re
 import os
 from distutils.spawn import find_executable
-from embarc_tools.toolchain import ARCtoolchain, ProcessException
-from embarc_tools.utils import pquery
-from embarc_tools.notify import print_string
+from ..toolchain import ARCtoolchain, ProcessException
+from ..utils import pquery
+from ..notify import print_string
 from .. download_manager import (download_file, extract_file, getcwd, mkdir, delete_dir_files)
 
 

@@ -1,10 +1,10 @@
-from __future__ import print_function, division, absolute_import, unicode_literals
+from __future__ import print_function, division, unicode_literals
 import os
 import sys
-from embarc_tools.notify import (print_string, colorstring_to_escapecode)
-from embarc_tools.settings import MAKEFILENAMES, get_input, OSP_DIRS
-from embarc_tools.exporter import Exporter
-from embarc_tools.utils import pquery
+from ..notify import (print_string, colorstring_to_escapecode)
+from ..settings import MAKEFILENAMES, get_input, OSP_DIRS
+from ..exporter import Exporter
+from ..utils import pquery
 from ..download_manager import cd, read_json, generate_json
 
 
