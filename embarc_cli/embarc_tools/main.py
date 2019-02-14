@@ -5,7 +5,7 @@ import pkgutil
 import importlib
 import pkg_resources
 from embarc_tools import commands
-from .commands import config_commands
+from embarc_tools.commands import config_commands
 
 
 def import_submodules(package, recursive=True):
