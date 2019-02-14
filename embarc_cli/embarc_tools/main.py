@@ -4,7 +4,7 @@ import sys
 import pkgutil
 import importlib
 import pkg_resources
-from . import commands
+from embarc_tools import commands
 from .commands import config_commands
 
 
