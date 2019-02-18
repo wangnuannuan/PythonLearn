@@ -1,4 +1,4 @@
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, absolute_import, unicode_literals
 from distutils.spawn import find_executable
 import os
 from ..settings import GNU_PATH, MW_PATH, SUPPORT_TOOLCHAIN, CURRENT_PLATFORM

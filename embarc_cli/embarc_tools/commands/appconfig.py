@@ -1,10 +1,12 @@
 from __future__ import print_function, division, unicode_literals
 import os
+import sys
 import collections
 from ..settings import SUPPORT_TOOLCHAIN, OLEVEL
 from ..notify import print_string, print_table
-from ..download_manager import getcwd, read_json, generate_json
+from ..download_manager import getcwd, read_json, generate_json, cd
 from ..osp import osp
+from ..builder import build
 
 help = "Get or set application config"
 description = ("Show detail config.\n"
@@ -13,9 +15,14 @@ description = ("Show detail config.\n"
 
 
 def run(args, remainder=None):
+    if remainder:
+        print("[embARC] embarc appconfig: error: invalid parameter %s" % remainder[0])
+        sys.exit(1)
     root = getcwd()
     app_path = None
+    recordBuildConfig = dict()
     osppath = osp.OSP()
+    osp_root = None
 
     if not args.application:
         app_path = root
@@ -25,36 +32,26 @@ def run(args, remainder=None):
     makefile = osppath.get_makefile(app_path)
     if makefile:
         embarc_config = os.path.join(app_path, "embarc_app.json")
-        defaultBuildConfig = dict()
-        defaultBuildConfig = collections.OrderedDict()
-        _, defaultBuildConfig = osppath.get_makefile_config(defaultBuildConfig)
         if os.path.exists(embarc_config):
-            print_string("Read embarc_config.json")
-            recordConfig = read_json(embarc_config)
-            defaultBuildConfig.update(recordConfig)
-
+            print("[embARC] Read embarc_app.json")
+            recordBuildConfig = read_json(embarc_config)
+        if args.board:
+            recordBuildConfig["BOARD"] = args.board
+        if args.bd_ver:
+            recordBuildConfig["BD_VER"] = args.bd_ver
+        if args.cur_core:
+            recordBuildConfig["CUR_CORE"] = args.cur_core
+        if args.toolchain:
+            recordBuildConfig["TOOLCHAIN"] = args.toolchain
+        if args.olevel:
+            recordBuildConfig["OLEVEL"] = args.olevel
         if args.osp_root:
             osp_root, _ = osppath.check_osp(args.osp_root)
-            defaultBuildConfig["EMBARC_OSP_ROOT"] = osp_root.replace("\\", "/")
-
-        if args.board:
-            defaultBuildConfig["BOARD"] = args.board
-        if args.bd_ver:
-            defaultBuildConfig["BD_VER"] = args.bd_ver
-        if args.cur_core:
-            defaultBuildConfig["CUR_CORE"] = args.cur_core
-        if args.toolchain and args.toolchain in SUPPORT_TOOLCHAIN:
-            defaultBuildConfig["TOOLCHAIN"] = args.toolchain
-        if args.olevel and args.olevel in OLEVEL:
-            defaultBuildConfig["OLEVEL"] = args.olevel
-
-        generate_json(defaultBuildConfig, embarc_config)
-        print_string("Current configuraion")
-        table_head = ["option", "value"]
-        table_content = [[key, value] for key, value in defaultBuildConfig.items()]
-        msg = [table_head]
-        msg.append(table_content)
-        print_table(msg)
+            recordBuildConfig["EMBARC_OSP_ROOT"] = osp_root.replace("\\", "/")
+        builder = build.embARC_Builder(osp_root, recordBuildConfig)
+        build_config_template = builder.get_build_template()
+        with cd(app_path):
+            builder.get_makefile_config(build_config_template)
 
     else:
         print_string("[embARC] Please set a valid application path")
