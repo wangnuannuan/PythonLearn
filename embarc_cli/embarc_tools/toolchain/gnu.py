@@ -138,6 +138,7 @@ class Gnu(ARCtoolchain):
 
             div_bf = BeautifulSoup(content) # re.findall(pattern, content)
             items = div_bf.find_all('div', class_ = 'Box Box--condensed mt-3')
+            print(items)
             latesturl = None
             if items:
                 a_bf = BeautifulSoup(items[0])
