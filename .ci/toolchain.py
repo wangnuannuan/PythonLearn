@@ -30,8 +30,8 @@ def store_gnu_toolchain(version, path):
         version = None
     gnu_toolchain = None
     os.chdir("embarc_cli")
-    from embarc_tools.toolchain import gnu
-    gnu_toolchain = gnu.Gnu()
+    from embarc_tools import toolchain
+    gnu_toolchain = toolchain.gnu.Gnu()
     os.chdir("..")
     gnu_tgz_path = gnu_toolchain.download(version, path)
     # gnu_tgz_path = download_gnu(version, path)
