@@ -1,13 +1,12 @@
 #! /usr/bin/env python
 
 import os
-import sys
 import re
 import shutil
 import argparse
-# sys.path.append( os.path.join(os.path.dirname( os.path.dirname( os.path.abspath(__file__) ) ), "embarc_cli") )
-# from ..embarc_cli.embarc_tools.toolchain import gnu
-
+import sys
+sys.path.append('embarc_cli/embarc_tools')
+from embarc_tools.toolchain import gnu
 def is_number(s):
     try:
         float(s)
@@ -28,11 +27,7 @@ def store_gnu_toolchain(version, path):
     gnu_version = version
     if not is_number(version):
         version = None
-    gnu_toolchain = None
-    os.chdir("embarc_cli")
-    from embarc_tools import toolchain
-    gnu_toolchain = toolchain.gnu.Gnu()
-    os.chdir("..")
+    gnu_toolchain = gnu.Gnu()
     gnu_tgz_path = gnu_toolchain.download(version, path)
     # gnu_tgz_path = download_gnu(version, path)
     gnu_root_path = None
