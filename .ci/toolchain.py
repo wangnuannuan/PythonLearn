@@ -5,8 +5,10 @@ import re
 import shutil
 import argparse
 import sys
-sys.path.append('embarc_cli/embarc_tools')
+sys.path.append('embarc_cli')
 from embarc_tools.toolchain import gnu
+
+
 def is_number(s):
     try:
         float(s)
