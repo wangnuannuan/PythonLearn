@@ -20,7 +20,8 @@ setup(
         'PyYAML',
         'colorama',
         'PrettyTable',
-        'Jinja2'
+        'Jinja2',
+        'beautifulsoup4'
     ],
 
     include_package_data = True,

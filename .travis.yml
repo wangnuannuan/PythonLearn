@@ -23,6 +23,7 @@ install:
   - "pip install pycodestyle"
   - "pip install pyflakes"
   - "pip install awscli"
+  - "pip install beautifulsoup4"
 before_script:
 
   - mkdir -p .cache/toolchain

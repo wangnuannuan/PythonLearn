@@ -8,6 +8,7 @@ except ImportError:
     from urllib2 import urlopen
 import re
 import os
+from bs4 import BeautifulSoup
 from distutils.spawn import find_executable
 from ..toolchain import ARCtoolchain, ProcessException
 from ..utils import pquery
@@ -124,26 +125,29 @@ class Gnu(ARCtoolchain):
         self.set_toolchain_env("gnu", path)
 
     def _lastest_url(self):
-        pattern = re.compile('<ul.*?class="mt-1 mt-md-2">(.*?)</ul>', re.S | re.M)
-        pattern2 = re.compile('<a.*?href=(.*?) rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<strong.*?</a>', re.S | re.M)
+
+        # pattern = re.compile('<ul.*?class="mt-1 mt-md-2">(.*?)</ul>', re.S | re.M)
+        # pattern2 = re.compile('<a.*?href=(.*?) rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<strong.*?</a>', re.S | re.M)
+        # pattern = re.compile('<div class="Box Box--condensed mt-3">(.*?)</div>', re.S | re.M)
+        pattern2 = re.compile('<a.*?href=(.*?) rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<span.*?</a>', re.S | re.M)
         pack_format = "_ide_win_install.exe" if self.get_platform() == "Windows" else "_prebuilt_elf32_le_linux_install.tar.gz"
         try:
             request = Request(self.root_url)
             response = urlopen(request)
             content = response.read().decode('utf-8')
 
-            items = re.findall(pattern, content)
+            div_bf = BeautifulSoup(content) # re.findall(pattern, content)
+            items = div_bf.find_all('div', class_ = 'Box Box--condensed mt-3')
             latesturl = None
-
-            for item in items:
-                itemsnow = re.findall(pattern2, item)
-                for i in itemsnow:
-                    if pack_format in i:
-                        latesturl = i.strip('"')
+            if items:
+                a_bf = BeautifulSoup(items[0])
+                a_items = a_bf.find_all('a', class_ = 'd-flex flex-items-center')
+                for a_item in a_items:
+                    a_url = a_item.get('href')
+                    if pack_format in a_url:
+                        latesturl = a_url
                         break
-                if latesturl:
-                    break
-            return latesturl
+                return latesturl
         except urllib2.URLError as e:
             if hasattr(e, "code"):
                 print_string(e, level="warning")
