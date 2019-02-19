@@ -146,4 +146,4 @@ class Gnu(ARCtoolchain):
                 print_string(e.reason, level="warning")
         else:
             print_string("Can not get latest veriosn Gnu")
-        
+            

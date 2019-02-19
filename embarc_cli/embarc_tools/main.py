@@ -1,11 +1,13 @@
 from __future__ import print_function, unicode_literals
 import argparse
+import os
 import sys
 import pkgutil
 import importlib
 import pkg_resources
-from . import commands
-from .commands import config_commands
+sys.path.append(os.path.dirname(__file__))
+from embarc_tools import commands
+from embarc_tools.commands import config_commands
 
 
 def import_submodules(package, recursive=True):
