@@ -29,9 +29,10 @@ def store_gnu_toolchain(version, path):
     if not is_number(version):
         version = None
     gnu_toolchain = None
-    with cd("..embarc_cli"):
-        from .embarc_tools.toolchain import gnu
-        gnu_toolchain = gnu.Gnu()
+    os.chdir("../embarc_cli")
+    from .embarc_tools.toolchain import gnu
+    gnu_toolchain = gnu.Gnu()
+    os.chdir("../ci")
     gnu_tgz_path = gnu_toolchain.download(version, path)
     # gnu_tgz_path = download_gnu(version, path)
     gnu_root_path = None
