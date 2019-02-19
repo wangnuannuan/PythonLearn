@@ -1,9 +1,0 @@
-{
-    "APPL": "helloworld",
-    "BOARD": "emsk",
-    "BD_VER": "23",
-    "CUR_CORE": "arcem7d",
-    "TOOLCHAIN": "gnu",
-    "EMBARC_OSP_ROOT": "C:/Users/jingru/Documents/embarc/testcli/embarc_osp",
-    "OLEVEL": "O3"
-}
