@@ -2,10 +2,12 @@ from __future__ import print_function, division, unicode_literals
 try:
     # For Python 3.0 and later
     from urllib.request import urlopen, Request
+    from urllib.error import URLError
 except ImportError:
     # Fall back to Python 2's urllib2
     from urllib2 import Request
     from urllib2 import urlopen
+    from urllib2 import URLError
 import re
 import os
 from bs4 import BeautifulSoup
@@ -137,7 +139,7 @@ class Gnu(ARCtoolchain):
                         latesturl = a_url
                         break
                 return latesturl
-        except urllib2.URLError as e:
+        except URLError as e:
             if hasattr(e, "code"):
                 print_string(e, level="warning")
             if hasattr(e, "reason"):
