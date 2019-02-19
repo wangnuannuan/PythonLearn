@@ -64,6 +64,8 @@ def popen(command, **kwargs):
                 "Please verify that it's installed and accessible from your current path by executing \"%s\".\n" % (command[0], command[0]), e.args[0])
         else:
             raise e
+    except Exception as e:
+        print(e)
 
     if proc and proc.wait() != 0:
         raise ProcessException(proc.returncode, command[0], ' '.join(command), getcwd())
