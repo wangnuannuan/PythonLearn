@@ -141,7 +141,7 @@ class Gnu(ARCtoolchain):
             print(items)
             latesturl = None
             if items:
-                a_bf = BeautifulSoup(items[0])
+                a_bf = BeautifulSoup(str(items[0]))
                 a_items = a_bf.find_all('a', class_ = 'd-flex flex-items-center')
                 for a_item in a_items:
                     a_url = a_item.get('href')
