@@ -4,7 +4,7 @@ import os
 import re
 import shutil
 import argparse
-from embarc_tools.toolchain import gnu
+from ..embarc_cli.embarc_tools.toolchain import gnu
 
 def is_number(s):
     try:
