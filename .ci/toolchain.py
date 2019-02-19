@@ -1,9 +1,11 @@
 #! /usr/bin/env python
 
 import os
+import sys
 import re
 import shutil
 import argparse
+sys.path.append( os.path.join(os.path.dirname( path.dirname( os.path.abspath(__file__) ) ), embarc_cli) )
 from ..embarc_cli.embarc_tools.toolchain import gnu
 
 def is_number(s):
