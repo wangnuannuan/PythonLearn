@@ -113,32 +113,20 @@ class Gnu(ARCtoolchain):
                 return gnu_file_path
             except Exception as e:
                 print(e)
-            '''
-            if gnu_file_path is not None:
-                self.path = os.path.join(path, version, "bin")
-                shutil.move(gnu_file_path, version)
-                return self.path
-            '''
 
     def set_env(self, path=None):
         '''set environment'''
         self.set_toolchain_env("gnu", path)
 
     def _lastest_url(self):
-
-        # pattern = re.compile('<ul.*?class="mt-1 mt-md-2">(.*?)</ul>', re.S | re.M)
-        # pattern2 = re.compile('<a.*?href=(.*?) rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<strong.*?</a>', re.S | re.M)
-        # pattern = re.compile('<div class="Box Box--condensed mt-3">(.*?)</div>', re.S | re.M)
-        pattern2 = re.compile('<a.*?href=(.*?) rel="nofollow" class="d-flex flex-items-center".*?<svg.*?<span.*?</a>', re.S | re.M)
         pack_format = "_ide_win_install.exe" if self.get_platform() == "Windows" else "_prebuilt_elf32_le_linux_install.tar.gz"
         try:
             request = Request(self.root_url)
             response = urlopen(request)
             content = response.read().decode('utf-8')
 
-            div_bf = BeautifulSoup(content) # re.findall(pattern, content)
+            div_bf = BeautifulSoup(content)
             items = div_bf.find_all('div', class_ = 'Box Box--condensed mt-3')
-            print(items)
             latesturl = None
             if items:
                 a_bf = BeautifulSoup(str(items[0]))
@@ -149,13 +137,11 @@ class Gnu(ARCtoolchain):
                         latesturl = a_url
                         break
                 return latesturl
-        except Exception as e:
-            print(e)
-        '''urllib2.URLError as e:
+        except urllib2.URLError as e:
             if hasattr(e, "code"):
                 print_string(e, level="warning")
             if hasattr(e, "reason"):
                 print_string(e.reason, level="warning")
         else:
             print_string("Can not get latest veriosn Gnu")
-        '''
+        
