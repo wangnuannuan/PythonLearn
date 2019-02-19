@@ -148,10 +148,13 @@ class Gnu(ARCtoolchain):
                         latesturl = a_url
                         break
                 return latesturl
-        except urllib2.URLError as e:
+        except Exception as e:
+            print(e)
+        '''urllib2.URLError as e:
             if hasattr(e, "code"):
                 print_string(e, level="warning")
             if hasattr(e, "reason"):
                 print_string(e.reason, level="warning")
         else:
             print_string("Can not get latest veriosn Gnu")
+        '''
