@@ -5,7 +5,6 @@ import sys
 import pkgutil
 import importlib
 import pkg_resources
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from embarc_tools import commands
 from embarc_tools.commands import config_commands
 
