@@ -6,7 +6,7 @@ import os
 import argparse
 from embarc_tools.settings import CURRENT_PLATFORM
 from embarc_tools.download_manager import cd
-from embarc_tools.command import build
+from embarc_tools.commands import build
 
 class TestIde(unittest.TestCase):
     def setUp(self):
