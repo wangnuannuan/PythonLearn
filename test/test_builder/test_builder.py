@@ -35,7 +35,7 @@ class TestBuilder(unittest.TestCase):
         popen(["ls"])
         parser = argparse.ArgumentParser()
         new.setup(parser)
-        parser.quick = True
+        print(parser)
         new.run(parser)
         app_path = os.path.join(getcwd(), "helloworld") # self.app_path
         build_status = self.app_builder.build_target(app_path, target='size')
