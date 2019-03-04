@@ -31,7 +31,7 @@ class TestBuilder(unittest.TestCase):
 
     def test_build_target(self):
         popen(["ls"])
-        popen(["embarc", "new", "--quick"])
+        popen(["python", "embarc_tools/main.py", "new", "--quick"])
         app_path = os.path.join(getcwd(), "helloworld") # self.app_path
         build_status = self.app_builder.build_target(app_path, target='size')
         self.app_builder.clean(app_path)
