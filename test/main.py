@@ -4,11 +4,43 @@ import unittest
 from unittest import defaultTestLoader
 import HTMLTestRunner
 import coverage
-from embarc_tools.osp import repo, osp
-from embarc_tools.download_manager import getcwd
+from embarc_tools.osp import repo, osp, Git
+from embarc_tools.download_manager import getcwd, mkdir, cd, copy_file, untar, delete_dir_files
 from embarc_tools.toolchain import gnu
 from embarc_tools.settings import EMBARC_OSP_URL
 from embarc_tools.notify import print_string
+import tarfile
+from embarc_tools.utils import popen
+
+def deploy():
+    print("start,,,,,,,,,")
+    file = "index.tar.gz"
+    tar = tarfile.open(file, "w:gz")
+    tar.add(pythonversion + "index.html")
+    tar.close()
+    repo_slug = os.environ.get("TRAVIS_REPO_SLUG")
+    gh_token = os.environ.get("GH_TOKEN")
+    url = "https://" + gh_token + "@github.com/" + repo_slug + ".git"
+    mkdir("gh-pages")
+    with cd("gh-pages"):
+        git = Git()
+        git.init(".")
+        popen(["git", "remote", "add", "origin", url])
+        git.fetch()
+        popen(["git", "checkout", "-b", "gh-pages", "origin/gh-pages"])
+        copy_file("../index.tar.gz", ".")
+        print("start untar file index.tar.gz")
+        untar(file, ".")
+        print("delete index.tar.gz")
+        delete_dir_files(file)
+        git.add("--all")
+        git.commit("deploy html")
+        try:
+            print("start to deploy")
+            git.publish()
+        except Exception as e:
+            popen(["git", "pull", url, "gh-pages"])
+            git.publish()
 
 
 def get_allcase(case_path):
@@ -53,6 +85,7 @@ def main():
     basedir = os.path.abspath(test_dir)
     covdir = os.path.join(basedir, 'coverage')
     COV.html_report(directory=covdir)
+    deploy()
     print('HTML version: file://%s/index.html' % covdir)
     COV.erase()
 
