@@ -1,4 +1,4 @@
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2494/badge)](https://bestpractices.coreinfrastructure.org/projects/2494)
+[ ![Travis CI Status](https://travis-ci.org/foss-for-synopsys-dwc-arc-processors/embarc_tools.svg?branch=master)](https://travis-ci.org/foss-for-synopsys-dwc-arc-processors/embarc_tools) [![Latest Version](https://img.shields.io/pypi/v/embarc_cli.svg)](https://pypi.org/project/embarc_cli/) [![Supported Python versions](https://img.shields.io/pypi/pyversions/embarc_cli.svg)](https://pypi.org/project/embarc_cli/)
 ## Introduction
 embARC CLI is the name of the embARC command-line tool, packaged as `embarc_tools`. embARC CLI support for embARC application creation, build and config, use of the embARC Open Software Platform.
 
@@ -18,7 +18,7 @@ Command-line tool for embARC OSP - https://embarc.org/embarc_osp
 version 0.0.3
 
 Use "embarc <command> -h|--help" for detailed help.
-Online manual and guide available at https://github.com/foss-for-synopsys-dwc-arc-processors/embarc-cli
+Online manual and guide available at https://github.com/foss-for-synopsys-dwc-arc-processors/embarc_tools
 
 positional arguments:
   {new,build,appconfig,config}

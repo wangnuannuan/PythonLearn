@@ -5,7 +5,7 @@ import re
 import shutil
 import argparse
 import sys
-sys.path.append('embarc_cli')
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from embarc_tools.toolchain import gnu
 
 
@@ -15,14 +15,14 @@ def is_number(s):
         return True
     except ValueError:
         pass
- 
+
     try:
         import unicodedata
         unicodedata.numeric(s)
         return True
     except (TypeError, ValueError):
         pass
- 
+
     return False
 
 def store_gnu_toolchain(version, path):
