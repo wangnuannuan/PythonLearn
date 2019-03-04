@@ -5,9 +5,11 @@ from embarc_tools.utils import popen
 from embarc_tools.download_manager import getcwd
 from embarc_tools.settings import EMBARC_OSP_URL
 from embarc_tools.notify import print_string
+from embarc_tools.command import new
 import unittest
 import os
 import shutil
+import argparse
 
 
 class TestBuilder(unittest.TestCase):
@@ -31,7 +33,11 @@ class TestBuilder(unittest.TestCase):
 
     def test_build_target(self):
         popen(["ls"])
-        popen(["python", "embarc_tools/main.py", "new", "--quick"])
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--quick', action='store_true')
+        parser.quick = True
+        new.run(parser)
+        # popen(["embarc", "new", "--quick"])
         app_path = os.path.join(getcwd(), "helloworld") # self.app_path
         build_status = self.app_builder.build_target(app_path, target='size')
         self.app_builder.clean(app_path)

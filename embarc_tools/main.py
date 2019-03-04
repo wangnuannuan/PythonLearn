@@ -31,11 +31,6 @@ ver = pkg_resources.require("embarc_cli")[0].version
 
 
 def main():
-    current_version = "0.0.0"
-    try:
-        current_version = pkg_resources.require("embarc_cli")[0].version
-    except:
-        pass
     parser = argparse.ArgumentParser(
         prog='embarc',
         description="Command-line tool for embARC OSP - https://embarc.org/embarc_osp\nversion %s\n\nUse \"embarc <command> -h|--help\" for detailed help.\nOnline manual and guide available at https://github.com/foss-for-synopsys-dwc-arc-processors/embarc-cli" % ver,
@@ -43,7 +38,7 @@ def main():
     )
     parser.add_argument(
         "--version", action='version',
-        version=current_version,
+        version=pkg_resources.require("embarc_cli")[0].version,
         help="Display version"
     )
     subparsers = parser.add_subparsers(help='commands')
