@@ -37,7 +37,6 @@ class TestBuilder(unittest.TestCase):
         parser.add_argument('--quick', action='store_true')
         parser.quick = True
         new.run(parser)
-        # popen(["embarc", "new", "--quick"])
         app_path = os.path.join(getcwd(), "helloworld") # self.app_path
         build_status = self.app_builder.build_target(app_path, target='size')
         self.app_builder.clean(app_path)
