@@ -17,7 +17,7 @@ class TestIde(unittest.TestCase):
     def test_generate(self):
         if CURRENT_PLATFORM == "Windows":
             parser = argparse.ArgumentParser()
-            parser.add_argument('--path')
+            build.setup(parser)
             parser.add_argument("-g", "--export", action="store_true")
             parser.path = self.app_path
             parser.export = True

@@ -34,7 +34,7 @@ class TestBuilder(unittest.TestCase):
     def test_build_target(self):
         popen(["ls"])
         parser = argparse.ArgumentParser()
-        parser.add_argument('--quick', action='store_true')
+        new.setup(parser)
         parser.quick = True
         new.run(parser)
         app_path = os.path.join(getcwd(), "helloworld") # self.app_path
