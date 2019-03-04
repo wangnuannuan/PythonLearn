@@ -16,6 +16,7 @@ def deploy():
     print("start,,,,,,,,,")
     file = "index.tar.gz"
     tar = tarfile.open(file, "w:gz")
+    pythonversion = os.environ.get("TRAVIS_PYTHON_VERSION")
     tar.add(pythonversion + "index.html")
     tar.close()
     repo_slug = os.environ.get("TRAVIS_REPO_SLUG")
