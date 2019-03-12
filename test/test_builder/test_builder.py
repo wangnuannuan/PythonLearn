@@ -2,14 +2,13 @@ from __future__ import print_function, division
 from embarc_tools.builder import build
 from embarc_tools.osp import osp, repo
 from embarc_tools.utils import popen
-from embarc_tools.download_manager import getcwd
+from embarc_tools.download_manager import getcwd, read_json
 from embarc_tools.settings import EMBARC_OSP_URL
 from embarc_tools.notify import print_string
-from embarc_tools.commands import new
+from embarc_tools.project import Generator
 import unittest
 import os
 import shutil
-import argparse
 
 
 class TestBuilder(unittest.TestCase):
@@ -33,11 +32,25 @@ class TestBuilder(unittest.TestCase):
 
     def test_build_target(self):
         build_status = self.app_builder.build_target(self.app_path, target='size')
+        embarc_config = os.path.join(self.app_path, "embarc_app.json")
+        if CURRENT_PLATFORM == "Windows":
+            self.app_builder.get_build_cmd(self.app_path, target=None, parallel=parallel, silent=False)
+            with cd(app_path):
+                generator = Generator()
+                recordBuildConfig = read_json(embarc_config)
+                for project in generator.generate(buildopts=recordBuildConfig):
+                    project.generate()
+
+            self.assertTrue(os.path.exists(os.path.join(self.app_path, file1)))
+            self.assertTrue(os.path.exists(os.path.join(self.app_path,file2)))
         self.app_builder.clean(self.app_path)
 
     def test_get_build_info(self):
         app_path = self.app_path
+        embarc_config = os.path.join(app_path, "embarc_app.json")
         print(self.app_builder.get_build_info(app_path))
+        recordBuildConfig = read_json(embarc_config)
+        print(recordBuildConfig)
         self.app_builder.clean(app_path)
 
     def test_build_elf(self):
@@ -60,15 +73,7 @@ class TestBuilder(unittest.TestCase):
         app_path = self.app_path
         build_status = self.app_builder.get_build_size(app_path)
         print(build_status)
-
         self.app_builder.distclean(self.app_path)
-
-    '''def test_build_target_coverity(self):
-        app_path = "C:\\Users\\jingru\\Documents\\embarc_tool\\embarc_tool\\test\\testapp"
-        build_status = self.app_builder.build_target(app_path,target='all',coverity=True)
-        self.app_builder.build_coverity_result()
-        self.assertTrue(build_status["result"])
-        app_builder.distclean(self.app_path)'''
 
     def tearDown(self):
         print("test builder")
