@@ -32,13 +32,7 @@ class TestBuilder(unittest.TestCase):
         self.assertTrue(build_status["result"])
 
     def test_build_target(self):
-        popen(["ls"])
-        parser = argparse.ArgumentParser()
-        new.setup(parser)
-        print(parser)
-        new.run(parser)
-        app_path = os.path.join(getcwd(), "helloworld") # self.app_path
-        build_status = self.app_builder.build_target(app_path, target='size')
+        build_status = self.app_builder.build_target(self.app_path, target='size')
         self.app_builder.clean(app_path)
 
     def test_get_build_info(self):
