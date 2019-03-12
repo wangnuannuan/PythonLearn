@@ -33,7 +33,7 @@ class TestBuilder(unittest.TestCase):
 
     def test_build_target(self):
         build_status = self.app_builder.build_target(self.app_path, target='size')
-        self.app_builder.clean(app_path)
+        self.app_builder.clean(self.app_path)
 
     def test_get_build_info(self):
         app_path = self.app_path
