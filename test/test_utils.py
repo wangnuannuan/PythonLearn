@@ -35,11 +35,11 @@ class TestUtils(unittest.TestCase):
         print(output)
 
     def test_popen(self):
-        command = ["embarc", "osp", "--list"]
+        command = ["python", "-V"]
         self.assertIsNone(popen(command))
 
     def test_pquery(self):
-        command = ["embarc", "osp", "--list"]
+        command = ["python", "-V"]
         output = pquery(command)
         print(output)
         # self.assertEqual(output, ".0.0.1")

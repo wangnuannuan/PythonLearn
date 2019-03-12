@@ -3,7 +3,7 @@ from embarc_tools.builder import build
 from embarc_tools.osp import osp, repo
 from embarc_tools.utils import popen
 from embarc_tools.download_manager import getcwd, read_json
-from embarc_tools.settings import EMBARC_OSP_URL
+from embarc_tools.settings import EMBARC_OSP_URL, CURRENT_PLATFORM
 from embarc_tools.notify import print_string
 from embarc_tools.project import Generator
 import unittest
